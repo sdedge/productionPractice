@@ -1,4 +1,5 @@
 QT       += core gui
+QT += network    #   network - используется для работы с сетевыми классами
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
