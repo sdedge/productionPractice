@@ -24,6 +24,9 @@ private:
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений
+
+signals:
+    void signalStatusServer(QString);   //  слот для обработки состояния сервера
 };
 
 #endif // SERVER_H

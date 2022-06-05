@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "server.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -18,6 +20,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Server *server;
+
+public slots:
+    void slotStatusServer(QString status);
 
 };
 

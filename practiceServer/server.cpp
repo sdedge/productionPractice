@@ -2,9 +2,12 @@
 
 Server::Server(){
     if(this->listen(QHostAddress::Any, 2323)){
-        ui->label->setText("Server start");
+//        ui->label->setText("Server start");
+        emit signalStatusServer("Server start");
+        qDebug() << "start";
     } else {
-        ui->label->setText("Something happened :(");
+//        ui->label->setText("Something happened :(");
+//        emit signalStatusServer();
     }
 }
 
@@ -16,7 +19,7 @@ void Server::incomingConnection(qintptr socketDescriptor){
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
 
     Sockets.push_back(socket);
-    ui->statusbar->showMessage("new client");
+//    ui->statusbar->showMessage("new client");
 }
 
 void Server::slotReadyRead(){
@@ -24,11 +27,11 @@ void Server::slotReadyRead(){
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_6_2);
     if(in.status() == QDataStream::Ok){
-        ui->statusbar->showMessage("reading...");
+//        ui->statusbar->showMessage("reading...");
         QString str;
         in >> str;
     } else {
-        ui->statusbar->showMessage("Something happened :(");
+//        ui->statusbar->showMessage("Something happened :(");
     }
 }
 
