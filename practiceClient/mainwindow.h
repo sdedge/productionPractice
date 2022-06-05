@@ -31,7 +31,7 @@ private:
 
     void SendToServer(QString str);
 
-    quint16 nextBlockSize;
+    quint16 nextBlockSize;  //  переменная для хранения размера блока текста
 
 public slots:
     void slotReadyRead();
