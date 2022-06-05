@@ -21,6 +21,8 @@ private:
 
     void SendToClient(QString str);    //  функция для передачи данных клиенту
 
+    quint16 nextBlockSize;
+
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений
