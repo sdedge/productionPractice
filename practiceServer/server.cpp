@@ -23,7 +23,7 @@ void Server::incomingConnection(qintptr socketDescriptor){
 }
 
 void Server::slotReadyRead(){
-    socket = (QTcpSocket*)sender();
+    socket = (QTcpSocket*)sender(); //  записываем именно тот сокет, с которого пришел запрос
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_6_2);
     if(in.status() == QDataStream::Ok){
@@ -36,9 +36,11 @@ void Server::slotReadyRead(){
 }
 
 void Server::SendToClient(QString str){
-    Data.clear();
+    Data.clear();   //  может быть мусор
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
     out << str;
-    socket->write(Data);
+    for(int i = 0; i < Sockets.size(); i++){
+        Sockets[i]->write(Data);
+    }
 }

@@ -6,9 +6,14 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    server = new Server;
+//    server = new Server;
 
-    connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
+//    connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
+
+    /// не будет ли дублирование сервера, если я тут делаю
+    /// server = new Server
+    /// а в main.cpp создаю сам сервер через Server s
+    /// ?
 }
 
 MainWindow::~MainWindow()
@@ -18,7 +23,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::slotStatusServer(QString status)
 {
-    ui->label->setText(status);
+//    ui->label->setText(status);
 }
 
 
