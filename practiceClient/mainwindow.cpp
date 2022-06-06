@@ -59,6 +59,17 @@ void MainWindow::SendFileToServer(QString filePath)
 
     if(file.open(QIODevice::WriteOnly)){
         ui->filePathLabel->setText("File open");
+
+//        QDataStream fileData(&file);
+
+//        QDataStream out(&Data, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_6_2);
+//        out << fileData;   //  пока сообщение оправлено, мы не можем определить размер блока
+//        out.device()->seek(0);
+//        out << quint16(Data.size() - sizeof(quint16));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+//        socket->write(Data);
+    } else {
+        ui->filePathLabel->setText("File not open :(");
     }
 }
 

@@ -22,27 +22,28 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-//    QTcpSocket *socket;
+    QTcpSocket *socket;
 
 private:
     Ui::MainWindow *ui;
-//    QTcpServer *server;
+    QTcpServer* server;
 
-//    QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
-//    QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
+    QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
+    QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
 
-//    void SendToClient(QString str);    //  функция для передачи данных клиенту
+    void SendToClient(QString str);    //  функция для передачи данных клиенту
 
-//    quint16 nextBlockSize;
+    quint16 nextBlockSize;
 
 public slots:
-//    void slotStatusServer(QString status);
+    void slotStatusServer(QString status);
 
 //    void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
-//    void slotReadyRead();   //  обработчик полученных от клиента сообщений
+    void slotNewConnection();
+    void slotReadyRead();   //  обработчик полученных от клиента сообщений
 
 signals:
-//    void signalStatusServer(QString);   //  слот для обработки состояния сервера
+    void signalStatusServer(QString);   //  слот для обработки состояния сервера
 
 };
 
