@@ -81,3 +81,11 @@ void MainWindow::on_lineEdit_returnPressed()    //  сообщение такж�
     SendToServer(ui->lineEdit->text());
 }
 
+
+void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на "Open file"
+{
+    QString filePath;
+    filePath = QFileDialog::getOpenFileName(this, "Выбор файла", "C:\\");   //  открываем диалоговое окно с заголовком "Выбор файла" и по умолчанию ставим путь C:/
+    ui->filePathLabel->setText(filePath);   //  устанавливаем путь в label для наглядности
+}
+

@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTcpSocket>
+#include <QTcpSocket>   //  класс сервера
+
+#include <QFileDialog>  //  класс работы с диалоговыми окнами (выбор файла)
 
 
 QT_BEGIN_NAMESPACE
@@ -23,6 +25,8 @@ private slots:
     void on_sendPushButton_clicked();
 
     void on_lineEdit_returnPressed();
+
+    void on_openFilePushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
