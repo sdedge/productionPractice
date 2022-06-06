@@ -13,16 +13,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
-    completer = new QCompleter(this);
+    completer = new QCompleter(this);   //  создаем completer
 
-    fModel = new QFileSystemModel();
-    fModel->setRootPath(QDir::currentPath() + "\\");
+    fModel = new QFileSystemModel();    //  создаем модель системы
+    fModel->setRootPath(QDir::currentPath() + "\\");    //  устанавливаем разделитель
 
-    completer->setModel(fModel);
+    completer->setModel(fModel);    //  completer'у устанавливаем модель
 
     completer->setCompletionMode(QCompleter::CompletionMode(0));    //  подсказки во всплывающем окне (2 - как выделенный текст, идущий далее)
     completer->setModelSorting(QCompleter::ModelSorting(2));    //  НЕ чувствительно к регистру (0 -  не сортировать, 1 - чувствительно к регистру)
-//    completer->setCompletionPrefix("/");    //  устанавливаем завершающий префикс
 
     ui->filePathLineEdit->setCompleter(completer);
 }
