@@ -52,6 +52,16 @@ void MainWindow::SendToServer(QString str)
     ui->lineEdit->clear();  //  чистим lineEdit после отправки сообщения
 }
 
+void MainWindow::SendFileToServer(QString filePath)
+{
+    Data.clear();
+    QFile file(filePath);
+
+    if(file.open(QIODevice::WriteOnly)){
+        ui->filePathLabel->setText("File open");
+    }
+}
+
 void MainWindow::slotReadyRead()
 {
     QDataStream in(socket); //  создание объекта "in", помогающий работать с данными в сокете
@@ -82,7 +92,7 @@ void MainWindow::slotReadyRead()
 }
 
 
-void MainWindow::on_sendPushButton_clicked()
+void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Send msg"
 {
     SendToServer(ui->lineEdit->text());
 }
@@ -94,10 +104,18 @@ void MainWindow::on_lineEdit_returnPressed()    //  сообщение такж�
 }
 
 
-void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на "Open file"
+void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на "Or open file"
 {
     QString filePath;
     filePath = QFileDialog::getOpenFileName(this, "Выбор файла", "C:\\");   //  открываем диалоговое окно с заголовком "Выбор файла" и по умолчанию ставим путь C:/
     ui->filePathLabel->setText(filePath);   //  устанавливаем путь в label для наглядности
+}
+
+
+void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на "Send file"
+{
+    ui->filePathLabel->setText(ui->filePathLineEdit->text());   //  для наглядности устанавливаем в label путь к файлу
+    ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
+    SendFileToServer(QString(ui->filePathLabel->text()));    //  передаем функции этот же текст
 }
 
