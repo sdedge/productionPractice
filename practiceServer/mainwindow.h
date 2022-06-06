@@ -3,7 +3,11 @@
 
 #include <QMainWindow>
 
-#include "server.h"
+///  ========================    классы для работы сервера
+#include <QTcpServer>
+#include <QTcpSocket>
+///  ========================
+#include <QVector>        //    класс вектора для хранения созданных сокетов
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,12 +22,27 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+//    QTcpSocket *socket;
+
 private:
     Ui::MainWindow *ui;
-    Server *server;
+//    QTcpServer *server;
+
+//    QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
+//    QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
+
+//    void SendToClient(QString str);    //  функция для передачи данных клиенту
+
+//    quint16 nextBlockSize;
 
 public slots:
-    void slotStatusServer(QString status);
+//    void slotStatusServer(QString status);
+
+//    void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
+//    void slotReadyRead();   //  обработчик полученных от клиента сообщений
+
+signals:
+//    void signalStatusServer(QString);   //  слот для обработки состояния сервера
 
 };
 
