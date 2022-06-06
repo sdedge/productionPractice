@@ -12,6 +12,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении сокет сам удалится
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
+
+    completer = new QCompleter(this);
+
+    fModel = new QFileSystemModel();
+    fModel->setRootPath(QDir::currentPath() + "\\");
+
+    completer->setModel(fModel);
+
+    completer->setCompletionMode(QCompleter::CompletionMode(0));    //  подсказки во всплывающем окне (2 - как выделенный текст, идущий далее)
+    completer->setModelSorting(QCompleter::ModelSorting(2));    //  НЕ чувствительно к регистру (0 -  не сортировать, 1 - чувствительно к регистру)
+//    completer->setCompletionPrefix("/");    //  устанавливаем завершающий префикс
+
+    ui->filePathLineEdit->setCompleter(completer);
 }
 
 MainWindow::~MainWindow()

@@ -5,6 +5,8 @@
 #include <QTcpSocket>   //  класс сервера
 
 #include <QFileDialog>  //  класс работы с диалоговыми окнами (выбор файла)
+#include <QCompleter>
+#include <QFileSystemModel>
 
 
 QT_BEGIN_NAMESPACE
@@ -32,6 +34,9 @@ private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
     QByteArray Data;
+
+    QCompleter *completer;
+    QFileSystemModel *fModel;
 
     void SendToServer(QString str);
 
