@@ -2,13 +2,10 @@
 
 Server::Server(bool &server_started){
     if(this->listen(QHostAddress::Any, 2323)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
-//        ui->label->setText("Server start");
         server_started = true;
         qDebug() << "start";
     } else {
         server_started = false;
-//        ui->label->setText("Something happened :(");
-//        emit signalStatusServer();
     }
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 }
@@ -21,7 +18,8 @@ void Server::incomingConnection(qintptr socketDescriptor){
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
 
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
-//    ui->statusbar->showMessage("new client");
+
+    Server::signalStatusServer("new client on " + QString::number(socketDescriptor));
     qDebug() << "new client on " << socketDescriptor;
 }
 
@@ -52,7 +50,7 @@ void Server::slotReadyRead(){
             break;
         }
     } else {
-//        ui->statusbar->showMessage("Something happened :(");
+        Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
     }
 }
 

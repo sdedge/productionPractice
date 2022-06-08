@@ -9,6 +9,8 @@
 ///  ========================
 #include <QVector>        //    класс вектора для хранения созданных сокетов
 
+#include <QFileDialog>
+
 #include "server.h"
 
 QT_BEGIN_NAMESPACE
@@ -40,13 +42,8 @@ private:
 public slots:
     void slotStatusServer(QString status);
 
-////    void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
-//    void slotNewConnection();
-//    void slotReadyRead();   //  обработчик полученных от клиента сообщений
-
-signals:
-    void signalStatusServer(QString);   //  слот для обработки состояния сервера
-
+private slots:
+    void on_chooseSaveDirPushButton_clicked();
 };
 
 #endif // MAINWINDOW_H
