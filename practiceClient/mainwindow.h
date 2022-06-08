@@ -8,6 +8,7 @@
 #include <QCompleter>
 #include <QFileSystemModel>
 #include <QFile>
+#include <QFileInfo>
 
 
 QT_BEGIN_NAMESPACE
@@ -40,6 +41,9 @@ private:
 
     QCompleter *completer;  //  автодополнение вводимого пути файла
     QFileSystemModel *fModel;   //  файловая модель
+
+    int fileSize;   //  размер файла
+    QString fileName;   //  его название
 
     void SendToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути

@@ -57,17 +57,21 @@ void MainWindow::SendFileToServer(QString filePath)
     Data.clear();
     QFile file(filePath);
 
-    if(file.open(QIODevice::WriteOnly)){
+    if(file.open(QIODevice::ReadOnly)){
         ui->filePathLabel->setText("File open");
-
-//        QDataStream fileData(&file);
-
-//        QDataStream out(&Data, QIODevice::WriteOnly);
-//        out.setVersion(QDataStream::Qt_6_2);
-//        out << fileData;   //  пока сообщение оправлено, мы не можем определить размер блока
+        fileSize = file.size();     //  определяем размер файла
+        QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
+        fileName = fileInfo.fileName();     //  записываем название файла
+        ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
+        char* bytes = new char[fileSize];   //  выделяем байты под файл
+        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
+        QDataStream out(&Data, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_2);
+        out << fileName << fileSize; //<< bytes;   //  отправляем наше название файла, размер и байты
 //        out.device()->seek(0);
-//        out << quint16(Data.size() - sizeof(quint16));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-//        socket->write(Data);
+        socket->write(Data);
+//        file.close();
+//        delete[] bytes;
     } else {
         ui->filePathLabel->setText("File not open :(");
     }
@@ -127,6 +131,6 @@ void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на
 {
     ui->filePathLabel->setText(ui->filePathLineEdit->text());   //  для наглядности устанавливаем в label путь к файлу
     ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
-    SendFileToServer(QString(ui->filePathLabel->text()));    //  передаем функции этот же текст
+    SendFileToServer(ui->filePathLabel->text());    //  передаем функции этот же текст
 }
 

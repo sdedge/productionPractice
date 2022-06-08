@@ -15,6 +15,7 @@ void Server::incomingConnection(qintptr socketDescriptor){
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, индентифицирующее поток ввода-вывода)
 
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);
+    connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyFileRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
 
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
@@ -46,9 +47,39 @@ void Server::slotReadyRead(){
             QString str;    //  т.к. у нас пока чат, то сервер и клиент будут обмениваться только текстом
             in >> str;  //  записываем в нее строку из объекта in
             nextBlockSize = 0;
+            //  оформляем чат на стороне Сервера
+            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);
             SendToClient(str);  //  отправляем клиенту сообщение
             break;
         }
+    } else {
+        Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
+    }
+}
+
+void Server::slotReadyFileRead()
+{
+    socket = (QTcpSocket*)sender(); //  записываем именно тот сокет, с которого пришел запрос
+    QDataStream in(socket); //  создание объекта "in", помогающий работать с данными в сокете
+    in.setVersion(QDataStream::Qt_6_2); //  установка версии, чтобы не было ошибок
+    if(in.status() == QDataStream::Ok){ //  если у нас нет ошибок в состоянии работы in
+//        ui->statusbar->showMessage("reading...");
+        QFile file;     //  определяем файл
+        in >> fileName >> fileSize; //  считываем его название
+        Server::signalStatusServer(fileName);
+//        file.setFileName(fileName);     //  устанавливаем это название файлу
+//        if(file.open(QIODevice::WriteOnly)){
+//            in << fileSize;     //  записываем размер файла из объекта in
+//            char* bytes = new char[fileSize];   //  выделяем байты под файл
+//            in << bytes;    //  считываем байты
+//            file.write(bytes, fileSize);    //  записываем файл
+//            nextBlockSize = 0;
+//            //  оформляем чат на стороне Сервера
+//            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file");
+//            file.close();
+//        }
+        //SendToClient(str);  //  отправляем клиенту сообщение
+
     } else {
         Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
     }
