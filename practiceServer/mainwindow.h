@@ -9,6 +9,8 @@
 ///  ========================
 #include <QVector>        //    класс вектора для хранения созданных сокетов
 
+#include "server.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -26,7 +28,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QTcpServer* server;
+    Server* server;
 
     QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
     QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
@@ -38,9 +40,9 @@ private:
 public slots:
     void slotStatusServer(QString status);
 
-//    void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
-    void slotNewConnection();
-    void slotReadyRead();   //  обработчик полученных от клиента сообщений
+////    void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
+//    void slotNewConnection();
+//    void slotReadyRead();   //  обработчик полученных от клиента сообщений
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера

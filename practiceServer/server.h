@@ -12,7 +12,7 @@
 class Server : public QTcpServer{   //  создание класса сервера, унаследованного от QTcpServer'a
     Q_OBJECT
 public:
-    Server();
+    Server(bool &server_started);
     QTcpSocket *socket;
 
 private:

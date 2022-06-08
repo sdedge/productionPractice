@@ -1,11 +1,12 @@
 #include "server.h"
 
-Server::Server(){
+Server::Server(bool &server_started){
     if(this->listen(QHostAddress::Any, 2323)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
 //        ui->label->setText("Server start");
-        emit signalStatusServer("Server start");
+        server_started = true;
         qDebug() << "start";
     } else {
+        server_started = false;
 //        ui->label->setText("Something happened :(");
 //        emit signalStatusServer();
     }
