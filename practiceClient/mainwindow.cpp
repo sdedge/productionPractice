@@ -37,6 +37,13 @@ void MainWindow::on_connectToServerPushButton_clicked()
     //  TODO: сделать программным способом задание значений для подключения
 
     socket->connectToHost("127.0.0.1", 2323);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
+
+    ui->filePathLineEdit->setEnabled(true);
+    ui->lineEdit->setEnabled(true);
+    ui->openFilePushButton->setEnabled(true);
+    ui->sendFilePushButton->setEnabled(true);
+    ui->sendMsgPushButton->setEnabled(true);
+    ui->textBrowser->setEnabled(true);
 }
 
 void MainWindow::SendToServer(QString str)
@@ -113,7 +120,12 @@ void MainWindow::slotReadyRead()
 
 void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Send msg"
 {
-    SendToServer("MESS:"+ui->lineEdit->text());
+    if(!ui->lineEdit->text().isEmpty()){
+        ui->filePathLabel->clear();
+        SendToServer("MESS:"+ui->lineEdit->text());
+    } else {
+        ui->filePathLabel->setText("Your msg is empty!");
+    }
 }
 
 
@@ -133,10 +145,16 @@ void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на
 
 void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на "Send file"
 {
-    QString filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
+    QString filePath;   //  определяем наш путь к файлу
+    if(ui->filePathLabel->text().isEmpty()){    //  если показательный label пуст
+        filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
 
-    ui->filePathLabel->setText(filePath);   //  для наглядности устанавливаем в label путь к файлу
-    ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
+        ui->filePathLabel->setText(filePath);   //  для наглядности устанавливаем в label путь к файлу
+        ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
+    } else {
+        filePath = ui->filePathLabel->text();   //  иначе в переменную путь сохраняется напрямую
+    }
+
 
     SendFileToServer(filePath); //  отправляем серверу файл
 

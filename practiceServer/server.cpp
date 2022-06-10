@@ -50,12 +50,14 @@ void Server::slotReadyRead(){
                 SendToClient(str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
             } else {    //  отправляется файл
                 SendToClient("Файл загружен");
-                QFile file(str);     //  определяем файл
+                QFile file;     //  определяем файл
                 in >> fileSize; //  считываем его название
                 char *bytes = new char[fileSize];   //  выделяем байты под файл
                 in >> bytes;    //  считываем байты
 //                file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
-//                file.setFileName(str);
+
+                file.setFileName(str);
+                QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
 
                 /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
                 /// представляет собой стек. Изначально достав данные в переменную str оказалось,

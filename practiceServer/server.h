@@ -10,6 +10,7 @@
 #include <QVector>        //    класс вектора для хранения созданных сокетов
 
 #include <QFile>
+#include <QDir>
 
 class Server : public QTcpServer{   //  создание класса сервера, унаследованного от QTcpServer'a
     Q_OBJECT
