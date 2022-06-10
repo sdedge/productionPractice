@@ -63,7 +63,6 @@ void Server::slotReadyRead(){
                     delete[] bytes;
                     file.close();
                 }
-                FileFlag = 0;
             }
 
             nextBlockSize = 0;
