@@ -63,11 +63,11 @@ void MainWindow::SendFileToServer(QString filePath)
         QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
         fileName = fileInfo.fileName();     //  записываем название файла
         ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
-        char* bytes = new char[fileSize];   //  выделяем байты под файл
-        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
+//        char* bytes = new char[fileSize];   //  выделяем байты под файл
+//        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
         QDataStream out(&Data, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_6_2);
-        out << fileName << fileSize; //<< bytes;   //  отправляем наше название файла, размер и байты
+        out << quint8(1) << fileName << fileSize; //<< bytes;   //  отправляем наше название файла, размер и байты
 //        out.device()->seek(0);
         socket->write(Data);
 //        file.close();
@@ -129,8 +129,18 @@ void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на
 
 void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на "Send file"
 {
-    ui->filePathLabel->setText(ui->filePathLineEdit->text());   //  для наглядности устанавливаем в label путь к файлу
+    QString filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
+
+    ui->filePathLabel->setText(filePath);   //  для наглядности устанавливаем в label путь к файлу
     ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
-    SendFileToServer(ui->filePathLabel->text());    //  передаем функции этот же текст
+
+    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
+
+    fileSize = file.size();     //  определяем размер файла
+    QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
+    fileName = fileInfo.fileName();     //  записываем название файла
+    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
+
+    SendToServer("FILE:"+QString::number(fileSize)+" "+fileName);    //  передаем функции ключ "FILE:", размер и название файла
 }
 

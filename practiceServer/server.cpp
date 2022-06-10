@@ -15,7 +15,6 @@ void Server::incomingConnection(qintptr socketDescriptor){
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, индентифицирующее поток ввода-вывода)
 
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);
-    connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyFileRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
 
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
@@ -43,12 +42,18 @@ void Server::slotReadyRead(){
                 qDebug() << "Data not full";    //  если данные пришли не полностью
                 break;
             }
+
             //  надо же, мы до сих пор в цикле, все хорошо
             QString str;    //  т.к. у нас пока чат, то сервер и клиент будут обмениваться только текстом
             in >> str;  //  записываем в нее строку из объекта in
+            if(str.contains("FILE:")){
+                Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" send new file: "+str);
+            } else {
+                Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);
+            }
             nextBlockSize = 0;
             //  оформляем чат на стороне Сервера
-            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);
+
             SendToClient(str);  //  отправляем клиенту сообщение
             break;
         }
