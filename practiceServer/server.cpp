@@ -43,23 +43,28 @@ void Server::slotReadyRead(){
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
-            QString str;    //  т.к. у нас пока чат, то сервер и клиент будут обмениваться только текстом
-            in >> str;  //  записываем в нее строку из объекта in
-            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-            if(str.startsWith("MESS:")){     //  если у нас нет подстроки-префикса "FILE:"
-                SendToClient(str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:"
+            QString str;    //  создаем переменную строки
+            in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
+            if(str.startsWith("MESS:")){     //  если у нас есть подстрока-префикс "FILE:"
+                Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
+                SendToClient(str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
             } else {    //  отправляется файл
-                QFile file;     //  определяем файл
-                in >> fileName >> fileSize; //  считываем его название
+                SendToClient("Файл загружен");
+                QFile file(str);     //  определяем файл
+                in >> fileSize; //  считываем его название
                 char *bytes = new char[fileSize];   //  выделяем байты под файл
-                Server::signalStatusServer(fileName);
+                in >> bytes;    //  считываем байты
+//                file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
+//                file.setFileName(str);
 
-                file.setFileName(fileName);     //  устанавливаем это название файлу
+                /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
+                /// представляет собой стек. Изначально достав данные в переменную str оказалось,
+                /// что оно хранит название файла
 
                 if(file.open(QIODevice::WriteOnly)){
                     file.write(bytes, fileSize);    //  записываем файл
                     //  оформляем чат на стороне Сервера
-                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file");
+                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     delete[] bytes;
                     file.close();
                 }
@@ -100,6 +105,11 @@ void Server::slotReadyFileRead()
     } else {
         Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
     }
+}
+
+void Server::slotNewSaveDir(QString newDirPath)
+{
+    this->newDirPath = newDirPath;  //  установили новую директорию
 }
 
 void Server::SendToClient(QString str){

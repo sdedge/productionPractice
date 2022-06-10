@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
+//    connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 }

@@ -44,6 +44,9 @@ public slots:
 
 private slots:
     void on_chooseSaveDirPushButton_clicked();
+
+signals:
+    void signalNewSaveDir(QString);   //  слот для обработки директории сохранения
 };
 
 #endif // MAINWINDOW_H
