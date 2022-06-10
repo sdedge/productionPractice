@@ -7,17 +7,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    bool server_started = false;
+    bool server_started = false;    //  изначально наш сервер выключен
 
-    server = new Server(server_started);
+    server = new Server(server_started);    //  создаем сервер, передавая его состояние, которое изменится в конструкторе
 
-    if(server_started)
+    if(server_started)  //  проверка состояния "true"
         {
-            ui->infoAboutServerTextEdit->append("Сервер запущен");
+            ui->infoAboutServerTextEdit->append("Сервер запущен");  //  уведомление
         }
         else
         {
-            ui->infoAboutServerTextEdit->append("Сервер не запущен");
+            ui->infoAboutServerTextEdit->append("Сервер не запущен");   //  уведомление
         }
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
@@ -31,10 +31,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::slotStatusServer(QString status)
+void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
 {
-    qDebug() << status;
-    ui->infoAboutServerTextEdit->append(status);
+    qDebug() << status; //  вывод в консоль статуса
+    ui->infoAboutServerTextEdit->append(status);    //  и также в textEdit
 }
 
 

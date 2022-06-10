@@ -30,20 +30,20 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Server* server;
+    Server* server;     //  создаем экземпляр сервера
 
     QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
     QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
 
     void SendToClient(QString str);    //  функция для передачи данных клиенту
 
-    quint16 nextBlockSize;
+    quint16 nextBlockSize;  //  размер блока сообщения
 
 public slots:
-    void slotStatusServer(QString status);
+    void slotStatusServer(QString status);  //  обработчик статуса сервера
 
 private slots:
-    void on_chooseSaveDirPushButton_clicked();
+    void on_chooseSaveDirPushButton_clicked();  //  по нажатию на "Choose save directory"
 
 signals:
     void signalNewSaveDir(QString);   //  слот для обработки директории сохранения

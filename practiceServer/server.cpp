@@ -2,24 +2,24 @@
 
 Server::Server(bool &server_started){
     if(this->listen(QHostAddress::Any, 2323)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
-        server_started = true;
-        qDebug() << "start";
+        server_started = true;  //  меняем состояние сервера
+        qDebug() << "start";    //  уведомляем в консоли
     } else {
-        server_started = false;
+        server_started = false; //  иначе что-то пошло не так
     }
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 }
 
-void Server::incomingConnection(qintptr socketDescriptor){
-    socket = new QTcpSocket;    //  создание нового сокета
+void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
+    socket = new QTcpSocket;    //  создание нового сокета под нового клиента
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, индентифицирующее поток ввода-вывода)
 
-    connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);
+    connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);  //  связка готовности чтения
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
 
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
 
-    Server::signalStatusServer("new client on " + QString::number(socketDescriptor));
+    Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
     qDebug() << "new client on " << socketDescriptor;
 }
 
@@ -66,14 +66,15 @@ void Server::slotReadyRead(){
                 if(file.open(QIODevice::WriteOnly)){
                     file.write(bytes, fileSize);    //  записываем файл
                     //  оформляем чат на стороне Сервера
+                    //  уведомление о "кто: какой файл"
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
-                    delete[] bytes;
-                    file.close();
+                    delete[] bytes; //  удаляем из кучи массив
+                    file.close();   //закрываем файл
                 }
             }
 
-            nextBlockSize = 0;
-            break;
+            nextBlockSize = 0;  //  обнуляем для новых сообщений
+            break;  //  выходим, делать больше нечего
 
         }
     } else {
@@ -81,46 +82,18 @@ void Server::slotReadyRead(){
     }
 }
 
-void Server::slotReadyFileRead()
-{
-    socket = (QTcpSocket*)sender(); //  записываем именно тот сокет, с которого пришел запрос
-    QDataStream in(socket); //  создание объекта "in", помогающий работать с данными в сокете
-    in.setVersion(QDataStream::Qt_6_2); //  установка версии, чтобы не было ошибок
-    if(in.status() == QDataStream::Ok){ //  если у нас нет ошибок в состоянии работы in
-//        ui->statusbar->showMessage("reading...");
-        QFile file;     //  определяем файл
-        in >> fileName >> fileSize; //  считываем его название
-        Server::signalStatusServer(fileName);
-//        file.setFileName(fileName);     //  устанавливаем это название файлу
-//        if(file.open(QIODevice::WriteOnly)){
-//            in << fileSize;     //  записываем размер файла из объекта in
-//            char* bytes = new char[fileSize];   //  выделяем байты под файл
-//            in << bytes;    //  считываем байты
-//            file.write(bytes, fileSize);    //  записываем файл
-//            nextBlockSize = 0;
-//            //  оформляем чат на стороне Сервера
-//            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file");
-//            file.close();
-//        }
-        //SendToClient(str);  //  отправляем клиенту сообщение
-
-    } else {
-        Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
-    }
-}
-
-void Server::slotNewSaveDir(QString newDirPath)
+void Server::slotNewSaveDir(QString newDirPath) //  пока неработающий обработчик новой директории
 {
     this->newDirPath = newDirPath;  //  установили новую директорию
 }
 
-void Server::SendToClient(QString str){
+void Server::SendToClient(QString str){ //  отправка клиенту сообщений
     Data.clear();   //  может быть мусор
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << str;
-    out.device()->seek(0);
-    out << quint16(Data.size() - sizeof(quint16));
+    out << quint16(0) << str;   //  записываем в поток размер сообщения и строку
+    out.device()->seek(0);  //  в начало потока
+    out << quint16(Data.size() - sizeof(quint16));  //  высчитываем размер сообщения
     for(int i = 0; i < Sockets.size(); i++){    //  пробегаемся по всем сокетам и
         Sockets[i]->write(Data);    //  отправляем по соответствующему сокету данные
     }

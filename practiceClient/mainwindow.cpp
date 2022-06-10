@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     completer->setCompletionMode(QCompleter::CompletionMode(0));    //  подсказки во всплывающем окне (2 - как выделенный текст, идущий далее)
     completer->setModelSorting(QCompleter::ModelSorting(2));    //  НЕ чувствительно к регистру (0 -  не сортировать, 1 - чувствительно к регистру)
 
-    ui->filePathLineEdit->setCompleter(completer);
+    ui->filePathLineEdit->setCompleter(completer);  //  устанавливам completer
 }
 
 MainWindow::~MainWindow()
@@ -38,6 +38,7 @@ void MainWindow::on_connectToServerPushButton_clicked()
 
     socket->connectToHost("127.0.0.1", 2323);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
 
+    //  включаем интерфейс
     ui->filePathLineEdit->setEnabled(true);
     ui->lineEdit->setEnabled(true);
     ui->openFilePushButton->setEnabled(true);
@@ -48,13 +49,13 @@ void MainWindow::on_connectToServerPushButton_clicked()
 
 void MainWindow::SendToServer(QString str)
 {
-    Data.clear();
-    QDataStream out(&Data, QIODevice::WriteOnly);
+    Data.clear();   //  чистим массив байт
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
     out.setVersion(QDataStream::Qt_6_2);
     out << quint16(0) << str;   //  пока сообщение оправлено, мы не можем определить размер блока
-    out.device()->seek(0);
+    out.device()->seek(0);  //  передвигаемся в начало
     out << quint16(Data.size() - sizeof(quint16));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-    socket->write(Data);
+    socket->write(Data);    //  записываем данные в сокет
 
     ui->lineEdit->clear();  //  чистим lineEdit после отправки сообщения
 }
@@ -67,9 +68,9 @@ void MainWindow::SendFileToServer(QString filePath)
     fileSize = file.size();     //  определяем размер файла
     QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
     fileName = fileInfo.fileName();     //  записываем название файла
-    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
+    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
 
-    char *bytes = new char[fileSize];   //  выделяем байты под файл
+    char *bytes = new char[fileSize];   //  выделяем в куче байты под файл
     if(file.open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
         file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
         file.close();                   //  закрываем файл
@@ -82,7 +83,7 @@ void MainWindow::SendFileToServer(QString filePath)
         out.device()->seek(0);
         socket->write(Data);
 
-        delete[] bytes;
+        delete[] bytes; //  удаляем из кучи массив байт
     } else {
         ui->filePathLabel->setText("File not open :(");
     }
@@ -107,7 +108,7 @@ void MainWindow::slotReadyRead()
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
-            QString str;
+            QString str;    //  определяем переменную, в которую сохраним данные
             in >> str;  //  выводим в переменную сообщение
             nextBlockSize = 0;  //  обнуляем размер блока для последующего
             ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
@@ -120,18 +121,18 @@ void MainWindow::slotReadyRead()
 
 void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Send msg"
 {
-    if(!ui->lineEdit->text().isEmpty()){
-        ui->filePathLabel->clear();
-        SendToServer("MESS:"+ui->lineEdit->text());
+    if(!ui->lineEdit->text().isEmpty()){    //  проверка на то, НЕ пустое ли сообщение
+        ui->filePathLabel->clear();     //  чистим от предыдущего уведомления
+        SendToServer("MESS:"+ui->lineEdit->text());     //  отправляем сообщение со служебным префиксом
     } else {
-        ui->filePathLabel->setText("Your msg is empty!");
+        ui->filePathLabel->setText("Your msg is empty!");   //  уведомляем о пустом сообщении
     }
 }
 
 
 void MainWindow::on_lineEdit_returnPressed()    //  сообщение также отправится, если нажать клавишу Enter
 {
-    SendToServer("MESS:"+ui->lineEdit->text());
+    SendToServer("MESS:"+ui->lineEdit->text()); //  отправляем сообщение со служебным префиксом
 }
 
 
@@ -155,9 +156,6 @@ void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на
         filePath = ui->filePathLabel->text();   //  иначе в переменную путь сохраняется напрямую
     }
 
-
     SendFileToServer(filePath); //  отправляем серверу файл
-
-//    SendToServer("FILE:"+QString::number(fileSize)+" "+fileName);    //  передаем функции ключ "FILE:", размер и название файла
 }
 

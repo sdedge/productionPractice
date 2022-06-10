@@ -9,8 +9,8 @@
 ///  ========================
 #include <QVector>        //    класс вектора для хранения созданных сокетов
 
-#include <QFile>
-#include <QDir>
+#include <QFile>    //  для работы с файлами
+#include <QDir>     //  для работы с директорией
 
 class Server : public QTcpServer{   //  создание класса сервера, унаследованного от QTcpServer'a
     Q_OBJECT
@@ -31,8 +31,7 @@ private:
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
-    void slotReadyRead();   //  обработчик полученных от клиента сообщений
-    void slotReadyFileRead();   //  обработчик полученных от клиента файлов
+    void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
     void slotNewSaveDir(QString newDirPath);  //  обработчик новой директории
 
 signals:
