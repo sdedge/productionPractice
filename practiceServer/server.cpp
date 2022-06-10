@@ -42,16 +42,33 @@ void Server::slotReadyRead(){
                 qDebug() << "Data not full";    //  если данные пришли не полностью
                 break;
             }
-
             //  надо же, мы до сих пор в цикле, все хорошо
             QString str;    //  т.к. у нас пока чат, то сервер и клиент будут обмениваться только текстом
             in >> str;  //  записываем в нее строку из объекта in
             Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-            if(!str.startsWith("FILE:")){     //  если у нас нет подстроки-префикса "FILE:"
+            if(str.startsWith("MESS:")){     //  если у нас нет подстроки-префикса "FILE:"
                 SendToClient(str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:"
+            } else {    //  отправляется файл
+                QFile file;     //  определяем файл
+                in >> fileName >> fileSize; //  считываем его название
+                char *bytes = new char[fileSize];   //  выделяем байты под файл
+                Server::signalStatusServer(fileName);
+
+                file.setFileName(fileName);     //  устанавливаем это название файлу
+
+                if(file.open(QIODevice::WriteOnly)){
+                    file.write(bytes, fileSize);    //  записываем файл
+                    //  оформляем чат на стороне Сервера
+                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file");
+                    delete[] bytes;
+                    file.close();
+                }
+                FileFlag = 0;
             }
+
             nextBlockSize = 0;
             break;
+
         }
     } else {
         Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения

@@ -54,24 +54,28 @@ void MainWindow::SendToServer(QString str)
 
 void MainWindow::SendFileToServer(QString filePath)
 {
-    Data.clear();
-    QFile file(filePath);
+    Data.clear();   //  чистим массив байт от мусора
+    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
 
-    if(file.open(QIODevice::ReadOnly)){
-        ui->filePathLabel->setText("File open");
-        fileSize = file.size();     //  определяем размер файла
-        QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
-        fileName = fileInfo.fileName();     //  записываем название файла
-        ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
-//        char* bytes = new char[fileSize];   //  выделяем байты под файл
-//        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
-        QDataStream out(&Data, QIODevice::WriteOnly);
+    fileSize = file.size();     //  определяем размер файла
+    QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
+    fileName = fileInfo.fileName();     //  записываем название файла
+    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
+
+    char *bytes = new char[fileSize];   //  выделяем байты под файл
+    if(file.open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
+        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
+        file.close();                   //  закрываем файл
+        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
         out.setVersion(QDataStream::Qt_6_2);
-        out << quint8(1) << fileName << fileSize; //<< bytes;   //  отправляем наше название файла, размер и байты
-//        out.device()->seek(0);
+        out << quint16(0);   //  пока сообщение оправлено, мы не можем определить размер блока
+        out.device()->seek(0);
+        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+        out << quint16(Data.size() - sizeof(quint16)) << fileName << fileSize << bytes;   //  отправляем наше название файла, размер и байты
+        out.device()->seek(0);
         socket->write(Data);
-//        file.close();
-//        delete[] bytes;
+
+        delete[] bytes;
     } else {
         ui->filePathLabel->setText("File not open :(");
     }
@@ -134,13 +138,8 @@ void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на
     ui->filePathLabel->setText(filePath);   //  для наглядности устанавливаем в label путь к файлу
     ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
 
-    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
+    SendFileToServer(filePath); //  отправляем серверу файл
 
-    fileSize = file.size();     //  определяем размер файла
-    QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
-    fileName = fileInfo.fileName();     //  записываем название файла
-    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);
-
-    SendToServer("FILE:"+QString::number(fileSize)+" "+fileName);    //  передаем функции ключ "FILE:", размер и название файла
+//    SendToServer("FILE:"+QString::number(fileSize)+" "+fileName);    //  передаем функции ключ "FILE:", размер и название файла
 }
 
