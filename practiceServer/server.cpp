@@ -46,15 +46,11 @@ void Server::slotReadyRead(){
             //  надо же, мы до сих пор в цикле, все хорошо
             QString str;    //  т.к. у нас пока чат, то сервер и клиент будут обмениваться только текстом
             in >> str;  //  записываем в нее строку из объекта in
-            if(str.contains("FILE:")){
-                Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" send new file: "+str);
-            } else {
-                Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);
+            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
+            if(!str.startsWith("FILE:")){     //  если у нас нет подстроки-префикса "FILE:"
+                SendToClient(str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:"
             }
             nextBlockSize = 0;
-            //  оформляем чат на стороне Сервера
-
-            SendToClient(str);  //  отправляем клиенту сообщение
             break;
         }
     } else {

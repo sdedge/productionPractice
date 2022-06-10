@@ -109,13 +109,13 @@ void MainWindow::slotReadyRead()
 
 void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Send msg"
 {
-    SendToServer(ui->lineEdit->text());
+    SendToServer("MESS:"+ui->lineEdit->text());
 }
 
 
 void MainWindow::on_lineEdit_returnPressed()    //  сообщение также отправится, если нажать клавишу Enter
 {
-    SendToServer(ui->lineEdit->text());
+    SendToServer("MESS:"+ui->lineEdit->text());
 }
 
 
