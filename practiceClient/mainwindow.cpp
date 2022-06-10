@@ -37,22 +37,26 @@ void MainWindow::on_connectToServerPushButton_clicked()
     //  TODO: сделать программным способом задание значений для подключения
 
     socket->connectToHost("127.0.0.1", 2323);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
+//    if(socket->state()==QTcpSocket::ConnectedState){     //  если подключились
+        ui->filePathLineEdit->setEnabled(true); //  то включаем интерфейс
+        ui->lineEdit->setEnabled(true);
+        ui->openFilePushButton->setEnabled(true);
+        ui->sendFilePushButton->setEnabled(true);
+        ui->sendMsgPushButton->setEnabled(true);
+        ui->textBrowser->setEnabled(true);
+//    } else {
+//        ui->filePathLabel->setText("No conection");
+//    }
 
-    //  включаем интерфейс
-    ui->filePathLineEdit->setEnabled(true);
-    ui->lineEdit->setEnabled(true);
-    ui->openFilePushButton->setEnabled(true);
-    ui->sendFilePushButton->setEnabled(true);
-    ui->sendMsgPushButton->setEnabled(true);
-    ui->textBrowser->setEnabled(true);
+
 }
 
 void MainWindow::SendToServer(QString str)
 {
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
-    out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << str;   //  пока сообщение оправлено, мы не можем определить размер блока
+    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
+    out << quint16(0) << str;   //  собираем сообщение из размер_сообщения << время_отправки << строка
     out.device()->seek(0);  //  передвигаемся в начало
     out << quint16(Data.size() - sizeof(quint16));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     socket->write(Data);    //  записываем данные в сокет

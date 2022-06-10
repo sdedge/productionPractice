@@ -45,11 +45,11 @@ void Server::slotReadyRead(){
             //  надо же, мы до сих пор в цикле, все хорошо
             QString str;    //  создаем переменную строки
             in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
-            if(str.startsWith("MESS:")){     //  если у нас есть подстрока-префикс "FILE:"
+            if(str.startsWith("MESS:")){     //  если у нас есть подстрока-префикс "MESS:"
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-                SendToClient(str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+                SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+                SendToClient(delimiter);    //  вставляем разделитель
             } else {    //  отправляется файл
-                SendToClient("Файл загружен");
                 QFile file;     //  определяем файл
                 in >> fileSize; //  считываем его название
                 char *bytes = new char[fileSize];   //  выделяем байты под файл
@@ -67,6 +67,7 @@ void Server::slotReadyRead(){
                     file.write(bytes, fileSize);    //  записываем файл
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл"
+                    SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     delete[] bytes; //  удаляем из кучи массив
                     file.close();   //закрываем файл

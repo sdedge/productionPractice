@@ -4,12 +4,20 @@
 #include <QMainWindow>
 #include <QTcpSocket>   //  класс сервера
 
-#include <QFileDialog>  //  класс работы с диалоговыми окнами (выбор файла)
-#include <QCompleter>
-#include <QFileSystemModel>
+/// =========================   Для работы с файлами
 #include <QFile>
 #include <QFileInfo>
-
+#include <QFileDialog>  //  класс работы с диалоговыми окнами (выбор файла)
+/// =========================
+///
+/// =========================   Для работы автодополнения ввода
+#include <QCompleter>
+#include <QFileSystemModel>
+/// =========================
+///
+/// =========================   Разные дополнения
+//#include <QTime>    //  для отображения времени отправки
+/// =========================
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

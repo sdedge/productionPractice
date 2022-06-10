@@ -7,10 +7,17 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 ///  ========================
-#include <QVector>        //    класс вектора для хранения созданных сокетов
-
+///
+///  ========================   классы для работы с файлами
 #include <QFile>    //  для работы с файлами
 #include <QDir>     //  для работы с директорией
+///  ========================
+///
+///  ========================   дополнения
+#include <QVector>        //    класс вектора для хранения созданных сокетов
+#include <QTime>    //  время
+
+
 
 class Server : public QTcpServer{   //  создание класса сервера, унаследованного от QTcpServer'a
     Q_OBJECT
@@ -28,6 +35,7 @@ private:
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QString newDirPath; //  путь новой директории
+    QString delimiter = "=======================";  //  создаем разделитель для сообщений
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
