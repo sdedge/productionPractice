@@ -51,27 +51,27 @@ void Server::slotReadyRead(){
                 SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
                 SendToClient(delimiter);    //  вставляем разделитель
             } else {    //  отправляется файл
-                QFile file;     //  определяем файл
+                QFile *file = new QFile;     //  определяем файл
                 in >> fileSize; //  считываем его название
                 char *bytes = new char[fileSize];   //  выделяем байты под файл
                 in >> bytes;    //  считываем байты
 //                file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
 
-                file.setFileName(str);
+                file->setFileName(str);
                 QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
 
                 /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
                 /// представляет собой стек. Изначально достав данные в переменную str оказалось,
                 /// что оно хранит название файла
 
-                if(file.open(QIODevice::WriteOnly)){
-                    file.write(bytes, fileSize);    //  записываем файл
+                if(file->open(QIODevice::WriteOnly)){
+                    file->write(bytes, fileSize);    //  записываем файл
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл"
                     SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     delete[] bytes; //  удаляем из кучи массив
-                    file.close();   //закрываем файл
+                    file->close();   //закрываем файл
                 }
             }
 
