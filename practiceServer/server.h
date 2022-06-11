@@ -35,7 +35,7 @@ private:
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QString newDirPath; //  путь новой директории
-    QString delimiter = "=======================";  //  создаем разделитель для сообщений
+    QString delimiter = "<font color = black><\\font>=======================";  //  создаем разделитель для сообщений
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений

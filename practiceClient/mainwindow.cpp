@@ -144,21 +144,15 @@ void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на
 {
     QString filePath;
     filePath = QFileDialog::getOpenFileName(this, "Выбор файла", "C:\\");   //  открываем диалоговое окно с заголовком "Выбор файла" и по умолчанию ставим путь C:/
-    ui->filePathLabel->setText(filePath);   //  устанавливаем путь в label для наглядности
+    ui->filePathLineEdit->setText(filePath);   //  устанавливаем путь в LineEdit для наглядности
 }
 
 
 void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на "Send file"
 {
     QString filePath;   //  определяем наш путь к файлу
-    if(ui->filePathLabel->text().isEmpty()){    //  если показательный label пуст
-        filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
-
-        ui->filePathLabel->setText(filePath);   //  для наглядности устанавливаем в label путь к файлу
-        ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
-    } else {
-        filePath = ui->filePathLabel->text();   //  иначе в переменную путь сохраняется напрямую
-    }
+    filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
+    ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
 
     SendFileToServer(filePath); //  отправляем серверу файл
 }

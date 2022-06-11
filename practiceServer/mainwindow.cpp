@@ -34,7 +34,7 @@ MainWindow::~MainWindow()
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
 {
     qDebug() << status; //  вывод в консоль статуса
-    ui->infoAboutServerTextEdit->append(status);    //  и также в textEdit
+    ui->infoAboutServerTextEdit->append("<font color = black><\\font>"+status);    //  и также в textEdit
 }
 
 
@@ -42,7 +42,7 @@ void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию 
 {
     QString dirPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
     //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
-    ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font><font color = black><\\font>");
+    ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
     ui->dirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
 }
 

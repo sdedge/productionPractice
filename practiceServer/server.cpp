@@ -48,7 +48,7 @@ void Server::slotReadyRead(){
             if(str.startsWith("MESS:")){     //  если у нас есть подстрока-префикс "MESS:"
                 /// По правилам названия файла нельзя использовать двоеточие, поэтому префикс не будет реагировать на название файла
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-                SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+                SendToClient("<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
                 SendToClient(delimiter);    //  вставляем разделитель
             } else {    //  отправляется файл
                 QFile *file = new QFile;     //  определяем файл
@@ -68,7 +68,8 @@ void Server::slotReadyRead(){
                     file->write(bytes, fileSize);    //  записываем файл
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл"
-                    SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
+                    SendToClient("<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
+                    SendToClient(delimiter);    //  вставляем разделитель
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     delete[] bytes; //  удаляем из кучи массив
                     file->close();   //закрываем файл
