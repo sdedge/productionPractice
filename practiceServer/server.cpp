@@ -46,6 +46,7 @@ void Server::slotReadyRead(){
             QString str;    //  создаем переменную строки
             in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
             if(str.startsWith("MESS:")){     //  если у нас есть подстрока-префикс "MESS:"
+                /// По правилам названия файла нельзя использовать двоеточие, поэтому префикс не будет реагировать на название файла
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
                 SendToClient("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
                 SendToClient(delimiter);    //  вставляем разделитель
