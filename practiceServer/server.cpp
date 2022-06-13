@@ -74,14 +74,16 @@ void Server::slotReadyRead(){
                     }
                     qDebug() << sizeReceivedData << " | " << fileSize;
                     if(sizeReceivedData == fileSize){
-                        file->close();
+
                         file = NULL;
                         fileSize = 0;
                         sizeReceivedData = 0;
                     } else {
                         qDebug() << "File Data not full";
+
                         break;
                     }
+
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл"
                     SendToClient("<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
@@ -90,6 +92,7 @@ void Server::slotReadyRead(){
 //                    delete[] bytes; //  удаляем из кучи массив
 //                    file->close();   //закрываем файл
                 }
+                file->close();
 
 
 
@@ -125,9 +128,9 @@ void Server::SendToClient(QString str){ //  отправка клиенту со
     Data.clear();   //  может быть мусор
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << str;   //  записываем в поток размер сообщения и строку
+    out << quint64(0) << str;   //  записываем в поток размер сообщения и строку
     out.device()->seek(0);  //  в начало потока
-    out << quint16(Data.size() - sizeof(quint16));  //  высчитываем размер сообщения
+    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
     for(int i = 0; i < Sockets.size(); i++){    //  пробегаемся по всем сокетам и
         Sockets[i]->write(Data);    //  отправляем по соответствующему сокету данные
     }
