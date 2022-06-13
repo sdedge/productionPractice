@@ -31,7 +31,7 @@ private:
 
     void SendToClient(QString str);    //  функция для передачи данных клиенту
 
-    quint16 nextBlockSize;
+    quint64 nextBlockSize;
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QString newDirPath; //  путь новой директории

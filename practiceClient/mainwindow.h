@@ -52,6 +52,7 @@ private:
 
     int fileSize;   //  размер файла
     QString fileName;   //  его название
+    QFile *file;     //  сам файлик
 
     void SendToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути

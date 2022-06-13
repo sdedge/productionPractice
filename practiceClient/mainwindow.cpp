@@ -67,31 +67,42 @@ void MainWindow::SendToServer(QString str)
 void MainWindow::SendFileToServer(QString filePath)
 {
     Data.clear();   //  чистим массив байт от мусора
-    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
+//    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
 
-    fileSize = file.size();     //  определяем размер файла
-    QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
+
+    file = new QFile(filePath);
+    fileSize = file->size();     //  определяем размер файла
+    QFileInfo fileInfo(file->fileName());    //  без этой строки название файла будет хранить полный путь до него
     fileName = fileInfo.fileName();     //  записываем название файла
     ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
 
-    char *bytes = new char[fileSize];   //  выделяем в куче байты под файл
-    if(file.open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
-        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
-        file.close();                   //  закрываем файл
+//    char *bytes = new char[fileSize];   //  выделяем в куче байты под файл
+    if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
+//        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
+        char block[100];
+
         QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
         out.setVersion(QDataStream::Qt_6_2);
-        out << quint16(0);   //  пока сообщение оправлено, мы не можем определить размер блока
+        out << quint64(0);   //  пока сообщение оправлено, мы не можем определить размер блока
         out.device()->seek(0);
         //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-        out << quint16(Data.size() - sizeof(quint16)) << fileName << fileSize << bytes;   //  отправляем наше название файла, размер и байты
-        out.device()->seek(0);
+        out << quint64(Data.size() - sizeof(quint64)) << fileName << fileSize;// << bytes;   //  отправляем наше название файла, размер и байты
         socket->write(Data);
+        socket->waitForBytesWritten();
 
-        delete[] bytes; //  удаляем из кучи массив байт
+        while(!file->atEnd()){
+            qint64 in = file->read(block, sizeof(block));
+            socket->write(block, in);
+        }
+
+        file->close();                   //  закрываем файл
+        delete file;
+//        delete[] bytes; //  удаляем из кучи массив байт
     } else {
         ui->filePathLabel->setText("File not open :(");
     }
 }
+
 
 void MainWindow::slotReadyRead()
 {
@@ -121,7 +132,6 @@ void MainWindow::slotReadyRead()
         ui->textBrowser->append("Error connection");
     }
 }
-
 
 void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Send msg"
 {
