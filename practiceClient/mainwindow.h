@@ -17,6 +17,7 @@
 ///
 /// =========================   Разные дополнения
 //#include <QTime>    //  для отображения времени отправки
+#include <QMap>     //  определение глоссария для приходящих данных сокета
 /// =========================
 
 QT_BEGIN_NAMESPACE
@@ -46,6 +47,8 @@ private:
     Ui::MainWindow *ui;
     QTcpSocket *socket; //  сокет соединения
     QByteArray Data;    //  передаваемые файлы
+
+    QMap<int,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
 
     QCompleter *completer;  //  автодополнение вводимого пути файла
     QFileSystemModel *fModel;   //  файловая модель

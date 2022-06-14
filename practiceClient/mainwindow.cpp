@@ -8,6 +8,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     socket = new QTcpSocket();  //  при подключении создаем новый сокет
 
+    /// Глоссарий, описывающий тип отправляемого сообщения
+    /// первое число определяет тип (0 - простой сигнал о чем-то \ 1 - запрос чего-то)
+    /// второе число определяет конец какого-то действия, если оно в несколько этапов, например, передача файла
+    /// третье и последующие числа определяют тип передаваемых данных
+
+    mapRequest[""] = "";  //  ничего не нужно
+    mapRequest["001"] = "Message";   //  отправляется простое сообщение
+    mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
+    mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
+    mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
+
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении сокет сам удалится
 
