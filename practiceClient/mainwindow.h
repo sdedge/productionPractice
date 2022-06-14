@@ -48,7 +48,7 @@ private:
     QTcpSocket *socket; //  сокет соединения
     QByteArray Data;    //  передаваемые файлы
 
-    QMap<int,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
+    QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
 
     QCompleter *completer;  //  автодополнение вводимого пути файла
     QFileSystemModel *fModel;   //  файловая модель
