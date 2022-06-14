@@ -32,13 +32,13 @@ void Server::slotReadyRead(){
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
                 qDebug() << "nextBlockSize == 0";
-                if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 2-х байт
-                    qDebug() << "Data < 8, break";
+                if(socket->bytesAvailable() < 2){   //  и не должен быть меньше 2-х байт
+                    qDebug() << "Data < 2, break";
                     break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
                 }
                 in >> nextBlockSize;    //  считываем размер блока в правильном исходе
             }
-            if(quint64(socket->bytesAvailable()) < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
+            if(socket->bytesAvailable() < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
                 qDebug() << "Data not full";    //  если данные пришли не полностью
                 break;
             }
@@ -53,60 +53,72 @@ void Server::slotReadyRead(){
             } else {    //  отправляется файл
 
                 QFile *file = new QFile;     //  определяем файл
-                in >> fileSize; //  считываем его размер
-
+                in >> fileSize; //  считываем его название
+                char *bytes = new char[fileSize];   //  выделяем байты под файл
+                in >> bytes;    //  считываем байты
+//                  file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
+                file->setFileName(str);
+                QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
                 /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
                 /// представляет собой стек. Изначально достав данные в переменную str оказалось,
                 /// что оно хранит название файла
-                qDebug() << str;
-                file->setFileName(str);
-                QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
-
-                char block[100];
-                int sizeReceivedData = 0;
-                qint64 toFile;
-
                 if(file->open(QIODevice::WriteOnly)){
-                    while(!in.atEnd()){
-                        toFile = in.readRawData(block, sizeof(block));
-                        sizeReceivedData += toFile;
-                        file->write(block, toFile);
-                    }
-                    qDebug() << sizeReceivedData << " | " << fileSize;
-                    if(sizeReceivedData == fileSize){
-
-                        file = NULL;
-                        fileSize = 0;
-                        sizeReceivedData = 0;
-                    } else {
-                        qDebug() << "File Data not full";
-
-                        break;
-                    }
-
+                    file->write(bytes, fileSize);    //  записываем файл
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл"
                     SendToClient("<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
                     SendToClient(delimiter);    //  вставляем разделитель
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
-//                    delete[] bytes; //  удаляем из кучи массив
-//                    file->close();   //закрываем файл
+                    delete[] bytes; //  удаляем из кучи массив
+                    file->close();   //закрываем файл
                 }
-                file->close();
 
 
+//                QFile *file = new QFile;     //  определяем файл
+//                in >> fileSize; //  считываем его размер
 
+//                /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
+//                /// представляет собой стек. Изначально достав данные в переменную str оказалось,
+//                /// что оно хранит название файла
+//                qDebug() << str;
+//                file->setFileName(str);
+//                QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
 
+//                char block[100];
+//                int sizeReceivedData = 0;
+//                qint64 toFile;
 
+//                if(file->open(QIODevice::WriteOnly)){
+//                    while(!in.atEnd()){
+//                        toFile = in.readRawData(block, sizeof(block));
+//                        sizeReceivedData += toFile;
+//                        file->write(block, toFile);
+//                    }
+//                    qDebug() << sizeReceivedData << " | " << fileSize;
+//                    if(sizeReceivedData == fileSize){
+
+//                        file = NULL;
+//                        fileSize = 0;
+//                        sizeReceivedData = 0;
+//                    } else {
+//                        qDebug() << "File Data not full";
+
+//                        break;
+//                    }
+
+//                    //  оформляем чат на стороне Сервера
+//                    //  уведомление о "кто: какой файл"
+//                    SendToClient("<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
+//                    SendToClient(delimiter);    //  вставляем разделитель
+//                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
+////                    delete[] bytes; //  удаляем из кучи массив
+////                    file->close();   //закрываем файл
+//                }
+//                file->close();
 
 //                char *bytes = new char[fileSize];   //  выделяем байты под файл
 //                in >> bytes;    //  считываем байты
 //                file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
-
-
-
-
-
 
             }   //  конец, если отправляется файл
 
@@ -128,9 +140,9 @@ void Server::SendToClient(QString str){ //  отправка клиенту со
     Data.clear();   //  может быть мусор
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << str;   //  записываем в поток размер сообщения и строку
+    out << quint16(0) << str;   //  записываем в поток размер сообщения и строку
     out.device()->seek(0);  //  в начало потока
-    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
+    out << quint16(Data.size() - sizeof(quint16));  //  высчитываем размер сообщения
     for(int i = 0; i < Sockets.size(); i++){    //  пробегаемся по всем сокетам и
         Sockets[i]->write(Data);    //  отправляем по соответствующему сокету данные
     }
