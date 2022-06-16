@@ -135,7 +135,7 @@ void MainWindow::slotReadyRead()
                 in >> nextBlockSize;    //  считываем размер блока в правильном исходе
             }
             if(socket->bytesAvailable() < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
-                qDebug() << "Data not full";    //  если данные пришли не полностью
+                qDebug() << "Data not full | socket->bytesAvailable() = "+QString::number(socket->bytesAvailable()) + " | nextBlockSize = "+QString::number(nextBlockSize);    //  если данные пришли не полностью
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
@@ -168,8 +168,10 @@ void MainWindow::slotReadyRead()
                 fileSize = 0;   //  очищаем его размер
                 blockData = 10000;  //  устанавливаем прежний размер байтов
                 delete[] bytes; //  удаляем байты из кучи
-                nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
+
+            nextBlockSize = 0;  //  обнуляем для новых сообщений
+            break;  //  выходим, делать больше нечего
         }
     } else {
         ui->textBrowser->append("Error connection");
@@ -189,7 +191,12 @@ void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Se
 
 void MainWindow::on_lineEdit_returnPressed()    //  сообщение также отправится, если нажать клавишу Enter
 {
-    SendToServer("MESS:"+ui->lineEdit->text()); //  отправляем сообщение со служебным префиксом
+    if(!ui->lineEdit->text().isEmpty()){    //  проверка на то, НЕ пустое ли сообщение
+        ui->filePathLabel->clear();     //  чистим от предыдущего уведомления
+        SendToServer("MESS:"+ui->lineEdit->text()); //  отправляем сообщение со служебным префиксом
+    } else {
+        ui->filePathLabel->setText("Your msg is empty!");   //  уведомляем о пустом сообщении
+    }
 }
 
 
