@@ -67,7 +67,7 @@ void MainWindow::SendToServer(QString str)
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
     out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
-    out << quint16(0) << str;   //  собираем сообщение из размер_сообщения << время_отправки << строка
+    out << quint16(0) << mapRequest["001"] << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка
     out.device()->seek(0);  //  передвигаемся в начало
     out << quint16(Data.size() - sizeof(quint16));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     socket->write(Data);    //  записываем данные в сокет
@@ -89,10 +89,10 @@ void MainWindow::SendFileToServer(QString filePath)
         file.close();                   //  закрываем файл
         QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
         out.setVersion(QDataStream::Qt_6_2);
-        out << quint16(0);   //  пока сообщение оправлено, мы не можем определить размер блока
+        out << quint16(0) << mapRequest["002"] << fileName << fileSize << bytes;   //  отправляем тип данных, название файла, его размер, байты
         out.device()->seek(0);
         //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-        out << quint16(Data.size() - sizeof(quint16)) << fileName << fileSize << bytes;   //  отправляем наше название файла, размер и байты
+        out << quint16(Data.size() - sizeof(quint16));   //  определяем размер сообщения
         out.device()->seek(0);
         socket->write(Data);
     } else {

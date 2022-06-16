@@ -8,6 +8,17 @@ Server::Server(bool &server_started){
         server_started = false; //  иначе что-то пошло не так
     }
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
+
+    /// Глоссарий, описывающий тип отправляемого сообщения
+    /// первое число определяет тип (0 - простой сигнал о чем-то \ 1 - запрос чего-то)
+    /// второе число определяет конец какого-то действия, если оно в несколько этапов, например, передача файла
+    /// третье и последующие числа определяют тип передаваемых данных
+
+    mapRequest[""] = "";  //  ничего не нужно
+    mapRequest["001"] = "Message";   //  отправляется простое сообщение
+    mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
+    mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
+    mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
 }
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
@@ -43,14 +54,16 @@ void Server::slotReadyRead(){
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
+            QString typeOfMess;
+            in >> typeOfMess;
             QString str;    //  создаем переменную строки
             in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
-            if(str.startsWith("MESS:")){     //  если у нас есть подстрока-префикс "MESS:"
-                /// По правилам названия файла нельзя использовать двоеточие, поэтому префикс не будет реагировать на название файла
+            if(typeOfMess == "Message"){     //  если тип данных "Message"
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
                 SendToClient("<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
                 SendToClient(delimiter);    //  вставляем разделитель
-            } else {    //  отправляется файл
+            }
+            if(typeOfMess == "File"){    //  отправляется файл
 
                 QFile *file = new QFile;     //  определяем файл
                 in >> fileSize; //  считываем его название
