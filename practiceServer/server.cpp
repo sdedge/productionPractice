@@ -98,11 +98,9 @@ void Server::slotReadyRead(){
 
                     SendToClient(mapRequest["102"],"");    //  запрашиваем новую часть файла
                 } else {
-                    SendToClient(mapRequest["012"],fileName);    //  говорим, что файл загружен
                     //  оформляем чат на стороне Сервера
-                    //  уведомление о "кто: какой файл"
-                    SendToClient(mapRequest["001"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
-                    SendToClient(mapRequest["001"],delimiter);    //  вставляем разделитель
+                    //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
+                    SendToClient(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
 
                     file->close();  //  закрываем файл

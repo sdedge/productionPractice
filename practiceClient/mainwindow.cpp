@@ -139,12 +139,13 @@ void MainWindow::slotReadyRead()
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
+
             QString typeOfMessage;
             in >> typeOfMessage;    //  определение типа сообщения
+
             if(typeOfMessage == "Message"){ //  сервер прислал сообщение
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
-                nextBlockSize = 0;  //  обнуляем размер блока для последующего
                 qDebug() << str;
                 ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
             }
@@ -152,15 +153,18 @@ void MainWindow::slotReadyRead()
             if(typeOfMessage == "Request part of file"){    //  если серверу нужна еще одна часть файла
                 qDebug() << "Downloading new part of file...";  //  выводим в консоль
                 ui->textBrowser->append("Downloading new part of file..."); //  выводим клиенту
+                nextBlockSize = 0;  //  заранее обнуляем размер сообщения
                 SendPartOfFile();   //  вызываем соответствующий метод отправки
             }
 
             if(typeOfMessage == "File downloaded"){ //  если файл полностью скачался
-                QString inFileName;
-                in >> inFileName;  //  считываем название файла
+                qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
+                ui->textBrowser->append("File "+fileName+" downloaded");  //  и то же самое клиенту
 
-                qDebug() << "File "+inFileName+" downloaded";   //  выводим консоль, какой файл был загружен
-                ui->textBrowser->append("File "+inFileName+" downloaded");  //  и то же самое клиенту
+                QString str;    //  определяем переменную, в которую сохраним данные
+                in >> str;  //  выводим в переменную сообщение
+                qDebug() << str;
+                ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
 
                 file->close();
                 file = nullptr; //  удаляем файл
