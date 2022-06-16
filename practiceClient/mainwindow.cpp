@@ -56,7 +56,7 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->sendMsgPushButton->setEnabled(true);
         ui->textBrowser->setEnabled(true);
 
-        ui->connectToServerPushButton->setEnabled(false);
+        ui->connectToServerPushButton->setEnabled(false);   //  и гасим кнопку подключения
 //    } else {
 //        ui->filePathLabel->setText("No conection");
 //    }
@@ -94,7 +94,7 @@ void MainWindow::SendPartOfFile()
 
 }
 
-void MainWindow::SendFileToServer(QString filePath)
+void MainWindow::SendFileToServer(QString filePath) //  метод отправки файла серверу (его начало)
 {
     Data.clear();   //  чистим массив байт от мусора
     file = new QFile(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
@@ -106,7 +106,7 @@ void MainWindow::SendFileToServer(QString filePath)
     if(fileSize < blockData){   //  если размер файла меньше выделенного блока
         blockData = fileSize;
     } else {    //  если мы еще раз отправляем какой-нибудь файл
-        blockData = 10000;
+        blockData = 10000;  //  возвращаем дефолтное значение
     }
     bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
 
@@ -140,8 +140,8 @@ void MainWindow::slotReadyRead()
             }
             //  надо же, мы до сих пор в цикле, все хорошо
             QString typeOfMessage;
-            in >> typeOfMessage;
-            if(typeOfMessage == "Message"){
+            in >> typeOfMessage;    //  определение типа сообщения
+            if(typeOfMessage == "Message"){ //  сервер прислал сообщение
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
                 nextBlockSize = 0;  //  обнуляем размер блока для последующего
@@ -149,18 +149,18 @@ void MainWindow::slotReadyRead()
                 ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
             }
 
-            if(typeOfMessage == "Request part of file"){
-                qDebug() << "Downloading new part of file...";
-                ui->textBrowser->append("Downloading new part of file...");
-                SendPartOfFile();
+            if(typeOfMessage == "Request part of file"){    //  если серверу нужна еще одна часть файла
+                qDebug() << "Downloading new part of file...";  //  выводим в консоль
+                ui->textBrowser->append("Downloading new part of file..."); //  выводим клиенту
+                SendPartOfFile();   //  вызываем соответствующий метод отправки
             }
 
-            if(typeOfMessage == "File downloaded"){
+            if(typeOfMessage == "File downloaded"){ //  если файл полностью скачался
                 QString inFileName;
                 in >> inFileName;  //  считываем название файла
 
-                qDebug() << "File "+inFileName+" downloaded";
-                ui->textBrowser->append("File "+inFileName+" downloaded");
+                qDebug() << "File "+inFileName+" downloaded";   //  выводим консоль, какой файл был загружен
+                ui->textBrowser->append("File "+inFileName+" downloaded");  //  и то же самое клиенту
 
                 file->close();
                 file = nullptr; //  удаляем файл
@@ -172,9 +172,9 @@ void MainWindow::slotReadyRead()
 
             nextBlockSize = 0;  //  обнуляем для новых сообщений
             break;  //  выходим, делать больше нечего
-        }
-    } else {
-        ui->textBrowser->append("Error connection");
+        }   //  конец whil'a
+    } else {    //  если произошли проблемы с подключением
+        ui->textBrowser->append("Error connection");    //  уведомление клиента
     }
 }
 
