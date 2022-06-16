@@ -56,13 +56,17 @@ private:
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QFile *file;     //  сам файлик
+    char *bytes;     //  массив байт данных
+    int blockData = 10000;  //  размер данных
 
     void SendToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути
+    void SendPartOfFile();  //  метод отправки части файла
 
-    quint16 nextBlockSize;  //  переменная для хранения размера блока текста
+    qint64 nextBlockSize;  //  переменная для хранения размера блока текста
 
 public slots:
     void slotReadyRead();   //  слот готовности к чтению сообщений
+//    void slotSendPartOfFile();  //  слот для отправки новой части файла
 };
 #endif // MAINWINDOW_H

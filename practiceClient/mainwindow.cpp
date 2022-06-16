@@ -55,6 +55,8 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->sendFilePushButton->setEnabled(true);
         ui->sendMsgPushButton->setEnabled(true);
         ui->textBrowser->setEnabled(true);
+
+        ui->connectToServerPushButton->setEnabled(false);
 //    } else {
 //        ui->filePathLabel->setText("No conection");
 //    }
@@ -67,76 +69,51 @@ void MainWindow::SendToServer(QString str)
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
     out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
-    out << quint16(0) << mapRequest["001"] << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка
+    out << quint64(0) << mapRequest["001"] << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка
     out.device()->seek(0);  //  передвигаемся в начало
-    out << quint16(Data.size() - sizeof(quint16));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     socket->write(Data);    //  записываем данные в сокет
 
     ui->lineEdit->clear();  //  чистим lineEdit после отправки сообщения
 }
 
+void MainWindow::SendPartOfFile()
+{
+    file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint64(0) << mapRequest["002"] << fileName << fileSize << bytes;   //  отправляем тип данных, название файла, его размер, байты
+    out.device()->seek(0);
+    //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+    socket->write(Data);
+    file->close();                   //  закрываем файл
+}
+
 void MainWindow::SendFileToServer(QString filePath)
 {
     Data.clear();   //  чистим массив байт от мусора
-    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
-    fileSize = file.size();     //  определяем размер файла
-    QFileInfo fileInfo(file.fileName());    //  без этой строки название файла будет хранить полный путь до него
+    file = new QFile(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
+    fileSize = file->size();     //  определяем размер файла
+    QFileInfo fileInfo(file->fileName());    //  без этой строки название файла будет хранить полный путь до него
     fileName = fileInfo.fileName();     //  записываем название файла
     ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
-    char *bytes = new char[fileSize];   //  выделяем в куче байты под файл
-    if(file.open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
-        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
-        file.close();                   //  закрываем файл
-        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-        out.setVersion(QDataStream::Qt_6_2);
-        out << quint16(0) << mapRequest["002"] << fileName << fileSize << bytes;   //  отправляем тип данных, название файла, его размер, байты
-        out.device()->seek(0);
-        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-        out << quint16(Data.size() - sizeof(quint16));   //  определяем размер сообщения
-        out.device()->seek(0);
-        socket->write(Data);
+
+    if(fileSize < blockData){   //  если размер файла меньше выделенного блока
+        bytes = new char[fileSize];   //  выделяем байты под файл, то есть передача пройдет за один раз
+    } else {
+        bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
+    }
+
+    if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
+        socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+
+        SendPartOfFile();   //  вызываем функцию отправки части файла
     } else {
         ui->filePathLabel->setText("File not open :(");
     }
     delete[] bytes; //  удаляем из кучи массив байт
-
-
-
-//    Data.clear();   //  чистим массив байт от мусора
-////    QFile file(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
-
-
-//    file = new QFile(filePath);
-//    fileSize = file->size();     //  определяем размер файла
-//    QFileInfo fileInfo(file->fileName());    //  без этой строки название файла будет хранить полный путь до него
-//    fileName = fileInfo.fileName();     //  записываем название файла
-//    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
-
-////    char *bytes = new char[fileSize];   //  выделяем в куче байты под файл
-//    if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
-////        file.read(bytes, fileSize);     //  читаем файл и записываем данные в байты
-//        char block[100];
-
-//        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-//        out.setVersion(QDataStream::Qt_6_2);
-//        out << quint64(0) << fileName << fileSize;   //  пока сообщение оправлено, мы не можем определить размер блока, отправляем наше название файла, размер и байты
-//        while(!file->atEnd()){
-//            quint16 nextBlockFile = file->read(block, sizeof(block));
-//            out << nextBlockFile;
-//        }
-
-//        out.device()->seek(0);
-//        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-//        out << quint64(Data.size() - sizeof(quint64));// << bytes;   //  записываем размер всего сообщения
-//        socket->write(Data);
-////        socket->waitForBytesWritten();
-
-//        file->close();                   //  закрываем файл
-//        delete file;
-////        delete[] bytes; //  удаляем из кучи массив байт
-//    } else {
-//        ui->filePathLabel->setText("File not open :(");
-//    }
+    delete file;    //  удаляем из кучи файл
 }
 
 
@@ -148,8 +125,8 @@ void MainWindow::slotReadyRead()
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
                 qDebug() << "nextBlockSize == 0";
-                if(socket->bytesAvailable() < 2){   //  и не должен быть меньше 2-х байт
-                    qDebug() << "Data < 2       , break";
+                if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 2-х байт
+                    qDebug() << "Data < 8, break";
                     break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
                 }
                 in >> nextBlockSize;    //  считываем размер блока в правильном исходе
@@ -159,10 +136,23 @@ void MainWindow::slotReadyRead()
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
-            QString str;    //  определяем переменную, в которую сохраним данные
-            in >> str;  //  выводим в переменную сообщение
-            nextBlockSize = 0;  //  обнуляем размер блока для последующего
-            ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
+            QString typeOfMessage;
+            in >> typeOfMessage;
+            if(typeOfMessage == "Message"){
+                QString str;    //  определяем переменную, в которую сохраним данные
+                in >> str;  //  выводим в переменную сообщение
+                nextBlockSize = 0;  //  обнуляем размер блока для последующего
+                ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
+            }
+
+            if(typeOfMessage == "Request part of file"){
+                ui->textBrowser->append("Downloading new part of file");
+                SendPartOfFile();
+            }
+
+            if(typeOfMessage == "File downloaded"){
+                ui->textBrowser->append("File downloaded");
+            }
         }
     } else {
         ui->textBrowser->append("Error connection");

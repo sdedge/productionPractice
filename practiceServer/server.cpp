@@ -43,95 +43,79 @@ void Server::slotReadyRead(){
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
                 qDebug() << "nextBlockSize == 0";
-                if(socket->bytesAvailable() < 2){   //  и не должен быть меньше 2-х байт
-                    qDebug() << "Data < 2, break";
+                if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 2-х байт
+                    qDebug() << "Data < 8, break";
                     break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
                 }
                 in >> nextBlockSize;    //  считываем размер блока в правильном исходе
             }
             if(socket->bytesAvailable() < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
-                qDebug() << "Data not full";    //  если данные пришли не полностью
+                qDebug() << "Data not full | socket->bytesAvailable() = "+QString::number(socket->bytesAvailable()) + " | nextBlockSize = "+QString::number(nextBlockSize);    //  если данные пришли не полностью
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
             QString typeOfMess;
             in >> typeOfMess;
-            QString str;    //  создаем переменную строки
-            in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
+
             if(typeOfMess == "Message"){     //  если тип данных "Message"
+                QString str;    //  создаем переменную строки
+                in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-                SendToClient("<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
-                SendToClient(delimiter);    //  вставляем разделитель
+                SendToClient(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+                SendToClient(mapRequest["001"],delimiter);    //  вставляем разделитель
             }
+
             if(typeOfMess == "File"){    //  отправляется файл
 
-                QFile *file = new QFile;     //  определяем файл
-                in >> fileSize; //  считываем его название
-                char *bytes = new char[fileSize];   //  выделяем байты под файл
-                in >> bytes;    //  считываем байты
-//                  file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
-                file->setFileName(str);
-                QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
-                /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
-                /// представляет собой стек. Изначально достав данные в переменную str оказалось,
-                /// что оно хранит название файла
-                if(file->open(QIODevice::WriteOnly)){
-                    file->write(bytes, fileSize);    //  записываем файл
-                    //  оформляем чат на стороне Сервера
-                    //  уведомление о "кто: какой файл"
-                    SendToClient("<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
-                    SendToClient(delimiter);    //  вставляем разделитель
-                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
-                    delete[] bytes; //  удаляем из кучи массив
-                    file->close();   //закрываем файл
+                // mapRequest["002"] << fileName << fileSize << bytes
+
+                if(fileName.isEmpty()){    //  если файла не существует
+                    in >> fileName;  //  записываем из потока название файла
+                    in >> fileSize; //  считываем его размер
+
+                    file = new QFile;     //  определяем файл
+                    file->setFileName(fileName);
+                    QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
+
+                    Server::signalStatusServer("Файл "+fileName+" создан на сервере");  //  уведомляем
                 }
 
+                if(fileSize < blockData){   //  если размер файла меньше выделенного блока
+                    blockData = fileSize;
+                }
+                bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
 
-//                QFile *file = new QFile;     //  определяем файл
-//                in >> fileSize; //  считываем его размер
+                in >> bytes;    //  считываем байты
+                if(file->open(QIODevice::WriteOnly)){
+                    file->write(bytes, blockData);    //  записываем в файл
+                } else {
+                    Server::signalStatusServer("Не удается открыть файл "+fileName);
+                }
 
-//                /// !!! - str хранит в себе название файла, потому что поток данных QDataStream
-//                /// представляет собой стек. Изначально достав данные в переменную str оказалось,
-//                /// что оно хранит название файла
-//                qDebug() << str;
-//                file->setFileName(str);
-//                QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
+                if(!(file->size() == fileSize)){    //  если размер до сих пор не полон
+                    Server::signalStatusServer("Текущий размер файла = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-//                char block[100];
-//                int sizeReceivedData = 0;
-//                qint64 toFile;
+                    SendToClient(mapRequest["102"],"");    //  запрашиваем новую часть файла
+                } else {
+                    SendToClient(mapRequest["012"],"");    //  говорим, что файл загружен
+                    //  оформляем чат на стороне Сервера
+                    //  уведомление о "кто: какой файл"
+                    SendToClient(mapRequest["001"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
+                    SendToClient(mapRequest["001"],delimiter);    //  вставляем разделитель
+                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
 
-//                if(file->open(QIODevice::WriteOnly)){
-//                    while(!in.atEnd()){
-//                        toFile = in.readRawData(block, sizeof(block));
-//                        sizeReceivedData += toFile;
-//                        file->write(block, toFile);
-//                    }
-//                    qDebug() << sizeReceivedData << " | " << fileSize;
-//                    if(sizeReceivedData == fileSize){
+                    file->close();  //  закрываем файл
+                    file = nullptr; //  удаляем файл
+                    fileName.clear();   //  очищаем его название
+                    fileSize = 0;   //  очищаем его размер
+                    delete[] bytes; //  удаляем байты из кучи
+                    nextBlockSize = 0;  //  обнуляем для новых сообщений
 
-//                        file = NULL;
-//                        fileSize = 0;
-//                        sizeReceivedData = 0;
-//                    } else {
-//                        qDebug() << "File Data not full";
+                    return; //  выходим
+                }
 
-//                        break;
-//                    }
-
-//                    //  оформляем чат на стороне Сервера
-//                    //  уведомление о "кто: какой файл"
-//                    SendToClient("<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
-//                    SendToClient(delimiter);    //  вставляем разделитель
-//                    Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+str+"\"");
-////                    delete[] bytes; //  удаляем из кучи массив
-////                    file->close();   //закрываем файл
-//                }
-//                file->close();
-
-//                char *bytes = new char[fileSize];   //  выделяем байты под файл
-//                in >> bytes;    //  считываем байты
-//                file.setFileName(newDirPath+str);     //  устанавливаем это название файлу
+                file->close();   //закрываем файл
+                delete[] bytes; //  удаляем байты из кучи
 
             }   //  конец, если отправляется файл
 
@@ -149,13 +133,13 @@ void Server::slotNewSaveDir(QString newDirPath) //  пока неработаю�
     this->newDirPath = newDirPath;  //  установили новую директорию
 }
 
-void Server::SendToClient(QString str){ //  отправка клиенту сообщений
+void Server::SendToClient(QString typeOfMsg, QString str){ //  отправка клиенту сообщений
     Data.clear();   //  может быть мусор
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << str;   //  записываем в поток размер сообщения и строку
+    out << quint64(0) << typeOfMsg << str;  //  отправляем размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
-    out << quint16(Data.size() - sizeof(quint16));  //  высчитываем размер сообщения
+    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
     for(int i = 0; i < Sockets.size(); i++){    //  пробегаемся по всем сокетам и
         Sockets[i]->write(Data);    //  отправляем по соответствующему сокету данные
     }

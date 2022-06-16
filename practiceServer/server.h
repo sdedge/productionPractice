@@ -32,11 +32,16 @@ private:
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
 
-    void SendToClient(QString str);    //  функция для передачи данных клиенту
+    void SendToClient(QString typeOfMsg, QString str);    //  функция для передачи данных клиенту
 
-    qint16 nextBlockSize;
+    qint64 nextBlockSize;   //  блок нового сообщения
+
+    QFile *file;    //  определяем файл
+    char *bytes = {0};     //  массив байт данных
     int fileSize;   //  размер файла
     QString fileName;   //  его название
+    int blockData = 10000;  //  размер данных
+
     QString newDirPath; //  путь новой директории
     QString delimiter = "<font color = black><\\font>=======================";  //  создаем разделитель для сообщений
 
