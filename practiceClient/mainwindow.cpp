@@ -79,18 +79,19 @@ void MainWindow::SendToServer(QString str)
 
 void MainWindow::SendPartOfFile()
 {
-//    if(!(file->open(QIODevice::ReadOnly))){
-//        file->open(QIODevice::ReadOnly);
-//    }
-        file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
-        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-        out.setVersion(QDataStream::Qt_6_2);
-        out << quint64(0) << mapRequest["102"] << bytes;   //  отправляем байты
-        out.device()->seek(0);
-        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-        out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-        socket->write(Data);
-//        file->close();                   //  закрываем файл
+    if((fileSize - file->pos()) < blockData){   //  если остаток файла будет меньше блока байт
+        blockData = fileSize - file->pos();     //  мы просто будем читать этот остаток
+    }
+    file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
+    qDebug() << "block: "+QString::number(blockData);   //  нужно, чтобы видеть текущий размер блоков
+
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint64(0) << mapRequest["102"] << bytes;   //  отправляем байты
+    out.device()->seek(0);
+    //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+    socket->write(Data);
 
 }
 
@@ -176,13 +177,10 @@ void MainWindow::slotReadyRead()
             }
 
             if(typeOfMessage == "File downloaded"){ //  если файл полностью скачался
-                QString str, info;    //  определяем переменную, в которую сохраним данные
-                in >> str >> info;  //  выводим в переменную сообщение
+                QString str;    //  определяем переменную, в которую сохраним данные
+                in >> str;  //  выводим в переменную сообщение
                 qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
-//                ui->textBrowser->append("File "+fileName+" downloaded");  //  и то же самое клиенту
-
-                qDebug() << info;
-                ui->textBrowser->append(info);   //  выводим полученное сообщение на экран
+                ui->textBrowser->append("File "+fileName+" downloaded");  //  и то же самое клиенту
 
                 file->close();
                 file = nullptr; //  удаляем файл

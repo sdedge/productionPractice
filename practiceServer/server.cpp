@@ -91,16 +91,18 @@ void Server::slotReadyRead(){
             }
 
             if(typeOfMess == "Request part of file"){   //  отправляется часть файла
-
+                if((fileSize - file->size()) < blockData){  //  если разница между плановым и текущим размером файла меньше блока байтов
+                    blockData = fileSize - file->size();    //  мы устанавливаем такой размер для блока (разницу)
+                }
                 in >> bytes;    //  считываем байты
+
                 if(file->open(QIODevice::Append)){  //  записываем в конец файла
                     file->write(bytes, blockData);    //  записываем в файл
-
                 } else {
                     Server::signalStatusServer("Не удается открыть файл "+fileName);
                 }
 
-                if(file->size() != fileSize){    //  если размер до сих пор не полон
+                if(file->size() < fileSize){    //  если размер до сих пор не полон
                     Server::signalStatusServer("Текущий размер файла = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
                     SendToClient(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем новую часть файла
