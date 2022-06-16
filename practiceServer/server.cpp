@@ -72,19 +72,25 @@ void Server::slotReadyRead(){
                     in >> fileName;  //  записываем из потока название файла
                     in >> fileSize; //  считываем его размер
 
+                    if(fileSize < blockData){   //  если размер файла меньше выделенного блока
+                        blockData = fileSize;   //  устанавливаем размер блока ровно по файлу (передача произойдет в один этап)
+                    } else {
+                        blockData = 10000;  //  устанавливаем по умолчанию (на случай последующей передачи, если размер файла будет куда больше)
+                    }
+
+                    bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
+
+
                     file = new QFile;     //  определяем файл
-                    file->setFileName(fileName);
+                    file->setFileName(fileName);    //  устанавливаем имя файла
                     QDir::setCurrent("C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\");  //  устанавливаем путь сохранения на рабочем столе
 
                     Server::signalStatusServer("Файл "+fileName+" создан на сервере");  //  уведомляем
+                    SendToClient(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
                 }
+            }
 
-                if(fileSize < blockData){   //  если размер файла меньше выделенного блока
-                    blockData = fileSize;
-                } else {
-                    blockData = 10000;
-                }
-                bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
+            if(typeOfMess == "Request part of file"){   //  отправляется часть файла
 
                 in >> bytes;    //  считываем байты
                 if(file->open(QIODevice::WriteOnly)){
@@ -100,8 +106,9 @@ void Server::slotReadyRead(){
                 } else {
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
-                    SendToClient(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
+                    SendToClient(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
+
 
                     file->close();  //  закрываем файл
                     file = nullptr; //  удаляем файл
