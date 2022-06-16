@@ -79,15 +79,19 @@ void MainWindow::SendToServer(QString str)
 
 void MainWindow::SendPartOfFile()
 {
-    file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
-    QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-    out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << mapRequest["002"] << fileName << fileSize << bytes;   //  отправляем тип данных, название файла, его размер, байты
-    out.device()->seek(0);
-    //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-    out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-    socket->write(Data);
-    file->close();                   //  закрываем файл
+//    if(!(file->open(QIODevice::ReadOnly))){
+//        file->open(QIODevice::ReadOnly);
+//    }
+        file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
+        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+        out.setVersion(QDataStream::Qt_6_2);
+        out << quint64(0) << mapRequest["002"] << fileName << fileSize << bytes;   //  отправляем тип данных, название файла, его размер, байты
+        out.device()->seek(0);
+        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+        out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+        socket->write(Data);
+//        file->close();                   //  закрываем файл
+
 }
 
 void MainWindow::SendFileToServer(QString filePath)
@@ -100,10 +104,11 @@ void MainWindow::SendFileToServer(QString filePath)
     ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
 
     if(fileSize < blockData){   //  если размер файла меньше выделенного блока
-        bytes = new char[fileSize];   //  выделяем байты под файл, то есть передача пройдет за один раз
-    } else {
-        bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
+        blockData = fileSize;
+    } else {    //  если мы еще раз отправляем какой-нибудь файл
+        blockData = 10000;
     }
+    bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
 
     if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
         socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
@@ -112,8 +117,6 @@ void MainWindow::SendFileToServer(QString filePath)
     } else {
         ui->filePathLabel->setText("File not open :(");
     }
-    delete[] bytes; //  удаляем из кучи массив байт
-    delete file;    //  удаляем из кучи файл
 }
 
 
@@ -142,16 +145,30 @@ void MainWindow::slotReadyRead()
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
                 nextBlockSize = 0;  //  обнуляем размер блока для последующего
+                qDebug() << str;
                 ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
             }
 
             if(typeOfMessage == "Request part of file"){
-                ui->textBrowser->append("Downloading new part of file");
+                qDebug() << "Downloading new part of file...";
+                ui->textBrowser->append("Downloading new part of file...");
                 SendPartOfFile();
             }
 
             if(typeOfMessage == "File downloaded"){
-                ui->textBrowser->append("File downloaded");
+                QString inFileName;
+                in >> inFileName;  //  считываем название файла
+
+                qDebug() << "File "+inFileName+" downloaded";
+                ui->textBrowser->append("File "+inFileName+" downloaded");
+
+                file->close();
+                file = nullptr; //  удаляем файл
+                fileName.clear();   //  очищаем его название
+                fileSize = 0;   //  очищаем его размер
+                blockData = 10000;  //  устанавливаем прежний размер байтов
+                delete[] bytes; //  удаляем байты из кучи
+                nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
         }
     } else {

@@ -56,7 +56,7 @@ private:
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QFile *file;     //  сам файлик
-    char *bytes;     //  массив байт данных
+    char *bytes = {0};     //  массив байт данных
     int blockData = 10000;  //  размер данных
 
     void SendToServer(QString str); //  метод отправки на сервер сообщения

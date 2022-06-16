@@ -43,7 +43,7 @@ private:
     int blockData = 10000;  //  размер данных
 
     QString newDirPath; //  путь новой директории
-    QString delimiter = "<font color = black><\\font>=======================";  //  создаем разделитель для сообщений
+    QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений

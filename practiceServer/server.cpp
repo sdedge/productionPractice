@@ -61,8 +61,7 @@ void Server::slotReadyRead(){
                 QString str;    //  создаем переменную строки
                 in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-                SendToClient(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5));      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
-                SendToClient(mapRequest["001"],delimiter);    //  вставляем разделитель
+                SendToClient(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
             }
 
             if(typeOfMess == "File"){    //  отправляется файл
@@ -82,6 +81,8 @@ void Server::slotReadyRead(){
 
                 if(fileSize < blockData){   //  если размер файла меньше выделенного блока
                     blockData = fileSize;
+                } else {
+                    blockData = 10000;
                 }
                 bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
 
@@ -97,7 +98,7 @@ void Server::slotReadyRead(){
 
                     SendToClient(mapRequest["102"],"");    //  запрашиваем новую часть файла
                 } else {
-                    SendToClient(mapRequest["012"],"");    //  говорим, что файл загружен
+                    SendToClient(mapRequest["012"],fileName);    //  говорим, что файл загружен
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл"
                     SendToClient(mapRequest["001"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
@@ -108,6 +109,7 @@ void Server::slotReadyRead(){
                     file = nullptr; //  удаляем файл
                     fileName.clear();   //  очищаем его название
                     fileSize = 0;   //  очищаем его размер
+                    blockData = 10000;  //  устанавливаем прежний размер байтов
                     delete[] bytes; //  удаляем байты из кучи
                     nextBlockSize = 0;  //  обнуляем для новых сообщений
 
@@ -121,7 +123,6 @@ void Server::slotReadyRead(){
 
             nextBlockSize = 0;  //  обнуляем для новых сообщений
             break;  //  выходим, делать больше нечего
-
         }   //  конец while
     } else {
         Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
