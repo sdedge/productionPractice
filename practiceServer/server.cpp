@@ -93,16 +93,17 @@ void Server::slotReadyRead(){
             if(typeOfMess == "Request part of file"){   //  отправляется часть файла
 
                 in >> bytes;    //  считываем байты
-                if(file->open(QIODevice::WriteOnly)){
+                if(file->open(QIODevice::Append)){  //  записываем в конец файла
                     file->write(bytes, blockData);    //  записываем в файл
+
                 } else {
                     Server::signalStatusServer("Не удается открыть файл "+fileName);
                 }
 
-                if(!(file->size() == fileSize)){    //  если размер до сих пор не полон
+                if(file->size() != fileSize){    //  если размер до сих пор не полон
                     Server::signalStatusServer("Текущий размер файла = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-                    SendToClient(mapRequest["102"],"");    //  запрашиваем новую часть файла
+                    SendToClient(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем новую часть файла
                 } else {
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
