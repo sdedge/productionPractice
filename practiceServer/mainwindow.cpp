@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
-//    connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);
+    connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 }
@@ -44,5 +44,6 @@ void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию 
     //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
     ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
     ui->dirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
+    emit signalNewSaveDir(dirPath);
 }
 

@@ -42,7 +42,7 @@ private:
     QString fileName;   //  его название
     int blockData = 1000000;  //  размер данных
 
-    QString newDirPath; //  путь новой директории
+    QString newDirPath = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\"; //  путь новой директории, по умолчанию рабочий стол
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
 
 public slots:

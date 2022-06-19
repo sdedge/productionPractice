@@ -67,6 +67,5 @@ private:
 
 public slots:
     void slotReadyRead();   //  слот готовности к чтению сообщений
-//    void slotSendPartOfFile();  //  слот для отправки новой части файла
 };
 #endif // MAINWINDOW_H

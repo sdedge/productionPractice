@@ -95,9 +95,6 @@ void MainWindow::SendPartOfFile()
 
     qDebug() << "block size" << blockData << "buffer size" << buffer.size();
 
-//    file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
-//    qDebug() << "block: "+QString::number(blockData);   //  нужно, чтобы видеть текущий размер блоков
-
     QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
     out.setVersion(QDataStream::Qt_6_2);
     out << quint64(0) << mapRequest["102"] << buffer;   //  отправляем байты
@@ -128,8 +125,6 @@ void MainWindow::SendFileToServer(QString filePath) //  метод отправ�
     if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
         socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
 
-//        SendPartOfFile();   //  вызываем функцию отправки части файла
-
         QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
         out.setVersion(QDataStream::Qt_6_2);
         out << quint64(0) << mapRequest["002"] << fileName << fileSize;   //  отправляем название файла и его размер
@@ -157,7 +152,7 @@ void MainWindow::slotReadyRead()
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
                 qDebug() << "nextBlockSize == 0";
-                if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 2-х байт
+                if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 8-и байт
                     qDebug() << "Data < 8, break";
                     break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
                 }
@@ -194,14 +189,12 @@ void MainWindow::slotReadyRead()
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
                 qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
-                ui->textBrowser->append("File "+fileName+" downloaded");  //  и то же самое клиенту
-
+                ui->textBrowser->append(str);  //  и то же самое клиенту
                 file->close();
-                file = nullptr; //  удаляем файл
-                fileName.clear();   //  очищаем его название
-                fileSize = 0;   //  очищаем его размер
-                blockData = 1000000;  //  устанавливаем прежний размер байтов
+                delete file; //  удаляем файл
+                file = nullptr;
                 delete[] bytes; //  удаляем байты из кучи
+                nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
 
             nextBlockSize = 0;  //  обнуляем для новых сообщений
