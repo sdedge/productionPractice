@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mapRequest[""] = "";  //  ничего не нужно
     mapRequest["001"] = "Message";   //  отправляется простое сообщение
+    mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
     mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
     mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
@@ -69,7 +70,11 @@ void MainWindow::SendToServer(QString str)
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
     out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
-    out << quint64(0) << mapRequest["001"] << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка
+    if(!ui->callMeLineEdit->text().isEmpty()){
+        out <<  quint64(0) << mapRequest["0011"] << str << ui->callMeLineEdit->text();   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
+    } else {
+        out << quint64(0) << mapRequest["001"] << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка
+    }
     out.device()->seek(0);  //  передвигаемся в начало
     out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     socket->write(Data);    //  записываем данные в сокет

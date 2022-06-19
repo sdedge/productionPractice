@@ -16,6 +16,7 @@ Server::Server(bool &server_started){
 
     mapRequest[""] = "";  //  ничего не нужно
     mapRequest["001"] = "Message";   //  отправляется простое сообщение
+    mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
     mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
     mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
@@ -65,6 +66,13 @@ void Server::slotReadyRead(){
                 SendToClient(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
             }
 
+            if(typeOfMess == "Message from someone"){   //  если сообщение с конкретным отправителем
+                QString str, someone;    //  создаем переменную строки и отправителя
+                in >> str >> someone;   //  считываем
+                Server::signalStatusServer(someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
+                SendToClient(mapRequest["001"],"<font color = black><\\font>"+someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+            }
+
             if(typeOfMess == "File"){    //  отправляется файл
 
                 // mapRequest["002"] << fileName << fileSize << bytes
@@ -105,7 +113,7 @@ void Server::slotReadyRead(){
                 if(file->size() < fileSize){    //  если размер до сих пор не полон
                     Server::signalStatusServer("Текущий размер файла = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-                    SendToClient(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем новую часть файла
+                    SendToClient(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...");    //  запрашиваем новую часть файла
                 } else {
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
