@@ -40,7 +40,7 @@ private:
     char *bytes = {0};     //  массив байт данных
     int fileSize;   //  размер файла
     QString fileName;   //  его название
-    int blockData = 10000;  //  размер данных
+    int blockData = 1000000;  //  размер данных
 
     QString newDirPath; //  путь новой директории
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
