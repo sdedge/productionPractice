@@ -34,7 +34,7 @@ MainWindow::~MainWindow()
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
 {
     qDebug() << status; //  вывод в консоль статуса
-    ui->infoAboutServerTextEdit->append("<font color = black><\\font>"+status);    //  и также в textEdit
+    ui->infoAboutServerTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+status);    //  и также в textEdit
 }
 
 

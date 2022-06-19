@@ -177,7 +177,7 @@ void MainWindow::slotReadyRead()
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
                 qDebug() << str;
-                ui->textBrowser->append(str);   //  выводим полученное сообщение на экран
+                ui->textBrowser->append(QTime::currentTime().toString()+" | "+str);   //  выводим полученное сообщение на экран
             }
 
             if(typeOfMessage == "Request part of file"){    //  если серверу нужна еще одна часть файла
@@ -185,7 +185,7 @@ void MainWindow::slotReadyRead()
                 in >> str;  //  выводим в переменную сообщение
 
                 qDebug() << str;  //  выводим в консоль
-                ui->textBrowser->append(str); //  выводим клиенту
+                ui->textBrowser->append(QTime::currentTime().toString()+" | "+str); //  выводим клиенту
 
                 nextBlockSize = 0;  //  заранее обнуляем размер сообщения
                 SendPartOfFile();   //  вызываем соответствующий метод отправки
@@ -195,7 +195,7 @@ void MainWindow::slotReadyRead()
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
                 qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
-                ui->textBrowser->append(str);  //  и то же самое клиенту
+                ui->textBrowser->append(QTime::currentTime().toString()+" | "+str);  //  и то же самое клиенту
                 file->close();
                 delete file; //  удаляем файл
                 file = nullptr;
