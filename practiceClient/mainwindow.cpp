@@ -56,6 +56,7 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->sendFilePushButton->setEnabled(true);
         ui->sendMsgPushButton->setEnabled(true);
         ui->textBrowser->setEnabled(true);
+        ui->callMeLineEdit->setEnabled(true);
 
         ui->connectToServerPushButton->setEnabled(false);   //  и гасим кнопку подключения
 //    } else {
