@@ -75,7 +75,7 @@ void Server::slotReadyRead(){
 
             if(typeOfMess == "File"){    //  отправляется файл
 
-                // mapRequest["002"] << fileName << fileSize << bytes
+                // mapRequest["002"] << fileName << fileSize
 
                 if(fileName.isEmpty()){    //  если файла не существует
                     in >> fileName;  //  записываем из потока название файла
@@ -111,7 +111,7 @@ void Server::slotReadyRead(){
                 }
 
                 if(file->size() < fileSize){    //  если размер до сих пор не полон
-                    Server::signalStatusServer("Текущий размер файла = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
+                    Server::signalStatusServer("Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
                     SendToClient(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...");    //  запрашиваем новую часть файла
                 } else {
