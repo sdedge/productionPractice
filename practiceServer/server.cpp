@@ -24,7 +24,7 @@ Server::Server(bool &server_started){
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
     socket = new QTcpSocket;    //  создание нового сокета под нового клиента
-    socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, индентифицирующее поток ввода-вывода)
+    socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
 
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);  //  связка готовности чтения
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
