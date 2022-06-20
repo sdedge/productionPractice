@@ -52,7 +52,7 @@ void MainWindow::on_connectToServerPushButton_clicked()
         return;
     }
     if(ui->PortLineEdit->text().isEmpty()){
-        ui->filePathLabel->setText("Host is empty!");
+        ui->filePathLabel->setText("Port is empty!");
         return;
     }
     socket->connectToHost("127.0.0.1", 2323);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
