@@ -47,8 +47,16 @@ MainWindow::~MainWindow()
 void MainWindow::on_connectToServerPushButton_clicked()
 {
     //  TODO: сделать программным способом задание значений для подключения
-
+    if(ui->IPLineEdit->text().isEmpty()){
+        ui->filePathLabel->setText("IP is empty!");
+        return;
+    }
+    if(ui->PortLineEdit->text().isEmpty()){
+        ui->filePathLabel->setText("Host is empty!");
+        return;
+    }
     socket->connectToHost("127.0.0.1", 2323);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
+//    if(socket->bind(ui->IPLineEdit->text(), ui->PortLineEdit->text()))
 //    if(socket->state()==QTcpSocket::ConnectedState){     //  если подключились
         ui->filePathLineEdit->setEnabled(true); //  то включаем интерфейс
         ui->lineEdit->setEnabled(true);
