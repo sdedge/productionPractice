@@ -55,9 +55,14 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->filePathLabel->setText("Port is empty!");
         return;
     }
-    socket->connectToHost("127.0.0.1", 2323);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
-//    if(socket->bind(ui->IPLineEdit->text(), ui->PortLineEdit->text()))
-//    if(socket->state()==QTcpSocket::ConnectedState){     //  если подключились
+    socket->connectToHost(ui->IPLineEdit->text(), ui->PortLineEdit->text().toUInt());   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
+    if(socket->socketDescriptor() != -1){
+        ui->filePathLabel->setText("Check your IP and host! You're offline");
+        return;
+    }
+        //    if(socket->bind(ui->IPLineEdit->text(), ui->PortLineEdit->text()))
+    //    if(socket->state()==QTcpSocket::ConnectedState){     //  если подключились
+        ui->filePathLabel->clear();
         ui->filePathLineEdit->setEnabled(true); //  то включаем интерфейс
         ui->lineEdit->setEnabled(true);
         ui->openFilePushButton->setEnabled(true);
@@ -67,11 +72,10 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->callMeLineEdit->setEnabled(true);
 
         ui->connectToServerPushButton->setEnabled(false);   //  и гасим кнопку подключения
-//    } else {
-//        ui->filePathLabel->setText("No conection");
-//    }
-
-
+    //    } else {
+    //        ui->filePathLabel->setText("No conection");
+    //    }
+        ui->textBrowser->append("You are online!"+delimiter);
 }
 
 void MainWindow::SendToServer(QString str)

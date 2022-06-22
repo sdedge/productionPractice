@@ -58,6 +58,7 @@ private:
     QFile *file;     //  сам файлик
     char *bytes = {0};     //  массив байт данных
     int blockData = 1000000;  //  размер данных
+    QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
 
     void SendToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути

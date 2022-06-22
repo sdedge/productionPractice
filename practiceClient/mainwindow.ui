@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Client</string>
   </property>
+  <property name="inputMethodHints">
+   <set>Qt::ImhFormattedNumbersOnly</set>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">

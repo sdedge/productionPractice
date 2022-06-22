@@ -32,6 +32,7 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
 
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
+    SendToClient(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
     qDebug() << "new client on " << socketDescriptor;
 }
 
