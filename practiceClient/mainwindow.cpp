@@ -56,7 +56,7 @@ void MainWindow::on_connectToServerPushButton_clicked()
         return;
     }
     socket->connectToHost(ui->IPLineEdit->text(), ui->PortLineEdit->text().toUInt());   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
-    if(socket->socketDescriptor() != -1){
+    if(!(socket->isOpen())){
         ui->filePathLabel->setText("Check your IP and host! You're offline");
         return;
     }
