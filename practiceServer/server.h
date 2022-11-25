@@ -49,6 +49,7 @@ private:
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
+    void slotDisconnect();  //  обработчик отключившихся клиентов
     void slotNewSaveDir(QString newDirPath);  //  обработчик новой директории
 
 signals:

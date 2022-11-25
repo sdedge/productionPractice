@@ -27,7 +27,8 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
 
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);  //  связка готовности чтения
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
+//    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
+    connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
 
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
 
@@ -72,6 +73,7 @@ void Server::slotReadyRead(){
                 in >> str >> someone;   //  считываем
                 Server::signalStatusServer(someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
                 SendToClient(mapRequest["001"],"<font color = black><\\font>"+someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+                qDebug() << "quantity of clients: "+QString::number(Sockets.length());
             }
 
             if(typeOfMess == "File"){    //  отправляется файл
@@ -114,7 +116,7 @@ void Server::slotReadyRead(){
                 if(file->size() < fileSize){    //  если размер до сих пор не полон
                     Server::signalStatusServer("Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-                    SendToClient(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...");    //  запрашиваем новую часть файла
+                    SendToClient(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файла
                 } else {
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
@@ -149,6 +151,25 @@ void Server::slotReadyRead(){
     }
 }
 
+void Server::slotDisconnect()
+{
+///     TODO: понять, почему нельзя отслеживать сокет по дискриптору
+//    auto socketsIterator = Sockets.begin(); //  создаем итератор для вектора сокетов
+//    qDebug() << "client on " + QString::number(socket->socketDescriptor()) + " disconnected";    //  вывод для справки
+//    while(socketsIterator != Sockets.end()){    //  пробегаем по вектору
+//        qDebug() << *socketsIterator;   //  текущий сокет
+//        if((*socketsIterator)->socketDescriptor() == socket->socketDescriptor()){   //  если дескриптор текущего вектора равен тому, что отсоединился
+//            Sockets.erase(socketsIterator); //  мы его удаляем по итератору
+//            qDebug() << "client on " + QString::number(socket->socketDescriptor()) + " disconnected";    //  вывод для справки
+//            qDebug() << "quantity of clients: "+QString::number(Sockets.length());
+//            break;  //  и выходим из вектора
+//        }
+//        socketsIterator++;  //  иначе идем к следующему элементу
+//    }
+
+    socket->deleteLater();  //  оставляем удаление сокета программе
+}
+
 void Server::slotNewSaveDir(QString newDirPath) //  пока неработающий обработчик новой директории
 {
     this->newDirPath = newDirPath;  //  установили новую директорию
@@ -159,7 +180,7 @@ void Server::SendToClient(QString typeOfMsg, QString str){ //  отправка 
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << typeOfMsg << str;  //  отправляем размер_сообщения, тип-сообщения и строку при необходимости
+    out << quint64(0) << typeOfMsg << str;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
     for(int i = 0; i < Sockets.size(); i++){    //  пробегаемся по всем сокетам и
