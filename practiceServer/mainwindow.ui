@@ -31,12 +31,16 @@
            <widget class="QTextBrowser" name="ChatTextBrowser"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="lineEdit">
+            <property name="placeholderText">
+             <string>Text message</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="sendMsgPushButton">
             <property name="text">
-             <string>PushButton</string>
+             <string>Send message</string>
             </property>
            </widget>
           </item>

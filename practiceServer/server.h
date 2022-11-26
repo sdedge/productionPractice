@@ -54,6 +54,7 @@ public slots:
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
+//    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };
 
 #endif // SERVER_H

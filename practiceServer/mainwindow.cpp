@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
+//    connect(server)
     connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
@@ -36,6 +37,11 @@ void MainWindow::slotStatusServer(QString status)   //  обработчик с�
     qDebug() << status; //  вывод в консоль статуса
     ui->infoAboutServerTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+status);    //  и также в textEdit
 }
+
+//void MainWindow::slotChatServer(QString message)    //  обработчик чата
+//{
+//    ui->ChatTextBrowser->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+message);
+//}
 
 
 void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию на "Choose save directory"

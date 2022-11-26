@@ -41,6 +41,7 @@ private:
 
 public slots:
     void slotStatusServer(QString status);  //  обработчик статуса сервера
+//    void slotChatServer(QString message);   //  обработчик чата на стороне сервера
 
 private slots:
     void on_chooseSaveDirPushButton_clicked();  //  по нажатию на "Choose save directory"
