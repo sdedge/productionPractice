@@ -95,7 +95,17 @@ void Server::slotReadyRead(){
                     file->setFileName(fileName);    //  устанавливаем имя файла
                     QDir::setCurrent(newDirPath);  //  устанавливаем путь сохранения на рабочем столе
                     Server::signalStatusServer("Файл "+fileName+" создан на сервере");  //  уведомляем
-                    SendToAllClients(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
+
+                    Data.clear();   //  может быть мусор
+
+                    QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
+                    out.setVersion(QDataStream::Qt_6_2);
+                    out << quint64(0) << mapRequest["102"] << "Downloading new part of file...";  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
+                    out.device()->seek(0);  //  в начало потока
+                    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
+                    socket->write(Data);    //  отправляем по сокету данные
+
+                    //  SendToAllClients(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
                 }
             }
 
@@ -117,13 +127,30 @@ void Server::slotReadyRead(){
                 if(file->size() < fileSize){    //  если размер до сих пор не полон
                     Server::signalStatusServer("Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-                    SendToAllClients(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файла
+                    //  SendToAllClients(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файла
+
+                    Data.clear();   //  может быть мусор
+
+                    QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
+                    out.setVersion(QDataStream::Qt_6_2);
+                    out << quint64(0) << mapRequest["102"] << "<font color = black><\\font>Downloading new part of file...<font color = black><\\font>";  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
+                    out.device()->seek(0);  //  в начало потока
+                    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
+                    socket->write(Data);    //  отправляем по сокету данные
                 } else {
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
-                    SendToAllClients(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
+                    //  SendToAllClients(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
 
+                    Data.clear();   //  может быть мусор
+
+                    QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
+                    out.setVersion(QDataStream::Qt_6_2);
+                    out << quint64(0) << mapRequest["012"] << "<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
+                    out.device()->seek(0);  //  в начало потока
+                    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
+                    socket->write(Data);    //  отправляем по сокету данные
 
                     file->close();  //  закрываем файл
                     file = nullptr; //  удаляем файл

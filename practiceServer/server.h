@@ -32,7 +32,8 @@ private:
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
 
-    void SendToAllClients(QString typeOfMsg, QString str);    //  функция для передачи данных клиенту
+    void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
+    void SendToOneClient(QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
 
     qint64 nextBlockSize;   //  блок нового сообщения
 
