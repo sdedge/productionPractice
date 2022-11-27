@@ -33,7 +33,7 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     Sockets.push_back(socket);  //  помещаем сокет в контейнер
 
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
-    SendToClient(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
+    SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
     qDebug() << "new client on " << socketDescriptor;
 }
 
@@ -65,14 +65,15 @@ void Server::slotReadyRead(){
                 QString str;    //  создаем переменную строки
                 in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
                 Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-                SendToClient(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+
+                SendToAllClients(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
             }
 
             if(typeOfMess == "Message from someone"){   //  если сообщение с конкретным отправителем
                 QString str, someone;    //  создаем переменную строки и отправителя
                 in >> str >> someone;   //  считываем
                 Server::signalStatusServer(someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-                SendToClient(mapRequest["001"],"<font color = black><\\font>"+someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
+                SendToAllClients(mapRequest["001"],"<font color = black><\\font>"+someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
                 qDebug() << "quantity of clients: "+QString::number(Sockets.length());
             }
 
@@ -94,7 +95,7 @@ void Server::slotReadyRead(){
                     file->setFileName(fileName);    //  устанавливаем имя файла
                     QDir::setCurrent(newDirPath);  //  устанавливаем путь сохранения на рабочем столе
                     Server::signalStatusServer("Файл "+fileName+" создан на сервере");  //  уведомляем
-                    SendToClient(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
+                    SendToAllClients(mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
                 }
             }
 
@@ -116,12 +117,12 @@ void Server::slotReadyRead(){
                 if(file->size() < fileSize){    //  если размер до сих пор не полон
                     Server::signalStatusServer("Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-                    SendToClient(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файла
+                    SendToAllClients(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файла
                 } else {
                     //  оформляем чат на стороне Сервера
                     //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
-                    SendToClient(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
+                    SendToAllClients(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
 
 
                     file->close();  //  закрываем файл
@@ -175,7 +176,7 @@ void Server::slotNewSaveDir(QString newDirPath) //  пока неработаю�
     this->newDirPath = newDirPath;  //  установили новую директорию
 }
 
-void Server::SendToClient(QString typeOfMsg, QString str){ //  отправка клиенту сообщений
+void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправка клиенту сообщений
     Data.clear();   //  может быть мусор
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
