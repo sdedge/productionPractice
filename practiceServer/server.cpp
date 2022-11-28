@@ -45,7 +45,7 @@ void Server::slotReadyRead(){
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
                 qDebug() << "nextBlockSize == 0";
-                qDebug() << socket->bytesAvailable();   //  выводим размер ожидающих байтов
+                qDebug() << "size of waiting bytes" << socket->bytesAvailable();   //  выводим размер ожидающих байтов
                 if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 8-и байт
                     qDebug() << "Data < 8, break";
                     break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
