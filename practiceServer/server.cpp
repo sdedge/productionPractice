@@ -25,7 +25,6 @@ Server::Server(bool &server_started){
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
     socket = new QTcpSocket;    //  создание нового сокета под нового клиента
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
-
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);  //  связка готовности чтения
 //    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
     connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
@@ -35,6 +34,7 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
     SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
     qDebug() << "new client on " << socketDescriptor;
+    qDebug() << "push quantity of clients: "+QString::number(Sockets.length());
 }
 
 void Server::slotReadyRead(){
@@ -74,7 +74,6 @@ void Server::slotReadyRead(){
                 in >> str >> someone;   //  считываем
                 Server::signalStatusServer(someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
                 SendToAllClients(mapRequest["001"],"<font color = black><\\font>"+someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
-                qDebug() << "quantity of clients: "+QString::number(Sockets.length());
             }
 
             if(typeOfMess == "File"){    //  отправляется файл
@@ -181,19 +180,10 @@ void Server::slotReadyRead(){
 
 void Server::slotDisconnect()
 {
-///     TODO: понять, почему нельзя отслеживать сокет по дискриптору
-//    auto socketsIterator = Sockets.begin(); //  создаем итератор для вектора сокетов
-//    qDebug() << "client on " + QString::number(socket->socketDescriptor()) + " disconnected";    //  вывод для справки
-//    while(socketsIterator != Sockets.end()){    //  пробегаем по вектору
-//        qDebug() << *socketsIterator;   //  текущий сокет
-//        if((*socketsIterator)->socketDescriptor() == socket->socketDescriptor()){   //  если дескриптор текущего вектора равен тому, что отсоединился
-//            Sockets.erase(socketsIterator); //  мы его удаляем по итератору
-//            qDebug() << "client on " + QString::number(socket->socketDescriptor()) + " disconnected";    //  вывод для справки
-//            qDebug() << "quantity of clients: "+QString::number(Sockets.length());
-//            break;  //  и выходим из вектора
-//        }
-//        socketsIterator++;  //  иначе идем к следующему элементу
-//    }
+    QTcpSocket* sender = static_cast<QTcpSocket*>(QObject::sender());
+    Sockets.removeOne(sender);
+    qDebug() << "pop quantity of clients: "+QString::number(Sockets.length());
+    SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+sender->localAddress().toString()+": has disconnected \n"+delimiter);
 
     socket->deleteLater();  //  оставляем удаление сокета программе
 }
