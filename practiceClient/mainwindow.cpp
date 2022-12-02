@@ -118,7 +118,7 @@ void MainWindow::SendPartOfFile()
     out << quint64(0) << mapRequest["102"] << buffer;   //  отправляем байты
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-    qDebug() << quint64(Data.size() - sizeof(quint64));
+    qDebug() << "sending blockSize = " << quint64(Data.size() - sizeof(quint64));
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
     socket->write(Data);
 
