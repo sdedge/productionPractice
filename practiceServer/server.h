@@ -55,6 +55,7 @@ public slots:
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
+//    void signalAddSocketToListWidget();     //  слот для добавления сокета в clientsListWidget
 //    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };
 

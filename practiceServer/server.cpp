@@ -29,8 +29,7 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
 //    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
     connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
 
-    Sockets.push_back(socket);  //  помещаем сокет в контейнер
-
+    Sockets.push_back(socket);  //  помещаем сокет в контейнер    
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
     SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
     qDebug() << "new client on " << socketDescriptor;
@@ -125,7 +124,10 @@ void Server::slotReadyRead(){
                     Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
                     //  SendToAllClients(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
 
-                    SendToOneClient(socket, mapRequest["102"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
+                    SendToOneClient(socket, mapRequest["012"], "<font color = green><\\font>file \""+fileName+"\" downloaded \n"+delimiter);
+
+                    //  TODO: при отправке всем происходит баг в задержке сообщений. решить
+                    //  SendToAllClients(mapRequest["001"], "<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
 
                     file->close();  //  закрываем файл
                     file = nullptr; //  удаляем файл

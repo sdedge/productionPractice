@@ -121,7 +121,7 @@ void MainWindow::SendPartOfFile()
     qDebug() << "sending blockSize = " << quint64(Data.size() - sizeof(quint64));
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
     socket->write(Data);
-
+    qDebug() << "Data size = " << Data.size();
 }
 
 void MainWindow::SendFileToServer(QString filePath) //  метод отправки файла серверу (его начало)
