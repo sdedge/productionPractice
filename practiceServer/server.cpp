@@ -20,6 +20,15 @@ Server::Server(bool &server_started){
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
     mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
     mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
+
+    fileSystemWatcher = new QFileSystemWatcher;
+    fileSystemWatcher->addPath(folderForRawInformation);    //  устанавливаем папку для слежки
+    connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotFolderForRawInformationChanged(QString)));
+}
+
+void Server::slotFolderForRawInformationChanged(const QString &fileName)
+{
+    qDebug() << fileName;
 }
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
@@ -31,6 +40,7 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
 
     Sockets.push_back(socket);  //  помещаем сокет в контейнер    
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
+    Server::signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
     SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
     qDebug() << "new client on " << socketDescriptor;
     qDebug() << "push quantity of clients: "+QString::number(Sockets.length());
@@ -158,12 +168,12 @@ void Server::slotReadyRead(){
 
 void Server::slotDisconnect()
 {
-    QTcpSocket* sender = static_cast<QTcpSocket*>(QObject::sender());
-    Sockets.removeOne(sender);
+    QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
+    Sockets.removeOne(disconnectedSocket);
     qDebug() << "pop quantity of clients: "+QString::number(Sockets.length());
-    SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+sender->localAddress().toString()+": has disconnected \n"+delimiter);
-
-    socket->deleteLater();  //  оставляем удаление сокета программе
+    SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
+    Server::signalDeleteSocketFromListWidget(disconnectedSocket);
+    disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
 }
 
 void Server::slotNewSaveDir(QString newDirPath) //  пока неработающий обработчик новой директории

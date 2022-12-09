@@ -11,6 +11,7 @@
 ///  ========================   классы для работы с файлами
 #include <QFile>    //  для работы с файлами
 #include <QDir>     //  для работы с директорией
+#include <QFileSystemWatcher>   //  наблюдатель за файловой системой
 ///  ========================
 ///
 ///  ========================   дополнения
@@ -45,17 +46,22 @@ private:
     QString someone;    //  имя отправителя
 
     QString newDirPath = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\"; //  путь новой директории, по умолчанию рабочий стол
+    QString folderForRawInformation = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\folderForRawInformation";  //  путь к папке с приходящей обработанной информацией от клиентов
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
+
+    QFileSystemWatcher *fileSystemWatcher;
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
     void slotDisconnect();  //  обработчик отключившихся клиентов
     void slotNewSaveDir(QString newDirPath);  //  обработчик новой директории
+    void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
-//    void signalAddSocketToListWidget();     //  слот для добавления сокета в clientsListWidget
+    void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
+    void signalDeleteSocketFromListWidget(QTcpSocket* socketToDelete);  //  слот для удаления сокета из clientsListWidget при его отключении
 //    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };
 

@@ -11,6 +11,8 @@
 
 #include <QFileDialog>
 
+#include <QListWidgetItem>
+
 #include "server.h"
 
 QT_BEGIN_NAMESPACE
@@ -41,6 +43,10 @@ private:
 
 public slots:
     void slotStatusServer(QString status);  //  обработчик статуса сервера
+
+    void slotAddSocketToListWidget(QTcpSocket* socketToAdd);    //  обработчик отображения добавляемых сокетов
+
+    void slotDeleteSocketFromListWidget(QTcpSocket* socketToDelete);    //  обработчик удаления отключившихся сокетов
 //    void slotChatServer(QString message);   //  обработчик чата на стороне сервера
 
 private slots:

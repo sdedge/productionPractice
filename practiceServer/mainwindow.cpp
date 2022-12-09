@@ -20,11 +20,14 @@ MainWindow::MainWindow(QWidget *parent)
             ui->infoAboutServerTextEdit->append("Сервер не запущен");   //  уведомление
         }
 
-    connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);
-//    connect(server)
-    connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);
+    connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+    connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
+    connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
+    connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);  //  связка для отображения новой директории
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
+
+//    ui->clientsListWidget->children()->setContextMenuPolicy(Qt::CustomContextMenu);     //  создаем к меню контекстное меню
 }
 
 MainWindow::~MainWindow()
@@ -36,6 +39,27 @@ void MainWindow::slotStatusServer(QString status)   //  обработчик с�
 {
     qDebug() << status; //  вывод в консоль статуса
     ui->infoAboutServerTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+status);    //  и также в textEdit
+}
+
+void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
+{
+    //  TODO:   сделать обращение к clientsListWidget и добавление данных с сокета
+    ui->clientsListWidget->addItem("User desc: "+QString::number(socketToAdd->socketDescriptor())+" | IP: "+socketToAdd->localAddress().toString());
+//    qDebug() << QString::number(socketToAdd->socketDescriptor()) << socketToAdd->localAddress().toString();
+}
+
+void MainWindow::slotDeleteSocketFromListWidget(QTcpSocket *socketToDelete)
+{
+    qDebug() << "User desc :"+QString::number(socketToDelete->socketDescriptor())+" | IP: "+socketToDelete->localAddress().toString();
+    for(int i = 0; i < ui->clientsListWidget->count(); i++){    //  перебираем все элементы clietnsListWidget
+        //  ↓↓↓ Если текст элемента совпадает с удаляемым сокетом, ....
+        if(ui->clientsListWidget->item(i)->text() == "User desc :"+QString::number(socketToDelete->socketDescriptor())+" | IP: "+socketToDelete->localAddress().toString()){
+            QListWidgetItem* itemSocketToDelete = ui->clientsListWidget->takeItem(i);   //  ...., то удаляем из clientsListWidget сокет
+            delete itemSocketToDelete;  //  но он останется в памяти, поэтому его надо удалить вручную по совету документации
+            break;
+        }
+    }
+
 }
 
 //void MainWindow::slotChatServer(QString message)    //  обработчик чата
@@ -54,4 +78,3 @@ void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию 
         emit signalNewSaveDir(dirPath);
     }
 }
-
