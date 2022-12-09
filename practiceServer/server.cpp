@@ -28,6 +28,16 @@ Server::Server(bool &server_started){
 
 void Server::slotFolderForRawInformationChanged(const QString &fileName)
 {
+    QDir workWithDirectory;
+    workWithDirectory.cd(fileName);
+    workWithDirectory.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);     //  устанавливаем фильтр выводимых файлов/папок
+    workWithDirectory.setSorting(QDir::Size | QDir::Reversed);  //  устанавливаем сортировку "от меньшего к большему"
+    QFileInfoList list = workWithDirectory.entryInfoList();     //  получаем список файлов директории
+    for (int i = 0; i < list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+        qDebug() << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));     //  выводим в формате "размер имя"
+        qDebug() << "";     // переводим строку
+    }
     qDebug() << fileName;
 }
 
