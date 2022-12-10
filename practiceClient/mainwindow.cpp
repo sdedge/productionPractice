@@ -18,7 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
     mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
     mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
+    mapRequest["103"] = "Request part of processing file";  //  запрос на еще одну часть обрабатываемого файла
     mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
+    mapRequest["004"] = "Possible treatments ComboBox data";    //  отправка данных по доступным обработкам
+    mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
 
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении сокет сам удалится
@@ -70,6 +73,8 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->sendMsgPushButton->setEnabled(true);
         ui->textBrowser->setEnabled(true);
         ui->callMeLineEdit->setEnabled(true);
+        ui->chooseTreatmentComboBox->setEnabled(true);
+        ui->chooseTreatmentPushButton->setEnabled(true);
 
         ui->connectToServerPushButton->setEnabled(false);   //  и гасим кнопку подключения
     //    } else {
@@ -78,7 +83,7 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->textBrowser->append("You are online!"+delimiter);
 }
 
-void MainWindow::SendToServer(QString str)
+void MainWindow::SendTextToServer(QString str)
 {
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
@@ -122,6 +127,18 @@ void MainWindow::SendPartOfFile()
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
     socket->write(Data);
     qDebug() << "Data size = " << Data.size();
+}
+
+void MainWindow::SendToServer(QString typeOfMsg, QString str)   //  отдельная функция отправки сообщения, чтобы она не пересекалась с другими
+{
+    Data.clear();   //  может быть мусор
+
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint64(0) << typeOfMsg << str;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
+    out.device()->seek(0);  //  в начало потока
+    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
+    socket->write(Data);    //  отправляем данные на сервер
 }
 
 void MainWindow::SendFileToServer(QString filePath) //  метод отправки файла серверу (его начало)
@@ -192,6 +209,29 @@ void MainWindow::slotReadyRead()
                 ui->textBrowser->append(QTime::currentTime().toString()+" | "+str);   //  выводим полученное сообщение на экран
             }
 
+            if(typeOfMessage == "File"){    //  отправляется файл
+
+                // mapRequest["002"] << fileName << fileSize
+
+                if(fileName.isEmpty()){    //  если файла не существует
+                    in >> fileName;  //  записываем из потока название файла
+                    in >> fileSize; //  считываем его размер
+
+                    if(fileSize < blockData){   //  если размер файла меньше выделенного блока
+                        blockData = fileSize;   //  устанавливаем размер блока ровно по файлу (передача произойдет в один этап)
+                    } else {
+                        blockData = 1000000;  //  устанавливаем по умолчанию (на случай последующей передачи, если размер файла будет куда больше)
+                    }
+
+                    file = new QFile;     //  определяем файл
+                    file->setFileName(fileName);    //  устанавливаем имя файла
+                    QDir::setCurrent(rawInformationDirectory);  //  устанавливаем путь сохранения на рабочем столе
+
+
+                    SendToServer(mapRequest["103"],"Downloading new part of processing file to "+QString::number(socket->socketDescriptor())+"...");    //  запрашиваем первую часть файла
+                }
+            }
+
             if(typeOfMessage == "Request part of file"){    //  если серверу нужна еще одна часть файла
                 QString str;    //  определяем переменную, в которую сохраним уведомление от запроса
                 in >> str;  //  выводим в переменную сообщение
@@ -201,6 +241,55 @@ void MainWindow::slotReadyRead()
 
                 nextBlockSize = 0;  //  заранее обнуляем размер сообщения
                 SendPartOfFile();   //  вызываем соответствующий метод отправки
+            }
+
+            if(typeOfMessage == "Request part of processing file"){
+                if((fileSize - file->size()) < blockData){  //  если разница между плановым и текущим размером файла меньше блока байтов
+                    blockData = fileSize - file->size();    //  мы устанавливаем такой размер для блока (разницу)
+                }
+
+                bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
+
+                in >> bytes;    //  считываем байты
+
+                if(file->open(QIODevice::Append)){  //  записываем в конец файла
+                    file->write(bytes, blockData);    //  записываем в файл
+                } else {
+                    qDebug() << "Не удается открыть файл "+fileName;
+                }
+
+                if(file->size() < fileSize){    //  если размер до сих пор не полон
+                    qDebug() << "Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize);
+
+                    //  SendToAllClients(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файл
+                    SendToServer(mapRequest["103"],"<font color = black><\\font>Downloading new part of processing file...<font color = black><\\font>");    //  запрашиваем первую часть файла
+                } else {
+                    //  оформляем чат на стороне Сервера
+                    //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
+                    qDebug() << "Server: send file by name \""+fileName+"\"";
+                    //  SendToAllClients(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
+
+                    SendToServer(mapRequest["012"], "<font color = green><\\font>file \""+fileName+"\" downloaded \n"+delimiter);
+
+                    //  TODO: при отправке всем происходит баг в задержке сообщений. решить
+                    //  SendToAllClients(mapRequest["001"], "<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
+
+                    file->close();  //  закрываем файл
+                    file = nullptr; //  удаляем файл
+                    fileName.clear();   //  очищаем его название
+                    fileSize = 0;   //  очищаем его размер
+                    blockData = 1000000;  //  устанавливаем прежний размер байтов
+                    delete[] bytes; //  удаляем байты из кучи
+                    nextBlockSize = 0;  //  обнуляем для новых сообщений
+
+                    return; //  выходим
+                }
+
+                file->close();   //закрываем файл
+                if(bytes != nullptr){   //  удаляем байты из кучи, делая проверку на случай двойного удаления
+                    delete[] bytes;
+                    bytes = nullptr;
+                }
             }
 
             if(typeOfMessage == "File downloaded"){ //  если файл полностью скачался
@@ -215,6 +304,16 @@ void MainWindow::slotReadyRead()
                 nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
 
+            if(typeOfMessage == "Possible treatments ComboBox data"){
+                in >> possibleTreatments;  //  выводим в глобальную переменную map из доступных обработок
+                qDebug() << possibleTreatments;
+
+                for(auto item = possibleTreatments.begin(); item != possibleTreatments.end(); ++item)
+                {
+                    ui->chooseTreatmentComboBox->addItem(item.value());
+                }
+            }
+
             nextBlockSize = 0;  //  обнуляем для новых сообщений
             break;  //  выходим, делать больше нечего
         }   //  конец whil'a
@@ -227,7 +326,7 @@ void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Se
 {
     if(!ui->lineEdit->text().isEmpty()){    //  проверка на то, НЕ пустое ли сообщение
         ui->filePathLabel->clear();     //  чистим от предыдущего уведомления
-        SendToServer("MESS:"+ui->lineEdit->text());     //  отправляем сообщение со служебным префиксом
+        SendTextToServer("MESS:"+ui->lineEdit->text());     //  отправляем сообщение со служебным префиксом
     } else {
         ui->filePathLabel->setText("Your msg is empty!");   //  уведомляем о пустом сообщении
     }
@@ -238,7 +337,7 @@ void MainWindow::on_lineEdit_returnPressed()    //  сообщение такж�
 {
     if(!ui->lineEdit->text().isEmpty()){    //  проверка на то, НЕ пустое ли сообщение
         ui->filePathLabel->clear();     //  чистим от предыдущего уведомления
-        SendToServer("MESS:"+ui->lineEdit->text()); //  отправляем сообщение со служебным префиксом
+        SendTextToServer("MESS:"+ui->lineEdit->text()); //  отправляем сообщение со служебным префиксом
     } else {
         ui->filePathLabel->setText("Your msg is empty!");   //  уведомляем о пустом сообщении
     }
@@ -253,12 +352,18 @@ void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на
 }
 
 
-void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на "Send file"
+void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на кнопку "Send file"
 {
     QString filePath;   //  определяем наш путь к файлу
     filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
     ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
 
     SendFileToServer(filePath); //  отправляем серверу файл
+}
+
+
+void MainWindow::on_chooseTreatmentPushButton_clicked() //  по нажатию на кнопку "Choose treatment"
+{
+    SendToServer(mapRequest["0041"], ui->chooseTreatmentComboBox->currentText());   //  отправляем серверу текущий текст в комбобоксе
 }
 

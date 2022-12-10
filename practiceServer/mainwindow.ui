@@ -15,10 +15,10 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="0">
+    <item row="1" column="0">
      <widget class="QTabWidget" name="serverTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="movable">
        <bool>true</bool>
@@ -77,34 +77,120 @@
        <attribute name="title">
         <string>Settings</string>
        </attribute>
-       <widget class="QPushButton" name="chooseSaveDirPushButton">
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>80</y>
+          <width>207</width>
+          <height>93</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="PossibleTreatments">
+         <item row="1" column="0">
+          <widget class="QLabel" name="possibleTreatmetsLabel">
+           <property name="text">
+            <string>Возможные обработки:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QComboBox" name="possibleTreatmetsComboBox"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="possibleTreatmetsPushButton">
+           <property name="text">
+            <string>нерабочая Добавить новую</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>20</x>
           <y>20</y>
-          <width>171</width>
-          <height>29</height>
+          <width>381</width>
+          <height>58</height>
          </rect>
         </property>
-        <property name="text">
-         <string>Choose save directory</string>
-        </property>
+        <layout class="QGridLayout" name="ChooseSaveDirectory">
+         <item row="0" column="0">
+          <widget class="QPushButton" name="chooseSaveDirPushButton">
+           <property name="text">
+            <string>Choose save directory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="dirPathLabel">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
-       <widget class="QLabel" name="dirPathLabel">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>50</y>
-          <width>421</width>
-          <height>20</height>
+          <y>190</y>
+          <width>247</width>
+          <height>31</height>
          </rect>
         </property>
-        <property name="text">
-         <string/>
+        <layout class="QHBoxLayout" name="QuantityOfClients">
+         <item>
+          <widget class="QLabel" name="quantityOfClientsLabel">
+           <property name="text">
+            <string>Количество пользователей</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="quantityOfClientsSpinBox"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>230</y>
+          <width>210</width>
+          <height>30</height>
+         </rect>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
+        <layout class="QHBoxLayout" name="ChangeIP">
+         <item>
+          <widget class="QLabel" name="changeIPLabel">
+           <property name="text">
+            <string>Сменить IP</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="changeIPLineEdit"/>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>

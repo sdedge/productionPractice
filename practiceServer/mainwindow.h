@@ -47,6 +47,8 @@ public slots:
     void slotAddSocketToListWidget(QTcpSocket* socketToAdd);    //  обработчик отображения добавляемых сокетов
 
     void slotDeleteSocketFromListWidget(QTcpSocket* socketToDelete);    //  обработчик удаления отключившихся сокетов
+
+    void slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd);  //  обработчик добавления новой обработки
 //    void slotChatServer(QString message);   //  обработчик чата на стороне сервера
 
 private slots:
@@ -54,6 +56,7 @@ private slots:
 
 signals:
     void signalNewSaveDir(QString);   //  слот для обработки директории сохранения
+    void signalSocketDisplayed(QTcpSocket* displayedSocket);   //  сигнал для обработки уже отобразившихся сокетов
 };
 
 #endif // MAINWINDOW_H

@@ -19,28 +19,63 @@ Server::Server(bool &server_started){
     mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
     mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
+    mapRequest["103"] = "Request part of processing file";  //  запрос на еще одну часть обрабатываемого файла
     mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
+    mapRequest["004"] = "Possible treatments ComboBox data";    //  отправка данных по доступным обработкам
+    mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
+
+    possibleTreatments["DOUBLE_INFO"] = "Дублирование информации";  //  содержимое файла дублируется в конец
 
     fileSystemWatcher = new QFileSystemWatcher;
     fileSystemWatcher->addPath(folderForRawInformation);    //  устанавливаем папку для слежки
     connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotFolderForRawInformationChanged(QString)));
+
+    /// TODO: сделать функцию, которая сама будет определять, какие типы обработок серверу нужны
+    /// то есть она должна просматривать файл с настройками и добавлять их в выпадающий список
+
+    // временный вариант с одной обработкой (пока не будет сохранения настроек):
+    //
+    //  НЕ РАБОТАЕТ
+    //
+    //Server::signalAddTreatmentToPossibleTreatmentsComboBox("DOUBLE_INFO");  //  программно добавляем в PossibleTreatmentsComboBox вид обработки
 }
 
-void Server::slotFolderForRawInformationChanged(const QString &fileName)
+void Server::SendPossibleTreatments(QTcpSocket* socketForSend)
 {
-    QDir workWithDirectory;
-    workWithDirectory.cd(fileName);
+    Data.clear();   //  может быть мусор
+
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint64(0) << mapRequest["004"] << possibleTreatments;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
+    out.device()->seek(0);  //  в начало потока
+    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
+    socketForSend->write(Data);    //  отправляем по сокету данные
+}
+
+void Server::slotFolderForRawInformationChanged(const QString &folderName)
+{
+    QDir workWithDirectory;     //  создаем рабочую директорию
+    workWithDirectory.cd(folderName); //  переходим в нужный каталог
+
+    QStringList filters;    //  создаем список для фильтра
+    filters << "DOUBLE_INFO*.txt";  //  заполняем
+
+    workWithDirectory.setNameFilters(filters);  //  устанавливаем фильтр
     workWithDirectory.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);     //  устанавливаем фильтр выводимых файлов/папок
     workWithDirectory.setSorting(QDir::Size | QDir::Reversed);  //  устанавливаем сортировку "от меньшего к большему"
     QFileInfoList list = workWithDirectory.entryInfoList();     //  получаем список файлов директории
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo fileInfo = list.at(i);
-        if(fileInfo.fileName().startsWith("DOUBLE_INFO") && fileInfo.fileName().endsWith(".txt")){      //  проверяем только файлы "DOUBLE_INFO......txt"
-            qDebug() << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //  выводим в формате "размер имя"
-        }
-        qDebug() << "";     // переводим строку
+        qDebug() << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //  выводим в формате "размер имя"
+        SendFileToClient(fileInfo.filePath());  //  отправляем файл клиенту
     }
-    qDebug() << fileName;
+    qDebug() << folderName;
+    qDebug() << "================";     // переводим строку
+}
+
+void Server::slotSocketDisplayed(QTcpSocket* displayedSocket)
+{
+    SendPossibleTreatments(displayedSocket);
 }
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
@@ -120,6 +155,17 @@ void Server::slotReadyRead(){
                 }
             }
 
+            if(typeOfMess == "Request part of processing file"){    //  от нас запрашивается новая часть файла
+                QString str;    //  определяем переменную, в которую сохраним уведомление от запроса
+                in >> str;  //  выводим в переменную сообщение
+
+                qDebug() << str;  //  выводим в консоль
+                Server::signalStatusServer(QTime::currentTime().toString()+" | "+str); //  выводим клиенту
+
+                nextBlockSize = 0;  //  заранее обнуляем размер сообщения
+                SendPartOfFile();   //  вызываем соответствующий метод отправки
+            }
+
             if(typeOfMess == "Request part of file"){   //  отправляется часть файла
                 if((fileSize - file->size()) < blockData){  //  если разница между плановым и текущим размером файла меньше блока байтов
                     blockData = fileSize - file->size();    //  мы устанавливаем такой размер для блока (разницу)
@@ -170,6 +216,22 @@ void Server::slotReadyRead(){
 
             }   //  конец, если отправляется файл
 
+            if(typeOfMess == "File downloaded"){ //  если файл полностью скачался
+                QString str;    //  определяем переменную, в которую сохраним данные
+                in >> str;  //  выводим в переменную сообщение
+                qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
+                Server::signalStatusServer(QTime::currentTime().toString()+" | "+str);  //  и то же самое клиенту
+                file->close();
+                delete file; //  удаляем файл
+                file = nullptr;
+                delete[] bytes; //  удаляем байты из кучи
+                nextBlockSize = 0;  //  обнуляем для новых сообщений
+            }
+
+            if(typeOfMess == "Set treatment on client"){
+
+            }
+
             nextBlockSize = 0;  //  обнуляем для новых сообщений
             break;  //  выходим, делать больше нечего
         }   //  конец while
@@ -216,5 +278,66 @@ void Server::SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str)
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
     socket->write(Data);    //  отправляем по сокету данные
+}
+
+void Server::SendFileToClient(QString filePath)
+{
+    Data.clear();   //  чистим массив байт от мусора
+    file = new QFile(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
+    fileSize = file->size();     //  определяем размер файла
+    QFileInfo fileInfo(file->fileName());    //  без этой строки название файла будет хранить полный путь до него
+    fileName = fileInfo.fileName();     //  записываем название файла
+
+    Server::signalStatusServer("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его найти
+
+    if(fileSize < blockData){   //  если размер файла меньше выделенного блока
+        blockData = fileSize;
+    } else {    //  если мы еще раз отправляем какой-нибудь файл
+        blockData = 1000000;  //  возвращаем дефолтное значение
+    }
+    bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
+
+    if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
+        socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+
+        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+        out.setVersion(QDataStream::Qt_6_2);
+        out << quint64(0) << mapRequest["002"] << fileName << fileSize;   //  отправляем название файла и его размер
+        out.device()->seek(0);
+        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+        out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+        socket->write(Data);
+    } else {
+        Server::signalStatusServer("File"+fileName+" not open :(");
+    }
+}
+
+void Server::SendPartOfFile()
+{
+    if((fileSize - file->pos()) < blockData){   //  если остаток файла будет меньше блока байт
+        blockData = fileSize - file->pos();     //  мы просто будем читать этот остаток
+    }
+
+    socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+    Data.clear();
+
+    qDebug() << "read " << file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
+    qDebug() << "block: "+QString::number(blockData);   //  нужно, чтобы видеть текущий размер блоков
+
+
+    QByteArray buffer;
+    buffer = buffer.fromRawData(bytes, blockData);
+
+    qDebug() << "block size" << blockData << "buffer size" << buffer.size();
+
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint64(0) << mapRequest["102"] << buffer;   //  отправляем байты
+    out.device()->seek(0);
+    //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    qDebug() << "sending blockSize = " << quint64(Data.size() - sizeof(quint64));
+    out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+    socket->write(Data);
+    qDebug() << "Data size = " << Data.size();
 }
 

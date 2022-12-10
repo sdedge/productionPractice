@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>593</width>
-    <height>610</height>
+    <width>587</width>
+    <height>686</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,21 +22,11 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>571</width>
-      <height>541</height>
+      <width>561</width>
+      <height>621</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0" colspan="2">
-      <widget class="QPushButton" name="connectToServerPushButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string>Connect to Server</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLineEdit" name="IPLineEdit">
        <property name="maxLength">
@@ -47,24 +37,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QPushButton" name="sendMsgPushButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Send msg</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" colspan="2">
-      <widget class="QTextBrowser" name="textBrowser">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0" colspan="2">
+     <item row="9" column="0" colspan="2">
       <widget class="QPushButton" name="sendFilePushButton">
        <property name="enabled">
         <bool>false</bool>
@@ -74,13 +47,43 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
-      <widget class="QPushButton" name="openFilePushButton">
+     <item row="8" column="0">
+      <widget class="QLineEdit" name="filePathLineEdit">
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="placeholderText">
+        <string>Enter file path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="QLabel" name="filePathLabel">
        <property name="text">
-        <string>Or open file</string>
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QTextBrowser" name="textBrowser">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Text your message</string>
        </property>
       </widget>
      </item>
@@ -94,27 +97,17 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
-      <widget class="QLineEdit" name="filePathLineEdit">
+     <item row="5" column="1">
+      <widget class="QPushButton" name="sendMsgPushButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="placeholderText">
-        <string>Enter file path</string>
+       <property name="text">
+        <string>Send msg</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="placeholderText">
-        <string>Text your message</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" colspan="2">
+     <item row="3" column="0" colspan="2">
       <widget class="QLineEdit" name="callMeLineEdit">
        <property name="enabled">
         <bool>false</bool>
@@ -124,16 +117,40 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0" colspan="2">
-      <widget class="QLabel" name="filePathLabel">
+     <item row="8" column="1">
+      <widget class="QPushButton" name="openFilePushButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string/>
+        <string>Or open file</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QPushButton" name="connectToServerPushButton">
+       <property name="enabled">
         <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Connect to Server</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QComboBox" name="chooseTreatmentComboBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="chooseTreatmentPushButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Choose treatment</string>
        </property>
       </widget>
      </item>
@@ -145,7 +162,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>593</width>
+     <width>587</width>
      <height>25</height>
     </rect>
    </property>

@@ -49,6 +49,7 @@ private:
     QByteArray Data;    //  передаваемые файлы
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
+    QMap<QString,QString> possibleTreatments;   //  определяем возможные обработки с приставкой и её человеческим описанием
 
     QCompleter *completer;  //  автодополнение вводимого пути файла
     QFileSystemModel *fModel;   //  файловая модель
@@ -58,11 +59,14 @@ private:
     QFile *file;     //  сам файлик
     char *bytes = {0};     //  массив байт данных
     int blockData = 1000000;  //  размер данных
+    QString rawInformationDirectory = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\folderForIncomingFromServerRawInformation";    //  папка для приходящих от сервера сырых данных на обработку
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
 
-    void SendToServer(QString str); //  метод отправки на сервер сообщения
+    void SendTextToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути
     void SendPartOfFile();  //  метод отправки части файла
+
+    void SendToServer(QString typeOfMsg, QString str);  //  отправка служебных сообщений серверу
 
     qint64 nextBlockSize;  //  переменная для хранения размера блока текста
 

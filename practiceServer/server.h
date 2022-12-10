@@ -32,9 +32,15 @@ private:
     QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
+    QMap<QString,QString> possibleTreatments;   //  определяем возможные обработки с приставкой и её человеческим описанием
+
+    void SendPossibleTreatments(QTcpSocket* socket);  //  функция передачи возможных обработок
 
     void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
     void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
+
+    void SendFileToClient(QString filePath);    //  функция отправки файл (начало)
+    void SendPartOfFile();      //  функция отправки части файла (продолжение)
 
     qint64 nextBlockSize;   //  блок нового сообщения
 
@@ -57,11 +63,13 @@ public slots:
     void slotDisconnect();  //  обработчик отключившихся клиентов
     void slotNewSaveDir(QString newDirPath);  //  обработчик новой директории
     void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
+    void slotSocketDisplayed(QTcpSocket* displayedSocket);
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
     void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
     void signalDeleteSocketFromListWidget(QTcpSocket* socketToDelete);  //  слот для удаления сокета из clientsListWidget при его отключении
+    void signalAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd); 
 //    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };
 

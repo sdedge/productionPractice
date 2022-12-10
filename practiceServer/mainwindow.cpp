@@ -24,9 +24,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
     connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
     connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);  //  связка для отображения новой директории
+    connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
+    //    connect(server, &Server::signalAddTreatmentToPossibleTreatmentsComboBox, this, &MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox);  //  связка для добавления нового вида обработки в PossibleTreatmentsComboBox
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
+    ui->possibleTreatmetsComboBox->addItem("Дублирование информации");
 //    ui->clientsListWidget->children()->setContextMenuPolicy(Qt::CustomContextMenu);     //  создаем к меню контекстное меню
 }
 
@@ -46,6 +49,7 @@ void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
     //  TODO:   сделать обращение к clientsListWidget и добавление данных с сокета
     ui->clientsListWidget->addItem("User desc: "+QString::number(socketToAdd->socketDescriptor())+" | IP: "+socketToAdd->localAddress().toString());
 //    qDebug() << QString::number(socketToAdd->socketDescriptor()) << socketToAdd->localAddress().toString();
+    MainWindow::signalSocketDisplayed(socketToAdd);
 }
 
 void MainWindow::slotDeleteSocketFromListWidget(QTcpSocket *socketToDelete)
@@ -60,6 +64,12 @@ void MainWindow::slotDeleteSocketFromListWidget(QTcpSocket *socketToDelete)
         }
     }
 
+}
+
+void MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd)
+{
+    ui->possibleTreatmetsComboBox->addItem(treatmentToAdd);
+    qDebug() << treatmentToAdd;
 }
 
 //void MainWindow::slotChatServer(QString message)    //  обработчик чата
