@@ -35,7 +35,9 @@ void Server::slotFolderForRawInformationChanged(const QString &fileName)
     QFileInfoList list = workWithDirectory.entryInfoList();     //  получаем список файлов директории
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo fileInfo = list.at(i);
-        qDebug() << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));     //  выводим в формате "размер имя"
+        if(fileInfo.fileName().startsWith("DOUBLE_INFO") && fileInfo.fileName().endsWith(".txt")){      //  проверяем только файлы "DOUBLE_INFO......txt"
+            qDebug() << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //  выводим в формате "размер имя"
+        }
         qDebug() << "";     // переводим строку
     }
     qDebug() << fileName;
