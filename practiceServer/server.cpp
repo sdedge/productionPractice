@@ -25,6 +25,7 @@ Server::Server(bool &server_started){
     mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
 
     possibleTreatments["DOUBLE_INFO"] = "Дублирование информации";  //  содержимое файла дублируется в конец
+    possibleTreatments["TRIPLE_INFO"] = "Утроение информации";  //  то же самое, но утраивается
 
     fileSystemWatcher = new QFileSystemWatcher;
     fileSystemWatcher->addPath(folderForRawInformation);    //  устанавливаем папку для слежки
@@ -85,12 +86,12 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
 //    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
     connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
 
-    Sockets.push_back(socket);  //  помещаем сокет в контейнер    
+    mapSockets[socket] = "";    //  клиент пока не показал, что он умеет делать
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
     Server::signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
     SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
     qDebug() << "new client on " << socketDescriptor;
-    qDebug() << "push quantity of clients: "+QString::number(Sockets.length());
+    qDebug() << "push quantity of clients: "+QString::number(mapSockets.size());
 }
 
 void Server::slotReadyRead(){
@@ -229,11 +230,16 @@ void Server::slotReadyRead(){
             }
 
             if(typeOfMess == "Set treatment on client"){
-
+                QString currentTreatment;
+                in >> currentTreatment;
+                mapSockets[socket] = currentTreatment;
+                qDebug() << mapSockets;
             }
 
             nextBlockSize = 0;  //  обнуляем для новых сообщений
-            break;  //  выходим, делать больше нечего
+            if(socket->bytesAvailable() == 0){
+                break;  //  выходим, делать больше нечего
+            }
         }   //  конец while
     } else {
         Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
@@ -243,8 +249,8 @@ void Server::slotReadyRead(){
 void Server::slotDisconnect()
 {
     QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
-    Sockets.removeOne(disconnectedSocket);
-    qDebug() << "pop quantity of clients: "+QString::number(Sockets.length());
+    mapSockets.remove(disconnectedSocket);
+    qDebug() << "pop quantity of clients: "+QString::number(mapSockets.size());
     SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
     Server::signalDeleteSocketFromListWidget(disconnectedSocket);
     disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
@@ -263,8 +269,11 @@ void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправ�
     out << quint64(0) << typeOfMsg << str;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
-    for(int i = 0; i < Sockets.size(); i++){    //  пробегаемся по всем сокетам и
-        Sockets[i]->write(Data);    //  отправляем по соответствующему сокету данные
+
+    auto it = mapSockets.begin();
+    for(;it != mapSockets.end(); ++it)  //  пробегаемся по всем сокетам и
+    {
+        it.key()->write(Data);    //  отправляем по соответствующему сокету данные
     }
 }
 

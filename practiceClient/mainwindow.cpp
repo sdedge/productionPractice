@@ -313,9 +313,10 @@ void MainWindow::slotReadyRead()
                     ui->chooseTreatmentComboBox->addItem(item.value());
                 }
             }
-
             nextBlockSize = 0;  //  обнуляем для новых сообщений
-            break;  //  выходим, делать больше нечего
+            if(socket->bytesAvailable() == 0){
+                break;  //  выходим, делать больше нечего
+            }
         }   //  конец whil'a
     } else {    //  если произошли проблемы с подключением
         ui->textBrowser->append("Error connection");    //  уведомление клиента

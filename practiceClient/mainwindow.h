@@ -43,6 +43,8 @@ private slots:
 
     void on_sendFilePushButton_clicked();
 
+    void on_chooseTreatmentPushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket; //  сокет соединения

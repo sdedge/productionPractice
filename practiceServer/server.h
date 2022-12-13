@@ -28,7 +28,8 @@ public:
     QTcpSocket *socket;
 
 private:
-    QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
+//    QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
+    QMap<QTcpSocket*, QString> mapSockets;  //  структура из сокета-ключа и возможной обработки-значения
     QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам

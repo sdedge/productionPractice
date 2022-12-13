@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
     ui->possibleTreatmetsComboBox->addItem("Дублирование информации");
+    ui->possibleTreatmetsComboBox->addItem("Утроение информации");
 //    ui->clientsListWidget->children()->setContextMenuPolicy(Qt::CustomContextMenu);     //  создаем к меню контекстное меню
 }
 
