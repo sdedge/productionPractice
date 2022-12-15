@@ -36,6 +36,7 @@ private:
 
     QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
     QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
+    QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
 
     void SendToClient(QString str);    //  функция для передачи данных клиенту
 

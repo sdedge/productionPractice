@@ -24,6 +24,7 @@ Server::Server(bool &server_started){
     mapRequest["004"] = "Possible treatments ComboBox data";    //  отправка данных по доступным обработкам
     mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
 
+    possibleTreatments[""] = "Отсутствие обработки";
     possibleTreatments["DOUBLE_INFO"] = "Дублирование информации";  //  содержимое файла дублируется в конец
     possibleTreatments["TRIPLE_INFO"] = "Утроение информации";  //  то же самое, но утраивается
 
@@ -83,7 +84,6 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     socket = new QTcpSocket;    //  создание нового сокета под нового клиента
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);  //  связка готовности чтения
-//    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении клиента сервер удалит сокет при первой же возможности
     connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
 
     mapSockets[socket] = "";    //  клиент пока не показал, что он умеет делать
@@ -234,6 +234,11 @@ void Server::slotReadyRead(){
                 in >> currentTreatment;
                 mapSockets[socket] = currentTreatment;
                 qDebug() << mapSockets;
+                if(currentTreatment != ""){
+                    Server::signalStatusServer("<font color = blue><\\font>Client on "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" choose "+currentTreatment+" for processing"+delimiter);
+                } else {
+                    Server::signalStatusServer("<font color = red><\\font>Client on "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" removed the processing "+delimiter);
+                }
             }
 
             nextBlockSize = 0;  //  обнуляем для новых сообщений
@@ -252,6 +257,7 @@ void Server::slotDisconnect()
     mapSockets.remove(disconnectedSocket);
     qDebug() << "pop quantity of clients: "+QString::number(mapSockets.size());
     SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
+    Server::signalStatusServer("<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
     Server::signalDeleteSocketFromListWidget(disconnectedSocket);
     disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
 }

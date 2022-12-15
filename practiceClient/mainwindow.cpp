@@ -310,7 +310,8 @@ void MainWindow::slotReadyRead()
 
                 for(auto item = possibleTreatments.begin(); item != possibleTreatments.end(); ++item)
                 {
-                    ui->chooseTreatmentComboBox->addItem(item.value());
+                    //  Вставляем в комбобокс "в конец, читаемый текст, префикс"
+                    ui->chooseTreatmentComboBox->insertItem(ui->chooseTreatmentComboBox->count(), item.value(), item.key());
                 }
             }
             nextBlockSize = 0;  //  обнуляем для новых сообщений
@@ -365,6 +366,6 @@ void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на
 
 void MainWindow::on_chooseTreatmentPushButton_clicked() //  по нажатию на кнопку "Choose treatment"
 {
-    SendToServer(mapRequest["0041"], ui->chooseTreatmentComboBox->currentText());   //  отправляем серверу текущий текст в комбобоксе
+    SendToServer(mapRequest["0041"], ui->chooseTreatmentComboBox->currentData().toString());   //  отправляем серверу текущий текст в комбобоксе
 }
 

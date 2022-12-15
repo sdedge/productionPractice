@@ -142,6 +142,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="placeholderText">
+        <string>Show treatments</string>
+       </property>
       </widget>
      </item>
      <item row="2" column="1">
