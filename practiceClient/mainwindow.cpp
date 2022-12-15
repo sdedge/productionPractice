@@ -228,7 +228,7 @@ void MainWindow::slotReadyRead()
                     QDir::setCurrent(rawInformationDirectory);  //  устанавливаем путь сохранения на рабочем столе
 
 
-                    SendToServer(mapRequest["103"],"Downloading new part of processing file to "+QString::number(socket->socketDescriptor())+"...");    //  запрашиваем первую часть файла
+                    SendToServer(mapRequest["103"],"Downloading new part of processing file to "+socket->localAddress().toString()+"...");    //  запрашиваем первую часть файла
                 }
             }
 
@@ -367,5 +367,6 @@ void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на
 void MainWindow::on_chooseTreatmentPushButton_clicked() //  по нажатию на кнопку "Choose treatment"
 {
     SendToServer(mapRequest["0041"], ui->chooseTreatmentComboBox->currentData().toString());   //  отправляем серверу текущий текст в комбобоксе
+    ui->textBrowser->append("Selected "+ui->chooseTreatmentComboBox->currentData().toString()+delimiter);   //  пишем клиенту, что он выбрал
 }
 

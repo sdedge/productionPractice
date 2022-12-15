@@ -161,7 +161,7 @@ void Server::slotReadyRead(){
                 in >> str;  //  выводим в переменную сообщение
 
                 qDebug() << str;  //  выводим в консоль
-                Server::signalStatusServer(QTime::currentTime().toString()+" | "+str); //  выводим клиенту
+                Server::signalStatusServer(str); //  выводим клиенту
 
                 nextBlockSize = 0;  //  заранее обнуляем размер сообщения
                 SendPartOfFile();   //  вызываем соответствующий метод отправки
@@ -221,7 +221,7 @@ void Server::slotReadyRead(){
                 QString str;    //  определяем переменную, в которую сохраним данные
                 in >> str;  //  выводим в переменную сообщение
                 qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
-                Server::signalStatusServer(QTime::currentTime().toString()+" | "+str);  //  и то же самое клиенту
+                Server::signalStatusServer(str);  //  и то же самое клиенту
                 file->close();
                 delete file; //  удаляем файл
                 file = nullptr;
@@ -312,18 +312,25 @@ void Server::SendFileToClient(QString filePath)
     }
     bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
 
-    if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
-        socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+    for(auto iteratorSocket = mapSockets.begin(); iteratorSocket != mapSockets.end(); iteratorSocket++){
+        //  проверяем только начало с префиксом у сокета, потому что в эту функцию попадают файлы по фильтру
+        if(fileName.startsWith(iteratorSocket.value())){
+            socket = iteratorSocket.key();  //  присуждаем переменной ссылку на сокет
 
-        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-        out.setVersion(QDataStream::Qt_6_2);
-        out << quint64(0) << mapRequest["002"] << fileName << fileSize;   //  отправляем название файла и его размер
-        out.device()->seek(0);
-        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-        out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-        socket->write(Data);
-    } else {
-        Server::signalStatusServer("File"+fileName+" not open :(");
+            if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
+                socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+
+                QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+                out.setVersion(QDataStream::Qt_6_2);
+                out << quint64(0) << mapRequest["002"] << fileName << fileSize;   //  отправляем название файла и его размер
+                out.device()->seek(0);
+                //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+                out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+                socket->write(Data);
+            } else {
+                Server::signalStatusServer("File"+fileName+" not open :(");
+            }
+        }
     }
 }
 
@@ -347,7 +354,7 @@ void Server::SendPartOfFile()
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << mapRequest["102"] << buffer;   //  отправляем байты
+    out << quint64(0) << mapRequest["103"] << buffer;   //  отправляем байты
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     qDebug() << "sending blockSize = " << quint64(Data.size() - sizeof(quint64));
