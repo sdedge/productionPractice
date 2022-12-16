@@ -13,6 +13,7 @@
 /// =========================   Для работы автодополнения ввода
 #include <QCompleter>
 #include <QFileSystemModel>
+#include <QFileSystemWatcher>   //  наблюдатель за файловой системой
 /// =========================
 ///
 /// =========================   Разные дополнения
@@ -67,12 +68,16 @@ private:
     void SendTextToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути
     void SendPartOfFile();  //  метод отправки части файла
-
     void SendToServer(QString typeOfMsg, QString str);  //  отправка служебных сообщений серверу
+
+    void BlockingInterface();   //  функция блокировки интерфейса, пока снова не подключимся к хосту
 
     qint64 nextBlockSize;  //  переменная для хранения размера блока текста
 
+    QFileSystemWatcher *fileSystemWatcher;
+
 public slots:
     void slotReadyRead();   //  слот готовности к чтению сообщений
+    void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
 };
 #endif // MAINWINDOW_H
