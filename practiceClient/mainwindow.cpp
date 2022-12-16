@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    socket = new QTcpSocket();  //  при подключении создаем новый сокет
 
     /// Глоссарий, описывающий тип отправляемого сообщения
     /// первое число определяет тип (0 - простой сигнал о чем-то \ 1 - запрос чего-то)
@@ -14,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     /// третье и последующие числа определяют тип передаваемых данных
 
     mapRequest[""] = "";  //  ничего не нужно
+    mapRequest["000"] = "Disconnect";   //  сигнал на отключение
     mapRequest["001"] = "Message";   //  отправляется простое сообщение
     mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
@@ -23,8 +23,6 @@ MainWindow::MainWindow(QWidget *parent)
     mapRequest["004"] = "Possible treatments ComboBox data";    //  отправка данных по доступным обработкам
     mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
 
-    connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении сокет сам удалится
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
@@ -39,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent)
     completer->setModelSorting(QCompleter::ModelSorting(2));    //  НЕ чувствительно к регистру (0 -  не сортировать, 1 - чувствительно к регистру)
 
     ui->filePathLineEdit->setCompleter(completer);  //  устанавливам completer
+
+    fileSystemWatcher = new QFileSystemWatcher;
+    fileSystemWatcher->addPath(rawInformationDirectory);    //  устанавливаем папку для слежки
+    connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotFolderForRawInformationChanged(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -58,6 +60,10 @@ void MainWindow::on_connectToServerPushButton_clicked()
         ui->filePathLabel->setText("Port is empty!");
         return;
     }
+    socket = new QTcpSocket();  //  при подключении создаем новый сокет
+    connect(socket, &QTcpSocket::readyRead, this, &MainWindow::slotReadyRead);
+    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);   //  при отключении сокет сам удалится
+
     socket->connectToHost(ui->IPLineEdit->text(), ui->PortLineEdit->text().toUInt());   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
     if(!(socket->isOpen())){
         ui->filePathLabel->setText("Check your IP and host! You're offline");
@@ -141,6 +147,22 @@ void MainWindow::SendToServer(QString typeOfMsg, QString str)   //  отдель
     socket->write(Data);    //  отправляем данные на сервер
 }
 
+void MainWindow::BlockingInterface()
+{
+    ui->filePathLabel->clear();
+    ui->filePathLineEdit->setEnabled(false); //  то включаем интерфейс
+    ui->lineEdit->setEnabled(false);
+    ui->openFilePushButton->setEnabled(false);
+    ui->sendFilePushButton->setEnabled(false);
+    ui->sendMsgPushButton->setEnabled(false);
+    ui->textBrowser->setEnabled(false);
+    ui->callMeLineEdit->setEnabled(false);
+    ui->chooseTreatmentComboBox->setEnabled(false);
+    ui->chooseTreatmentPushButton->setEnabled(false);
+
+    ui->connectToServerPushButton->setEnabled(true);   //  и гасим кнопку подключения
+}
+
 void MainWindow::SendFileToServer(QString filePath) //  метод отправки файла серверу (его начало)
 {
     Data.clear();   //  чистим массив байт от мусора
@@ -166,6 +188,7 @@ void MainWindow::SendFileToServer(QString filePath) //  метод отправ�
         out.device()->seek(0);
         //  избавляемся от зарезервированных двух байт в начале каждого сообщения
         out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+        qDebug() << "sending file data size: " << Data.size() - sizeof(quint64);
         socket->write(Data);
     } else {
         ui->filePathLabel->setText("File not open :(");
@@ -290,6 +313,7 @@ void MainWindow::slotReadyRead()
                     delete[] bytes;
                     bytes = nullptr;
                 }
+                nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
 
             if(typeOfMessage == "File downloaded"){ //  если файл полностью скачался
@@ -313,7 +337,19 @@ void MainWindow::slotReadyRead()
                     //  Вставляем в комбобокс "в конец, читаемый текст, префикс"
                     ui->chooseTreatmentComboBox->insertItem(ui->chooseTreatmentComboBox->count(), item.value(), item.key());
                 }
+                nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
+
+            if(typeOfMessage == "Disconnect"){
+                QString str;
+                in >> str;
+
+                qDebug() << "Disconnect";
+                ui->textBrowser->append(str);
+                BlockingInterface();
+                socket->disconnectFromHost();
+            }
+
             nextBlockSize = 0;  //  обнуляем для новых сообщений
             if(socket->bytesAvailable() == 0){
                 break;  //  выходим, делать больше нечего
@@ -322,6 +358,27 @@ void MainWindow::slotReadyRead()
     } else {    //  если произошли проблемы с подключением
         ui->textBrowser->append("Error connection");    //  уведомление клиента
     }
+}
+
+void MainWindow::slotFolderForRawInformationChanged(const QString &folderName)
+{
+    QDir workWithDirectory;     //  создаем рабочую директорию
+    workWithDirectory.cd(folderName); //  переходим в нужный каталог
+
+    QStringList filters;    //  создаем список для фильтра
+    filters << "processed_*.txt";  //  заполняем
+
+    workWithDirectory.setNameFilters(filters);  //  устанавливаем фильтр
+    workWithDirectory.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);     //  устанавливаем фильтр выводимых файлов/папок
+    workWithDirectory.setSorting(QDir::Size | QDir::Reversed);  //  устанавливаем сортировку "от меньшего к большему"
+    QFileInfoList list = workWithDirectory.entryInfoList();     //  получаем список файлов директории
+    for (int i = 0; i < list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+        qDebug() << qPrintable(QString("%1 %2 %3").arg(fileInfo.size(), 10).arg(fileInfo.fileName()).arg(fileInfo.filePath()));   //  выводим в формате "размер имя"
+        SendFileToServer(fileInfo.filePath());  //  отправляем файл клиенту
+    }
+    qDebug() << folderName;
+    qDebug() << "================";     // переводим строку
 }
 
 void MainWindow::on_sendMsgPushButton_clicked() //  по нажатию на "Send msg"
