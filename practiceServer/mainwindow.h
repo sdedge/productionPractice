@@ -50,14 +50,21 @@ public slots:
     void slotDeleteSocketFromListWidget(QTcpSocket* socketToDelete);    //  обработчик удаления отключившихся сокетов
 
     void slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd);  //  обработчик добавления новой обработки
+
+    void slotShowContextMenu(const QPoint &pos);   //  обработчик контекстного меню
+
+    void slotDisconnectClient();
 //    void slotChatServer(QString message);   //  обработчик чата на стороне сервера
 
 private slots:
     void on_chooseSaveDirPushButton_clicked();  //  по нажатию на "Choose save directory"
 
+    void on_clientsListWidget_customContextMenuRequested(const QPoint &pos);
+
 signals:
     void signalNewSaveDir(QString);   //  слот для обработки директории сохранения
     void signalSocketDisplayed(QTcpSocket* displayedSocket);   //  сигнал для обработки уже отобразившихся сокетов
+    void signalDisconnectSocket(int socketDiscriptor);  //  сигнал для принудительного удаления сокета
 };
 
 #endif // MAINWINDOW_H
