@@ -64,7 +64,8 @@ public slots:
     void slotDisconnect();  //  обработчик отключившихся клиентов
     void slotNewSaveDir(QString newDirPath);  //  обработчик новой директории
     void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
-    void slotSocketDisplayed(QTcpSocket* displayedSocket);
+    void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
+    void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера

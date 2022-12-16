@@ -15,6 +15,7 @@ Server::Server(bool &server_started){
     /// третье и последующие числа определяют тип передаваемых данных
 
     mapRequest[""] = "";  //  ничего не нужно
+    mapRequest["000"] = "Disconnect";   //  сигнал на отключение
     mapRequest["001"] = "Message";   //  отправляется простое сообщение
     mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
     mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
@@ -78,6 +79,18 @@ void Server::slotFolderForRawInformationChanged(const QString &folderName)
 void Server::slotSocketDisplayed(QTcpSocket* displayedSocket)
 {
     SendPossibleTreatments(displayedSocket);
+}
+
+void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обработчик принудительного удаления сокетов
+{
+    for(auto item = mapSockets.begin(); item != mapSockets.end(); item++){  //  пробегаемся по сокетам
+        if(item.key()->socketDescriptor() == socketDiscriptorToDelete){     //  ищем совпадение по сокету
+            SendToOneClient(item.key(), mapRequest["000"], "Disconnect from host"); //  отправляем клиенту сигнал на отключение
+
+            qDebug() << "pop quantity of clients: "+QString::number(mapSockets.size());
+            break;
+        }
+    }
 }
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
@@ -163,8 +176,8 @@ void Server::slotReadyRead(){
                 qDebug() << str;  //  выводим в консоль
                 Server::signalStatusServer(str); //  выводим клиенту
 
-                nextBlockSize = 0;  //  заранее обнуляем размер сообщения
                 SendPartOfFile();   //  вызываем соответствующий метод отправки
+                nextBlockSize = 0;  //  заранее обнуляем размер сообщения
             }
 
             if(typeOfMess == "Request part of file"){   //  отправляется часть файла
@@ -242,9 +255,9 @@ void Server::slotReadyRead(){
             }
 
             nextBlockSize = 0;  //  обнуляем для новых сообщений
-            if(socket->bytesAvailable() == 0){
+//            if(socket->bytesAvailable() == 0){
                 break;  //  выходим, делать больше нечего
-            }
+//            }
         }   //  конец while
     } else {
         Server::signalStatusServer("Something happened :(");    //  при ошибке чтения сообщения
@@ -326,6 +339,7 @@ void Server::SendFileToClient(QString filePath)
                 out.device()->seek(0);
                 //  избавляемся от зарезервированных двух байт в начале каждого сообщения
                 out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+                qDebug() << "sending file data size: " << Data.size() - sizeof(quint64);
                 socket->write(Data);
             } else {
                 Server::signalStatusServer("File"+fileName+" not open :(");
