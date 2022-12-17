@@ -176,9 +176,10 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
         keyObject = root.keys().at(i);
         if(keyObject.contains("Label")){
             QLabel *label = ui->widget->findChild<QLabel *>(keyObject);
-            label->setText(root.value(root.keys().at(0)).toString());
-            emit signalNewSaveDir(root.value(root.keys().at(0)).toString());
-            qDebug() << "on_openJSONSettingsFilePushButton_clicked || " << root.value(root.keys().at(0)).toString() << "set like text to dirPathLabe";
+            valueObject = root.value(root.keys().at(0)).toString();
+            label->setText(valueObject);
+            emit signalNewSaveDir(valueObject);
+            qDebug() << "on_openJSONSettingsFilePushButton_clicked || " << valueObject << "set like text to dirPathLabe";
         }
     }
 }
