@@ -135,6 +135,7 @@ void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию 
         ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
         ui->dirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
         emit signalNewSaveDir(dirPath);
+        qDebug() << "on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
     }
 }
 
@@ -179,7 +180,8 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
             valueObject = root.value(root.keys().at(0)).toString();
             label->setText(valueObject);
             emit signalNewSaveDir(valueObject);
-            qDebug() << "on_openJSONSettingsFilePushButton_clicked || " << valueObject << "set like text to dirPathLabe";
+            ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+valueObject+"<br/><font color = red>!!!<\\font>");
+            qDebug() << "on_openJSONSettingsFilePushButton_clicked || " << valueObject << "set like text to dirPathLabel";
         }
     }
 }

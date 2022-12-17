@@ -11,8 +11,8 @@
 /// =========================
 ///
 /// =========================   Для работы автодополнения ввода
-#include <QCompleter>
-#include <QFileSystemModel>
+#include <QCompleter>   //  дополняет строку при вводе пути к файлу
+#include <QFileSystemModel> //  работа с файловой моделью
 #include <QFileSystemWatcher>   //  наблюдатель за файловой системой
 /// =========================
 ///
@@ -42,9 +42,9 @@ private slots:
 
     void on_openFilePushButton_clicked();   //  нажатие на кнопку "Or open file"
 
-    void on_sendFilePushButton_clicked();
+    void on_sendFilePushButton_clicked();   //  нажатие на кнопку "Send file"
 
-    void on_chooseTreatmentPushButton_clicked();
+    void on_chooseTreatmentPushButton_clicked();    //  нажатие на кнопку выбора типа обработки
 
 private:
     Ui::MainWindow *ui;
