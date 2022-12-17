@@ -59,16 +59,20 @@ void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
     MainWindow::signalSocketDisplayed(socketToAdd);
 }
 
-void MainWindow::slotDeleteSocketFromListWidget(QTcpSocket *socketToDelete)
+void MainWindow::slotDeleteSocketFromListWidget(QMap<QTcpSocket *, QString> mapSockets)
 {
-    qDebug() << "User desc :"+QString::number(socketToDelete->socketDescriptor())+" | IP: "+socketToDelete->localAddress().toString();
-    for(int i = 0; i < ui->clientsListWidget->count(); i++){    //  перебираем все элементы clietnsListWidget
-        //  ↓↓↓ Если текст элемента совпадает с удаляемым сокетом, ....
-        if(ui->clientsListWidget->item(i)->text() == "User desc:"+QString::number(socketToDelete->socketDescriptor())+" | IP: "+socketToDelete->localAddress().toString()){
-            QListWidgetItem* itemSocketToDelete = ui->clientsListWidget->takeItem(i);   //  ...., то удаляем из clientsListWidget сокет
-            delete itemSocketToDelete;  //  но он останется в памяти, поэтому его надо удалить вручную по совету документации
-            break;
-        }
+//    qDebug() << "User desc :"+QString::number(mapSockets->socketDescriptor())+" | IP: "+mapSockets->localAddress().toString();
+//    for(int i = 0; i < ui->clientsListWidget->count(); i++){    //  перебираем все элементы clietnsListWidget
+//        //  ↓↓↓ Если текст элемента совпадает с удаляемым сокетом, ....
+//        if(ui->clientsListWidget->item(i)->text() == "User desc:"+QString::number(mapSockets->socketDescriptor())+" | IP: "+mapSockets->localAddress().toString()){
+//            QListWidgetItem* itemSocketToDelete = ui->clientsListWidget->takeItem(i);   //  ...., то удаляем из clientsListWidget сокет
+//            delete itemSocketToDelete;  //  но он останется в памяти, поэтому его надо удалить вручную по совету документации
+//            break;
+//        }
+//    }
+    ui->clientsListWidget->clear();
+    for(auto itemSocket = mapSockets.begin(); itemSocket != mapSockets.end(); itemSocket++){
+        ui->clientsListWidget->addItem("User desc:"+QString::number(itemSocket.key()->socketDescriptor())+" | IP: "+itemSocket.key()->localAddress().toString());
     }
 
 }
@@ -111,7 +115,7 @@ void MainWindow::slotDisconnectClient()
             return;
         } else {
             //  иначе берем дескриптор сокета
-            QString socketText = ui->clientsListWidget->currentItem()->text().remove(0, ui->clientsListWidget->currentItem()->text().indexOf(":")+2);
+            QString socketText = ui->clientsListWidget->currentItem()->text().remove(0, ui->clientsListWidget->currentItem()->text().indexOf(":")+1);
             socketText = socketText.remove(4, socketText.length());
 
             //  и отправляем запрос на сервер, чтобы по нему удалили сокет

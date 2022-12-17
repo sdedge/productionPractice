@@ -127,6 +127,7 @@ void Server::slotReadyRead(){
                     break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
                 }
                 in >> nextBlockSize;    //  считываем размер блока в правильном исходе
+                qDebug() << "nextBlockSize: " << nextBlockSize;
             }
             if(socket->bytesAvailable() < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
                 qDebug() << "Data not full | socket->bytesAvailable() = "+QString::number(socket->bytesAvailable()) + " | nextBlockSize = "+QString::number(nextBlockSize);    //  если данные пришли не полностью
@@ -244,6 +245,7 @@ void Server::slotReadyRead(){
                 file->close();
                 delete file; //  удаляем файл
                 file = nullptr;
+                fileName.clear();   //  очищаем его название
                 delete[] bytes; //  удаляем байты из кучи
                 nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
@@ -277,7 +279,7 @@ void Server::slotDisconnect()
     qDebug() << "pop quantity of clients: "+QString::number(mapSockets.size());
     SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
     Server::signalStatusServer("<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
-    Server::signalDeleteSocketFromListWidget(disconnectedSocket);
+    Server::signalDeleteSocketFromListWidget(mapSockets);
     disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
 }
 

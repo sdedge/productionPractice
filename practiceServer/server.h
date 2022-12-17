@@ -72,7 +72,7 @@ public slots:
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
     void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
-    void signalDeleteSocketFromListWidget(QTcpSocket* socketToDelete);  //  слот для удаления сокета из clientsListWidget при его отключении
+    void signalDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);  //  слот для удаления сокета из clientsListWidget при его отключении
     void signalAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd); 
 //    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };

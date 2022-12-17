@@ -188,7 +188,7 @@ void MainWindow::SendFileToServer(QString filePath) //  метод отправ�
         out.device()->seek(0);
         //  избавляемся от зарезервированных двух байт в начале каждого сообщения
         out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-        qDebug() << "sending file data size: " << Data.size() - sizeof(quint64);
+        qDebug() << "sending data size: " << Data.size() - sizeof(quint64);
         socket->write(Data);
     } else {
         ui->filePathLabel->setText("File not open :(");
@@ -324,11 +324,14 @@ void MainWindow::slotReadyRead()
                 file->close();
                 delete file; //  удаляем файл
                 file = nullptr;
+                fileName.clear();   //  очищаем его название
                 delete[] bytes; //  удаляем байты из кучи
                 nextBlockSize = 0;  //  обнуляем для новых сообщений
             }
 
             if(typeOfMessage == "Possible treatments ComboBox data"){
+                possibleTreatments.clear();
+                ui->chooseTreatmentComboBox->clear();
                 in >> possibleTreatments;  //  выводим в глобальную переменную map из доступных обработок
                 qDebug() << possibleTreatments;
 

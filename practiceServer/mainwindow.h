@@ -57,7 +57,7 @@ public slots:
 
     void slotAddSocketToListWidget(QTcpSocket* socketToAdd);    //  обработчик отображения добавляемых сокетов
 
-    void slotDeleteSocketFromListWidget(QTcpSocket* socketToDelete);    //  обработчик удаления отключившихся сокетов
+    void slotDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);    //  обработчик удаления отключившихся сокетов
 
     void slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd);  //  обработчик добавления новой обработки
 
