@@ -55,6 +55,7 @@ private:
     QString newDirPath = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\"; //  путь новой директории, по умолчанию рабочий стол
     QString folderForRawInformation = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\folderForRawInformation";  //  путь к папке с приходящей обработанной информацией от клиентов
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
+    QString JSONSettingFilePath = "";
 
     QFileSystemWatcher *fileSystemWatcher;
 
@@ -66,6 +67,7 @@ public slots:
     void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
     void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
     void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
+    void slotSetJSONSettingFilePath(QString JSONSettingsFilePath);   //  обработчик установки пути к JSON файлу настроек
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера

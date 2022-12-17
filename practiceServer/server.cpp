@@ -93,6 +93,12 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
     }
 }
 
+void Server::slotSetJSONSettingFilePath(QString JSONSettingsFilePath)   //  принимаем путь
+{
+    this->JSONSettingFilePath = JSONSettingsFilePath;   //   и устанавливаем его
+    qDebug() << this->JSONSettingFilePath;
+}
+
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
     socket = new QTcpSocket;    //  создание нового сокета под нового клиента
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
@@ -278,6 +284,7 @@ void Server::slotDisconnect()
 void Server::slotNewSaveDir(QString newDirPath) //  пока неработающий обработчик новой директории
 {
     this->newDirPath = newDirPath;  //  установили новую директорию
+    qDebug() << "Server::slotNewSaveDir || " << this->newDirPath;
 }
 
 void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправка клиенту сообщений

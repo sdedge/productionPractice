@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QAbstractScrollArea>
-#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -28,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);  //  связка для отображения новой директории
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
+    connect(this, &MainWindow::signalSetJSONSettingFilePath, server, &Server::slotSetJSONSettingFilePath);  //  связка для установки пути к JSON файлу настроек
     //    connect(server, &Server::signalAddTreatmentToPossibleTreatmentsComboBox, this, &MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox);  //  связка для добавления нового вида обработки в PossibleTreatmentsComboBox
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
@@ -153,5 +152,61 @@ void MainWindow::on_clientsListWidget_customContextMenuRequested(const QPoint &p
     menu->addAction(disconnectClient);
     //  Вызываем контекстное меню
     menu->popup(ui->clientsListWidget->viewport()->mapToGlobal(pos));
+}
+
+
+void MainWindow::on_openJSONSettingsFilePushButton_clicked()
+{
+    QString filePath;
+    filePath = QFileDialog::getOpenFileName(this, "Выбор файла", "C:\\");   //  открываем диалоговое окно с заголовком "Выбор файла" и по умолчанию ставим путь C:/
+    QFile fileJSONSetting;
+    fileJSONSetting.setFileName(filePath);
+    fileJSONSetting.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString val = fileJSONSetting.readAll();
+    fileJSONSetting.close();
+
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
+    qDebug() << "Error: " << error.errorString() << error.offset << error.error;
+
+    QJsonObject root = document.object();
+    QString keyObject = "";
+    QString valueObject = "";
+    for (int i = 0; i < root.size(); i++) {
+        keyObject = root.keys().at(i);
+        if(keyObject.contains("Label")){
+            QLabel *label = ui->widget->findChild<QLabel *>(keyObject);
+            label->setText(root.value(root.keys().at(0)).toString());
+            emit signalNewSaveDir(root.value(root.keys().at(0)).toString());
+            qDebug() << "on_openJSONSettingsFilePushButton_clicked || " << root.value(root.keys().at(0)).toString() << "set like text to dirPathLabe";
+        }
+    }
+}
+
+
+void MainWindow::on_saveSettingsPushButton_clicked()
+{
+
+    m_currentJsonObject.insert("dirPathLabel", ui->dirPathLabel->text());
+
+    // Выводим текст всего Json объекта в консоль для проверки
+    qDebug() << "on_saveSettingsPushButton_clicked || " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
+
+    QString saveFileName = QFileDialog::getSaveFileName(this,
+                                                            tr("Save Json File"),
+                                                            QString(),
+                                                            tr("JSON (*.json)"));
+    QFileInfo fileInfo(saveFileName);   // С помощью QFileInfo
+    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
+    // Создаём объект файла и открываем его на запись
+    QFile jsonFile(saveFileName);
+    if (!jsonFile.open(QIODevice::WriteOnly))
+    {
+        return;
+    }
+
+    // Записываем текущий объект Json в файл
+    jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
+    jsonFile.close();   // Закрываем файл
 }
 

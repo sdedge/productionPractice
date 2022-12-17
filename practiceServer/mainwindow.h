@@ -7,11 +7,23 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 ///  ========================
-#include <QVector>        //    класс вектора для хранения созданных сокетов
-
+///
+///  ========================   классы для работы с файлаи
 #include <QFileDialog>
-
+#include <QFile>
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonParseError>
+///  ========================
+///
+///  ========================   классы для работы с элементами формы
 #include <QListWidgetItem>
+#include <QAbstractScrollArea>
+#include <QMessageBox>
+///  ========================
 
 #include "server.h"
 
@@ -33,12 +45,10 @@ public:
 private:
     Ui::MainWindow *ui;
     Server* server;     //  создаем экземпляр сервера
-
-    QVector <QTcpSocket*> Sockets;   //  вектор, предназначенный под сокеты
-    QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
     QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
 
-    void SendToClient(QString str);    //  функция для передачи данных клиенту
+
+    QJsonObject m_currentJsonObject;    // Текущий json объект, с которым производится работа
 
     quint16 nextBlockSize;  //  размер блока сообщения
 
@@ -61,10 +71,16 @@ private slots:
 
     void on_clientsListWidget_customContextMenuRequested(const QPoint &pos);
 
+    void on_openJSONSettingsFilePushButton_clicked();
+
+    void on_saveSettingsPushButton_clicked();
+
 signals:
     void signalNewSaveDir(QString);   //  слот для обработки директории сохранения
     void signalSocketDisplayed(QTcpSocket* displayedSocket);   //  сигнал для обработки уже отобразившихся сокетов
     void signalDisconnectSocket(int socketDiscriptor);  //  сигнал для принудительного удаления сокета
+    void signalSetJSONSettingFilePath(QString); //  слот для установки пути к JSON файлу настроек
+    void signalSaveSettings();
 };
 
 #endif // MAINWINDOW_H
