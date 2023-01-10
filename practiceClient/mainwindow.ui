@@ -90,7 +90,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="PortLineEdit">
        <property name="maxLength">
-        <number>4</number>
+        <number>5</number>
        </property>
        <property name="placeholderText">
         <string>Enter Port (0000)</string>

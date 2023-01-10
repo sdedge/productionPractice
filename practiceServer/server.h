@@ -9,15 +9,17 @@
 ///  ========================
 ///
 ///  ========================   классы для работы с файлами
-#include <QFile>    //  для работы с файлами
-#include <QDir>     //  для работы с директорией
+#include <QFile>                //  для работы с файлами
+#include <QDir>                 //  для работы с директорией
 #include <QFileSystemWatcher>   //  наблюдатель за файловой системой
 ///  ========================
 ///
 ///  ========================   дополнения
-#include <QVector>        //    класс вектора для хранения созданных сокетов
-#include <QTime>    //  время
-#include <QMap>     //  определение глоссария для приходящих данных сокета
+#include <QVector>              //  класс вектора для хранения созданных сокетов
+#include <QTime>                //  время
+#include <QMap>                 //  определение глоссария для приходящих данных сокета
+#include <QRandomGenerator>     //  генератор случайных чисел
+///  ========================
 
 
 
@@ -26,6 +28,7 @@ class Server : public QTcpServer{   //  создание класса серве
 public:
     Server(bool &server_started);
     QTcpSocket *socket;
+    int generatedServerPort = QRandomGenerator::global()->bounded(1, 65535);    //  автоматически генерируем порт
 
 private:
     QMap<QTcpSocket*, QString> mapSockets;  //  структура из сокета-ключа и возможной обработки-значения

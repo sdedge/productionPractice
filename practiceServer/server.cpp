@@ -1,9 +1,9 @@
 #include "server.h"
 
 Server::Server(bool &server_started){
-    if(this->listen(QHostAddress::Any, 2323)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
+    if(this->listen(QHostAddress::Any, generatedServerPort)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
         server_started = true;  //  меняем состояние сервера
-        qDebug() << "start";    //  уведомляем в консоли
+        qDebug() << "start on "+QString::number(generatedServerPort);    //  уведомляем в консоли
     } else {
         server_started = false; //  иначе что-то пошло не так
     }
@@ -32,15 +32,6 @@ Server::Server(bool &server_started){
     fileSystemWatcher = new QFileSystemWatcher;
     fileSystemWatcher->addPath(folderForRawInformation);    //  устанавливаем папку для слежки
     connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotFolderForRawInformationChanged(QString)));
-
-    /// TODO: сделать функцию, которая сама будет определять, какие типы обработок серверу нужны
-    /// то есть она должна просматривать файл с настройками и добавлять их в выпадающий список
-
-    // временный вариант с одной обработкой (пока не будет сохранения настроек):
-    //
-    //  НЕ РАБОТАЕТ
-    //
-    //Server::signalAddTreatmentToPossibleTreatmentsComboBox("DOUBLE_INFO");  //  программно добавляем в PossibleTreatmentsComboBox вид обработки
 }
 
 void Server::SendPossibleTreatments(QTcpSocket* socketForSend)

@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     if(server_started)  //  проверка состояния "true"
         {
-            ui->infoAboutServerTextEdit->append("Сервер запущен");  //  уведомление
+            ui->infoAboutServerTextEdit->append("Сервер запущен на "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
         }
         else
         {
