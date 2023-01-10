@@ -13,11 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     if(server_started)  //  проверка состояния "true"
         {
-            ui->infoAboutServerTextEdit->append("Сервер запущен на "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
+            ui->infoAboutServerTextEdit->append("Сервер запущен на "+server->serverAddress().toString()+" IP и "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
         }
         else
         {
             ui->infoAboutServerTextEdit->append("Сервер не запущен");   //  уведомление
+            return;
         }
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
@@ -47,7 +48,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
 {
-    qDebug() << status; //  вывод в консоль статуса
+    qDebug() << "MainWindow::slotStatusServer:      " << status; //  вывод в консоль статуса
     ui->infoAboutServerTextEdit->append(delimiter+QTime::currentTime().toString()+" | <font color = black><\\font>"+status);    //  и также в textEdit
 }
 
@@ -80,7 +81,7 @@ void MainWindow::slotDeleteSocketFromListWidget(QMap<QTcpSocket *, QString> mapS
 void MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd)
 {
     ui->possibleTreatmetsComboBox->addItem(treatmentToAdd);
-    qDebug() << treatmentToAdd;
+    qDebug() << "MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox:      " << treatmentToAdd;
 }
 
 void MainWindow::slotShowContextMenu(const QPoint &pos)
@@ -120,7 +121,7 @@ void MainWindow::slotDisconnectClient()
 
             //  и отправляем запрос на сервер, чтобы по нему удалили сокет
             MainWindow::signalDisconnectSocket(socketText.toInt());
-            qDebug() << "descriptor to delete: " << socketText;
+            qDebug() << "MainWindow::slotDisconnectClient:      descriptor to delete: " << socketText;
         }
     }
 }
@@ -139,13 +140,13 @@ void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию 
         ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
         ui->dirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
         emit signalNewSaveDir(dirPath);
-        qDebug() << "on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
+        qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
     }
 }
 
 void MainWindow::on_clientsListWidget_customContextMenuRequested(const QPoint &pos)
 {
-    qDebug() << "contextMenu clicked";
+    qDebug() << "MainWindow::on_clientsListWidget_customContextMenuRequested:       contextMenu clicked";
 
     //  Создаем объект контекстного меню
     QMenu* menu = new QMenu(this);
@@ -172,7 +173,7 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
-    qDebug() << "Error: " << error.errorString() << error.offset << error.error;
+    qDebug() << "MainWindow::on_openJSONSettingsFilePushButton_clicked:     Error: " << error.errorString() << error.offset << error.error;
 
     QJsonObject root = document.object();
     QString keyObject = "";
@@ -180,12 +181,12 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
     for (int i = 0; i < root.size(); i++) {
         keyObject = root.keys().at(i);
         if(keyObject.contains("Label")){
-            QLabel *label = ui->widget->findChild<QLabel *>(keyObject);
+            QLabel *label = ui->mainInfoTab->findChild<QLabel *>(keyObject);
             valueObject = root.value(root.keys().at(0)).toString();
             label->setText(valueObject);
             emit signalNewSaveDir(valueObject);
             ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+valueObject+"<br/><font color = red>!!!<\\font>");
-            qDebug() << "on_openJSONSettingsFilePushButton_clicked || " << valueObject << "set like text to dirPathLabel";
+            qDebug() << "MainWindow::on_openJSONSettingsFilePushButton_clicked:     " << valueObject << "set like text to dirPathLabel";
         }
     }
 }
@@ -197,7 +198,7 @@ void MainWindow::on_saveSettingsPushButton_clicked()
     m_currentJsonObject.insert("dirPathLabel", ui->dirPathLabel->text());
 
     // Выводим текст всего Json объекта в консоль для проверки
-    qDebug() << "on_saveSettingsPushButton_clicked || " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
+    qDebug() << "on_saveSettingsPushButton_clicked:     " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
 
     QString saveFileName = QFileDialog::getSaveFileName(this,
                                                             tr("Save Json File"),
