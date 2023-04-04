@@ -54,8 +54,8 @@ private:
     int blockData = 1000000;  //  размер данных
     QString someone;    //  имя отправителя
 
-    QString newDirPath = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\"; //  путь новой директории, по умолчанию рабочий стол
-    QString folderForRawInformation = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\folderForRawInformation";  //  путь к папке с приходящей обработанной информацией от клиентов
+    QString newDirPath = ""; //  путь новой директории, по умолчанию рабочий стол
+    QString folderForRawInformation = "";  //  путь к папке с приходящей обработанной информацией от клиентов
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
     QString JSONSettingFilePath = "";
 
