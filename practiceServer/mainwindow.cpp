@@ -138,7 +138,7 @@ void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию 
     if(!dirPath.isEmpty()){
         //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
         ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
-        ui->dirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
+        ui->saveDirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
         emit signalNewSaveDir(dirPath);
         qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
     }
@@ -181,7 +181,7 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
     for (int i = 0; i < root.size(); i++) {
         keyObject = root.keys().at(i);
         if(keyObject.contains("Label")){
-            QLabel *label = ui->mainInfoTab->findChild<QLabel *>(keyObject);
+            QLabel *label = ui->settingsTab->findChild<QLabel *>(keyObject);
             valueObject = root.value(root.keys().at(0)).toString();
             label->setText(valueObject);
             emit signalNewSaveDir(valueObject);
@@ -195,7 +195,7 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 void MainWindow::on_saveSettingsPushButton_clicked()
 {
 
-    m_currentJsonObject.insert("dirPathLabel", ui->dirPathLabel->text());
+    m_currentJsonObject.insert("dirPathLabel", ui->saveDirPathLabel->text());
 
     // Выводим текст всего Json объекта в консоль для проверки
     qDebug() << "on_saveSettingsPushButton_clicked:     " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
