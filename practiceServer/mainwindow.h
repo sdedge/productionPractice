@@ -24,6 +24,9 @@
 #include <QAbstractScrollArea>
 #include <QMessageBox>
 ///  ========================
+///
+///  ========================   свои классы
+
 
 #include "server.h"
 
@@ -47,7 +50,6 @@ private:
     Server* server;     //  создаем экземпляр сервера
     QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
 
-
     QJsonObject m_currentJsonObject;    // Текущий json объект, с которым производится работа
 
     quint16 nextBlockSize;  //  размер блока сообщения
@@ -66,14 +68,14 @@ public slots:
     void slotDisconnectClient();
 //    void slotChatServer(QString message);   //  обработчик чата на стороне сервера
 
-private slots:
-    void on_chooseSaveDirPushButton_clicked();  //  по нажатию на "Choose save directory"
+    void on_chooseWorkspaceDirPushButton_clicked();  //  по нажатию на "Choose save directory"
 
+private slots:
     void on_clientsListWidget_customContextMenuRequested(const QPoint &pos);
 
     void on_openJSONSettingsFilePushButton_clicked();
 
-    void on_saveSettingsPushButton_clicked();
+//    void on_saveSettingsPushButton_clicked();
 
 signals:
     void signalNewSaveDir(QString);   //  слот для обработки директории сохранения

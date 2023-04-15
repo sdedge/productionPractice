@@ -86,7 +86,14 @@
           <height>361</height>
          </rect>
         </property>
-        <layout class="QGridLayout" name="gridLayout_4">
+        <layout class="QGridLayout" name="settingsGridLayout">
+         <item row="0" column="0">
+          <widget class="QPushButton" name="openJSONSettingsFilePushButton">
+           <property name="text">
+            <string>Открыть файл настроек</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QPushButton" name="saveSettingsPushButton">
            <property name="text">
@@ -95,129 +102,12 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="3" column="0">
-            <layout class="QHBoxLayout" name="ChangeIP">
-             <item>
-              <widget class="QLabel" name="changeIPLabel">
-               <property name="text">
-                <string>Сменить IP</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="changeIPLineEdit"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="changeIPPushButton">
-               <property name="text">
-                <string>нераб Подтвердить</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="1" column="0">
-            <layout class="QGridLayout" name="PossibleTreatments">
-             <item row="2" column="0">
-              <widget class="QComboBox" name="possibleTreatmetsComboBox"/>
-             </item>
-             <item row="3" column="0">
-              <widget class="QPushButton" name="possibleTreatmetsPushButton">
-               <property name="text">
-                <string>нерабочая Добавить новую</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="possibleTreatmetsLabel">
-               <property name="text">
-                <string>Возможные обработки:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="2" column="0">
-            <layout class="QHBoxLayout" name="QuantityOfClients">
-             <item>
-              <widget class="QLabel" name="quantityOfClientsLabel">
-               <property name="text">
-                <string>Количество пользователей</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="quantityOfClientsSpinBox"/>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="0" column="0">
-            <layout class="QGridLayout" name="ChooseSaveDirectory">
-             <item row="2" column="0" colspan="2">
-              <widget class="QLabel" name="saveDirPathLabel">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="chooseSaveDirPushButton">
-               <property name="text">
-                <string>Choose save directory</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="openJSONSettingsFilePushButton">
-           <property name="text">
-            <string>Открыть файл настроек</string>
+          <widget class="QFrame" name="settingsFrame">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
            </property>
           </widget>
          </item>

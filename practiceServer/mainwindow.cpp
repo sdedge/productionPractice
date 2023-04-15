@@ -1,5 +1,13 @@
+// #include "components/frames/cardFrame/cardframe.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include <QVBoxLayout>
+
+#include "components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h"
+#include "components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h"
+#include "components/frames/cardFrame/changeIPLineEditFrame/change_IP_line_edit_frame.h"
+#include "components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -32,8 +40,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
-    ui->possibleTreatmetsComboBox->addItem("Дублирование информации");
-    ui->possibleTreatmetsComboBox->addItem("Утроение информации");
+//    ui->possibleTreatmetsComboBox->addItem("Дублирование информации");
+//    ui->possibleTreatmetsComboBox->addItem("Утроение информации");
+
+    QVBoxLayout *settingsContainer = new QVBoxLayout();
+
+    I_CardFrame *m_chooseSaveDirFrame = new SelectWorkspaceFrame(this);
+    I_CardFrame *m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame();
+    I_CardFrame *m_changeIPLineEditFrame = new ChangeIPLineEditFrame();
+    I_CardFrame *m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame();
+
+    m_chooseSaveDirFrame->createInterface();
+    m_possibleProcessingFrame->createInterface();
+    m_changeIPLineEditFrame->createInterface();
+    m_maxConnectionSpinBoxFrame->createInterface();
+
+    settingsContainer->addWidget(m_chooseSaveDirFrame);
+    settingsContainer->addWidget(m_possibleProcessingFrame);
+    settingsContainer->addWidget(m_changeIPLineEditFrame);
+    settingsContainer->addWidget(m_maxConnectionSpinBoxFrame);
+
+    ui->settingsFrame->setLayout(settingsContainer);
 
     // устанавливаем специальную политику отображения меню
     ui->clientsListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -80,7 +107,7 @@ void MainWindow::slotDeleteSocketFromListWidget(QMap<QTcpSocket *, QString> mapS
 
 void MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd)
 {
-    ui->possibleTreatmetsComboBox->addItem(treatmentToAdd);
+//    ui->possibleTreatmetsComboBox->addItem(treatmentToAdd);
     qDebug() << "MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox:      " << treatmentToAdd;
 }
 
@@ -132,13 +159,13 @@ void MainWindow::slotDisconnectClient()
 //}
 
 
-void MainWindow::on_chooseSaveDirPushButton_clicked()   //  по нажатию на "Choose save directory"
+void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажатию на "Choose save directory"
 {
     QString dirPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
     if(!dirPath.isEmpty()){
         //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
         ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
-        ui->saveDirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
+//        ui->saveDirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
         emit signalNewSaveDir(dirPath);
         qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
     }
@@ -192,29 +219,38 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 }
 
 
-void MainWindow::on_saveSettingsPushButton_clicked()
-{
+//void MainWindow::on_saveSettingsPushButton_clicked()
+//{
+//    qDebug() << "=======" << ui->settingsGridLayout->children();
+//    for(auto item : ui->settingsGridLayout->children()){
+//        if(QString(item->metaObject()->className()).toLower().contains("layout")){
+//            qDebug() << "1";
+//        } else {
+//            qDebug() << "0";
+//        }
+//        qDebug() << QString(item->metaObject()->className()).toLower();
+//    }
 
-    m_currentJsonObject.insert("dirPathLabel", ui->saveDirPathLabel->text());
+//    m_currentJsonObject.insert("dirPathLabel", ui->saveDirPathLabel->text());
 
-    // Выводим текст всего Json объекта в консоль для проверки
-    qDebug() << "on_saveSettingsPushButton_clicked:     " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
+//    // Выводим текст всего Json объекта в консоль для проверки
+//    qDebug() << "on_saveSettingsPushButton_clicked:     " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
 
-    QString saveFileName = QFileDialog::getSaveFileName(this,
-                                                            tr("Save Json File"),
-                                                            QString(),
-                                                            tr("JSON (*.json)"));
-    QFileInfo fileInfo(saveFileName);   // С помощью QFileInfo
-    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
-    // Создаём объект файла и открываем его на запись
-    QFile jsonFile(saveFileName);
-    if (!jsonFile.open(QIODevice::WriteOnly))
-    {
-        return;
-    }
+//    QString saveFileName = QFileDialog::getSaveFileName(this,
+//                                                            tr("Save Json File"),
+//                                                            QString(),
+//                                                            tr("JSON (*.json)"));
+//    QFileInfo fileInfo(saveFileName);   // С помощью QFileInfo
+//    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
+//    // Создаём объект файла и открываем его на запись
+//    QFile jsonFile(saveFileName);
+//    if (!jsonFile.open(QIODevice::WriteOnly))
+//    {
+//        return;
+//    }
 
-    // Записываем текущий объект Json в файл
-    jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
-    jsonFile.close();   // Закрываем файл
-}
+//    // Записываем текущий объект Json в файл
+//    jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
+//    jsonFile.close();   // Закрываем файл
+//}
 
