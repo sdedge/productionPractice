@@ -9,8 +9,8 @@ PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame()
     possibleProcessingComboBox = new QComboBox();
 
     //  TODO:   сделать подгрузку из JSON
-    possibleProcessingComboBox->addItem("Дублирование информации");
-    possibleProcessingComboBox->addItem("Утроение информации");
+    possibleProcessingComboBox->addItem("Дублирование информации", "double");
+    possibleProcessingComboBox->addItem("Утроение информации", "triple");
 
     dataLabel = new QLabel();
 
@@ -28,5 +28,9 @@ void PossibleProcessingComboBoxFrame::createInterface()
 
 QVariant PossibleProcessingComboBoxFrame::getValue()
 {
-    return QString("test combobox");
+    QMap<QString, QVariant> comboBoxData;
+    for(int i = 0; i < possibleProcessingComboBox->count(); i++){
+        comboBoxData[possibleProcessingComboBox->itemText(i)] = possibleProcessingComboBox->itemData(i);
+    }
+    return QVariant(comboBoxData);
 }
