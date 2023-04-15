@@ -26,7 +26,7 @@
 ///  ========================
 ///
 ///  ========================   свои классы
-
+#include "components/frames/cardFrame/I_cardframe.h"
 
 #include "server.h"
 
@@ -48,6 +48,12 @@ public:
 private:
     Ui::MainWindow *ui;
     Server* server;     //  создаем экземпляр сервера
+
+    I_CardFrame *m_selectWorkspaceFrame;
+    I_CardFrame *m_possibleProcessingFrame;
+    I_CardFrame *m_changeIPLineEditFrame;
+    I_CardFrame *m_maxConnectionSpinBoxFrame;
+
     QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
 
     QJsonObject m_currentJsonObject;    // Текущий json объект, с которым производится работа

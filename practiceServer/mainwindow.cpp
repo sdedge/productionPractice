@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     if(server_started)  //  проверка состояния "true"
         {
-            ui->infoAboutServerTextEdit->append("Сервер запущен на "+server->serverAddress().toString()+" IP и "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
+            ui->infoAboutServerTextEdit->append("Сервер запущен на ["+server->serverAddress().toString()+" IP] и "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
         }
         else
         {
@@ -45,17 +45,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
-    I_CardFrame *m_chooseSaveDirFrame = new SelectWorkspaceFrame(this);
-    I_CardFrame *m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame();
-    I_CardFrame *m_changeIPLineEditFrame = new ChangeIPLineEditFrame();
-    I_CardFrame *m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame();
+    m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
+    m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame();
+    m_changeIPLineEditFrame = new ChangeIPLineEditFrame();
+    m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame();
 
-    m_chooseSaveDirFrame->createInterface();
+    m_selectWorkspaceFrame->createInterface();
     m_possibleProcessingFrame->createInterface();
     m_changeIPLineEditFrame->createInterface();
     m_maxConnectionSpinBoxFrame->createInterface();
 
-    settingsContainer->addWidget(m_chooseSaveDirFrame);
+    settingsContainer->addWidget(m_selectWorkspaceFrame);
     settingsContainer->addWidget(m_possibleProcessingFrame);
     settingsContainer->addWidget(m_changeIPLineEditFrame);
     settingsContainer->addWidget(m_maxConnectionSpinBoxFrame);
@@ -165,7 +165,9 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
     if(!dirPath.isEmpty()){
         //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
         ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
-//        ui->saveDirPathLabel->setText(dirPath); //  для наглядности выводим путь в dirPathLabel
+
+        m_selectWorkspaceFrame->findChild<QLabel*>("Data Label")->setText(dirPath); //  для наглядности выводим путь в dataLabel
+
         emit signalNewSaveDir(dirPath);
         qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
     }
