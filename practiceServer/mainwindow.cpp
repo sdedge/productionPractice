@@ -189,7 +189,6 @@ void MainWindow::on_clientsListWidget_customContextMenuRequested(const QPoint &p
     menu->popup(ui->clientsListWidget->viewport()->mapToGlobal(pos));
 }
 
-
 void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 {
     QString filePath;
@@ -220,39 +219,49 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
     }
 }
 
+void MainWindow::on_saveSettingsPushButton_clicked()
+{
+    for(auto item : ui->settingsFrame->children()){ //  проходимся по сгенерированному списку настроек
+        if(QString(item->metaObject()->className()).contains("Layout")){
+            continue;
+        }
 
-//void MainWindow::on_saveSettingsPushButton_clicked()
-//{
-//    qDebug() << "=======" << ui->settingsGridLayout->children();
-//    for(auto item : ui->settingsGridLayout->children()){
-//        if(QString(item->metaObject()->className()).toLower().contains("layout")){
-//            qDebug() << "1";
-//        } else {
-//            qDebug() << "0";
-//        }
-//        qDebug() << QString(item->metaObject()->className()).toLower();
-//    }
+        item = dynamic_cast<I_CardFrame*>(item);
 
-//    m_currentJsonObject.insert("dirPathLabel", ui->saveDirPathLabel->text());
+        if(QString(item->metaObject()->className()).contains("ComboBox")){
+            //  картеж из текста : данные
+            m_currentJsonValue = dynamic_cast<I_CardFrame*>(item)->getValue().toJsonObject();
 
-//    // Выводим текст всего Json объекта в консоль для проверки
-//    qDebug() << "on_saveSettingsPushButton_clicked:     " << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
+            m_currentJsonObject.insert(item->metaObject()->className(), m_currentJsonValue);
+            continue;
+        }
 
-//    QString saveFileName = QFileDialog::getSaveFileName(this,
-//                                                            tr("Save Json File"),
-//                                                            QString(),
-//                                                            tr("JSON (*.json)"));
-//    QFileInfo fileInfo(saveFileName);   // С помощью QFileInfo
-//    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
-//    // Создаём объект файла и открываем его на запись
-//    QFile jsonFile(saveFileName);
-//    if (!jsonFile.open(QIODevice::WriteOnly))
-//    {
-//        return;
-//    }
+        if(QString(item->metaObject()->className()).contains("SpinBox")){
+            m_currentJsonValue = dynamic_cast<I_CardFrame*>(item)->getValue().toInt();
 
-//    // Записываем текущий объект Json в файл
-//    jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
-//    jsonFile.close();   // Закрываем файл
-//}
+            m_currentJsonObject.insert(item->metaObject()->className(), m_currentJsonValue);
+            continue;
+        }
+
+        m_currentJsonObject[item->metaObject()->className()] = dynamic_cast<I_CardFrame*>(item)->getValue().toString();
+    }
+
+    //  TODO:   решить проблему с Linux
+    QString saveFileName = QFileDialog::getSaveFileName(this,
+                                                            tr("Save Json File"),
+                                                            QString(),
+                                                            tr("JSON (*.json)"));
+    QFileInfo fileInfo(saveFileName);   // С помощью QFileInfo
+    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
+    // Создаём объект файла и открываем его на запись
+    QFile jsonFile(saveFileName);
+    if (!jsonFile.open(QIODevice::WriteOnly))
+    {
+        return;
+    }
+
+    // Записываем текущий объект Json в файл
+    jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
+    jsonFile.close();   // Закрываем файл
+}
 

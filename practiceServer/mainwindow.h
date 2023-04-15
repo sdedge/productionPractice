@@ -57,6 +57,7 @@ private:
     QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
 
     QJsonObject m_currentJsonObject;    // Текущий json объект, с которым производится работа
+    QJsonValue m_currentJsonValue;
 
     quint16 nextBlockSize;  //  размер блока сообщения
 
@@ -82,6 +83,8 @@ private slots:
     void on_openJSONSettingsFilePushButton_clicked();
 
 //    void on_saveSettingsPushButton_clicked();
+
+    void on_saveSettingsPushButton_clicked();
 
 signals:
     void signalNewSaveDir(QString);   //  слот для обработки директории сохранения
