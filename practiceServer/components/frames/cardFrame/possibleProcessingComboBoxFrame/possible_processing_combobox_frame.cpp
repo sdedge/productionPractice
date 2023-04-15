@@ -7,6 +7,11 @@ PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame()
     this->setObjectName("Possible processing Frame");
 
     possibleProcessingComboBox = new QComboBox();
+
+    //  TODO:   сделать подгрузку из JSON
+    possibleProcessingComboBox->addItem("Дублирование информации");
+    possibleProcessingComboBox->addItem("Утроение информации");
+
     dataLabel = new QLabel();
 
     dataLabel->setText("Возможные обработки:");
