@@ -12,6 +12,8 @@ SelectWorkspaceFrame::SelectWorkspaceFrame(MainWindow *parentUi)
     dataLabel->setText("Нет рабочей папки!");
     dataLabel->setObjectName("Data Label");
 
+    this->parentUi = parentUi;
+
     connect(chooseWorkspaceDirPushButton, &QPushButton::clicked, parentUi, &MainWindow::on_chooseWorkspaceDirPushButton_clicked);
 }
 
@@ -25,4 +27,9 @@ void SelectWorkspaceFrame::createInterface(){
 
 QVariant SelectWorkspaceFrame::getValue(){
     return dataLabel->text();
+}
+
+void SelectWorkspaceFrame::setValue(QVariant value){
+    dataLabel->setText(value.toString());
+    emit parentUi->signalNewSaveDir(value.toString());
 }

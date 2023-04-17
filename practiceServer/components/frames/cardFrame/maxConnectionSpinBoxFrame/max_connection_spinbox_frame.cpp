@@ -2,12 +2,14 @@
 
 #include <QHBoxLayout>
 
-MaxConnectionSpinBoxFrame::MaxConnectionSpinBoxFrame()
+MaxConnectionSpinBoxFrame::MaxConnectionSpinBoxFrame(MainWindow *parentUi)
 {
     this->setObjectName("Max Connection Frame");
 
     maxConnectionSpinBox = new QSpinBox();
     dataLabel = new QLabel();
+
+    this->parentUi = parentUi;
 
     dataLabel->setText("Макс. подключений:");
 }
@@ -24,4 +26,9 @@ void MaxConnectionSpinBoxFrame::createInterface()
 QVariant MaxConnectionSpinBoxFrame::getValue()
 {
     return QString::number(maxConnectionSpinBox->value());
+}
+
+void MaxConnectionSpinBoxFrame::setValue(QVariant value)
+{
+    maxConnectionSpinBox->setValue(value.toInt());
 }

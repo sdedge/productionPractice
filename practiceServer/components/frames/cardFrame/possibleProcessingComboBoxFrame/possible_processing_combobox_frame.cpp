@@ -2,7 +2,7 @@
 
 #include <QHBoxLayout>
 
-PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame()
+PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame(MainWindow *parentUi)
 {
     this->setObjectName("Possible processing Frame");
 
@@ -13,6 +13,8 @@ PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame()
     possibleProcessingComboBox->addItem("Утроение информации", "triple");
 
     dataLabel = new QLabel();
+
+    this->parentUi = parentUi;
 
     dataLabel->setText("Возможные обработки:");
 }
@@ -34,3 +36,13 @@ QVariant PossibleProcessingComboBoxFrame::getValue()
     }
     return QVariant(comboBoxData);
 }
+
+void PossibleProcessingComboBoxFrame::setValue(QVariant value)
+{
+    QMap<QString, QVariant> comboBoxValue = value.toMap();
+
+    for(auto valueMap = comboBoxValue.begin(); valueMap != comboBoxValue.end(); valueMap++){
+        possibleProcessingComboBox->addItem(valueMap.key(), valueMap.value());
+    }
+}
+

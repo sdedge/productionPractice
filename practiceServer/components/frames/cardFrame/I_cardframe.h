@@ -12,6 +12,7 @@ public:
 
     virtual void createInterface() = 0;
     virtual QVariant getValue() = 0;
+    virtual void setValue(QVariant value) = 0;
 };
 
 #endif // CARDFRAME_H

@@ -16,9 +16,13 @@ public:
 
     void createInterface() override;
     QVariant getValue() override;
+    void setValue(QVariant value) override;
 
+private:
     QPushButton *chooseWorkspaceDirPushButton;
     QLabel *dataLabel;
+    MainWindow *parentUi;
+
 };
 
 #endif // CHOOSESAVEDIRFRAME_H
