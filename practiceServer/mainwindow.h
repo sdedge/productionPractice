@@ -88,10 +88,11 @@ private slots:
     void on_saveSettingsPushButton_clicked();
 
 signals:
-    void signalNewSaveDir(QString);   //  слот для обработки директории сохранения
+    void signalNewWorkspaceFolder(QString); //  сигнал для установки новой рабочей папки
+//    void signalNewSaveDir(QString);   //  сигнал для обработки директории сохранения
     void signalSocketDisplayed(QTcpSocket* displayedSocket);   //  сигнал для обработки уже отобразившихся сокетов
     void signalDisconnectSocket(int socketDiscriptor);  //  сигнал для принудительного удаления сокета
-    void signalSetJSONSettingFilePath(QString); //  слот для установки пути к JSON файлу настроек
+    void signalSetJSONSettingFilePath(QString); //  сигнал для установки пути к JSON файлу настроек
     void signalSaveSettings();
 };
 

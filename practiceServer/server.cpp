@@ -274,10 +274,10 @@ void Server::slotDisconnect()
     disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
 }
 
-void Server::slotNewSaveDir(QString newDirPath) //  пока неработающий обработчик новой директории
+void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока неработающий обработчик новой директории
 {
-    this->newDirPath = newDirPath;  //  установили новую директорию
-    qDebug() << "Server::slotNewSaveDir:        " << this->newDirPath;
+    this->workspaceFolder = newFolderPath;  //  установили новую директорию
+    qDebug() << "Server::slotNewWorkspaceFolder:        " << this->workspaceFolder;
 }
 
 void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправка клиенту сообщений

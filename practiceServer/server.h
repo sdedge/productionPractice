@@ -54,6 +54,7 @@ private:
     int blockData = 1000000;  //  размер данных
     QString someone;    //  имя отправителя
 
+    QString workspaceFolder = "";   //  путь до рабочей директории
     QString newDirPath = ""; //  путь новой директории, по умолчанию рабочий стол
     QString folderForRawInformation = "";  //  путь к папке с приходящей обработанной информацией от клиентов
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
@@ -65,7 +66,7 @@ public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
     void slotDisconnect();  //  обработчик отключившихся клиентов
-    void slotNewSaveDir(QString newDirPath);  //  обработчик новой директории
+    void slotNewWorkspaceFolder(QString newFolderPath);  //  обработчик новой директории
     void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
     void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
     void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета

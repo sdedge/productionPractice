@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
     connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
     connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
-    connect(this, &MainWindow::signalNewSaveDir, server, &Server::slotNewSaveDir);  //  связка для отображения новой директории
+    connect(this, &MainWindow::signalNewWorkspaceFolder, server, &Server::slotNewWorkspaceFolder);  //  связка для отображения новой директории
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
     connect(this, &MainWindow::signalSetJSONSettingFilePath, server, &Server::slotSetJSONSettingFilePath);  //  связка для установки пути к JSON файлу настроек
@@ -161,15 +161,15 @@ void MainWindow::slotDisconnectClient()
 
 void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажатию на "Choose save directory"
 {
-    QString dirPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
-    if(!dirPath.isEmpty()){
+    QString folderPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
+    if(!folderPath.isEmpty()){
         //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
-        ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dirPath+"<br/><font color = red>!!!<\\font>");
+        ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+folderPath+"<br/><font color = red>!!!<\\font>");
 
-        m_selectWorkspaceFrame->findChild<QLabel*>("Data Label")->setText(dirPath); //  для наглядности выводим путь в dataLabel
+        m_selectWorkspaceFrame->findChild<QLabel*>("Data Label")->setText(folderPath); //  для наглядности выводим путь в dataLabel
 
-        emit signalNewSaveDir(dirPath);
-        qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << dirPath << "set like text to dirPathLabel";
+        emit signalNewWorkspaceFolder(folderPath);
+        qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << folderPath;
     }
 }
 
