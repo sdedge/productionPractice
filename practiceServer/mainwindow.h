@@ -58,6 +58,7 @@ private:
 
     QJsonObject m_currentJsonObject;    // Текущий json объект, с которым производится работа
     QJsonValue m_currentJsonValue;
+    QJsonArray m_currentJsonArray;
 
     quint16 nextBlockSize;  //  размер блока сообщения
 

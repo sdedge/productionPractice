@@ -46,9 +46,9 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
-    m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame();
-    m_changeIPLineEditFrame = new ChangeIPLineEditFrame();
-    m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame();
+    m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame(this);
+    m_changeIPLineEditFrame = new ChangeIPLineEditFrame(this);
+    m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame(this);
 
     m_selectWorkspaceFrame->createInterface();
     m_possibleProcessingFrame->createInterface();
@@ -203,20 +203,31 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
     QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
     qDebug() << "MainWindow::on_openJSONSettingsFilePushButton_clicked:     Error: " << error.errorString() << error.offset << error.error;
 
-    QJsonObject root = document.object();
-    QString keyObject = "";
-    QString valueObject = "";
-    for (int i = 0; i < root.size(); i++) {
-        keyObject = root.keys().at(i);
-        if(keyObject.contains("Label")){
-            QLabel *label = ui->settingsTab->findChild<QLabel *>(keyObject);
-            valueObject = root.value(root.keys().at(0)).toString();
-            label->setText(valueObject);
-            emit signalNewSaveDir(valueObject);
-            ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+valueObject+"<br/><font color = red>!!!<\\font>");
-            qDebug() << "MainWindow::on_openJSONSettingsFilePushButton_clicked:     " << valueObject << "set like text to dirPathLabel";
+    QJsonObject documentObject = document.object();
+    QString keyObject = ""; //  ключ всегда строка
+    QVariant valueObject;  //  а вот значение может быть разным
+
+    for (int i = 0; i < documentObject.size(); i++) { //  проходимся по всему файлу
+
+        keyObject = documentObject.keys().at(0);  //  берем i-тый ключ-название_виджета
+
+        for(auto settingsTabChild : ui->settingsFrame->children()){
+            if(settingsTabChild->metaObject()->className() != keyObject) continue;
+
+            //  получаем значение по ключу
+            valueObject = documentObject.value(documentObject.keys().at(0));
+
+            dynamic_cast<I_CardFrame*>(settingsTabChild)->setValue(valueObject);
+
+            ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+valueObject.toString()+"<br/><font color = red>!!!<\\font>");
+
+            break;
         }
+
     }
+
+    qDebug() << "======";
+    qDebug() << "Настройки установлены";
 }
 
 void MainWindow::on_saveSettingsPushButton_clicked()
