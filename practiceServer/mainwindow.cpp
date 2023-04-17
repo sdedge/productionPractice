@@ -209,13 +209,13 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 
     for (int i = 0; i < documentObject.size(); i++) { //  проходимся по всему файлу
 
-        keyObject = documentObject.keys().at(0);  //  берем i-тый ключ-название_виджета
+        keyObject = documentObject.keys().at(i);  //  берем i-тый ключ-название_виджета
 
         for(auto settingsTabChild : ui->settingsFrame->children()){
             if(settingsTabChild->metaObject()->className() != keyObject) continue;
 
             //  получаем значение по ключу
-            valueObject = documentObject.value(documentObject.keys().at(0));
+            valueObject = documentObject.value(keyObject);
 
             dynamic_cast<I_CardFrame*>(settingsTabChild)->setValue(valueObject);
 

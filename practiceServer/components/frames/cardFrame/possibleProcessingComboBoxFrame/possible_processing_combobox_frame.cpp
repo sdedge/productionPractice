@@ -39,6 +39,7 @@ QVariant PossibleProcessingComboBoxFrame::getValue()
 
 void PossibleProcessingComboBoxFrame::setValue(QVariant value)
 {
+    possibleProcessingComboBox->clear();
     QMap<QString, QVariant> comboBoxValue = value.toMap();
 
     for(auto valueMap = comboBoxValue.begin(); valueMap != comboBoxValue.end(); valueMap++){
