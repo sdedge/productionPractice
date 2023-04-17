@@ -289,8 +289,7 @@ void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправ�
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
 
-    auto it = mapSockets.begin();
-    for(;it != mapSockets.end(); ++it)  //  пробегаемся по всем сокетам и
+    for(auto it = mapSockets.begin();it != mapSockets.end(); ++it)  //  пробегаемся по всем сокетам и
     {
         it.key()->write(Data);    //  отправляем по соответствующему сокету данные
     }
