@@ -15,10 +15,11 @@ public:
     SelectWorkspaceFrame(MainWindow *parentUi);
 
     void createInterface() override;
-    QVariant getValue() override;
+    QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
 
 private:
+    QString consoleMessage;
     QPushButton *chooseWorkspaceDirPushButton;
     QLabel *dataLabel;
     MainWindow *parentUi;

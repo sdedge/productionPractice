@@ -14,13 +14,14 @@ public:
     ChangeIPLineEditFrame(MainWindow *parentUi);
 
     void createInterface() override;
-    QVariant getValue() override;
+    QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
 
 private:
+    QString consoleMessage;
     QLineEdit *changeIPLineEdit;
     QLabel *dataLabel;
-    MainWindow *parentUi;
+    MainWindow *parentUi; 
 };
 
 #endif // LINEEDITFRAME_H

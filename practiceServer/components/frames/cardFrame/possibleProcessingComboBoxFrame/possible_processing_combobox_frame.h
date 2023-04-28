@@ -14,10 +14,11 @@ public:
     PossibleProcessingComboBoxFrame(MainWindow *parentUi);
 
     void createInterface() override;
-    QVariant getValue() override;
+    QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
 
 private:
+    QString consoleMessage;
     QComboBox *possibleProcessingComboBox;
     QLabel *dataLabel;
     MainWindow *parentUi;

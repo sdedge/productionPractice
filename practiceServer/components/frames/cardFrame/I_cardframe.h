@@ -11,7 +11,7 @@ public:
     I_CardFrame();
 
     virtual void createInterface() = 0;
-    virtual QVariant getValue() = 0;
+    virtual QMap<QString, QVariant> getValue() = 0;
     virtual void setValue(QVariant value) = 0;
 };
 

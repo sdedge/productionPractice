@@ -14,10 +14,11 @@ public:
     MaxConnectionSpinBoxFrame(MainWindow *parentUi);
 
     void createInterface() override;
-    QVariant getValue() override;
+    QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
 
 private:
+    QString consoleMessage;
     QSpinBox *maxConnectionSpinBox;
     QLabel *dataLabel;
     MainWindow *parentUi;
