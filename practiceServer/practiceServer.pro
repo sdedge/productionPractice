@@ -15,6 +15,7 @@ SOURCES += \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.cpp \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.cpp \
     components/frames/cardFrame/changeIPLineEditFrame/change_IP_line_edit_frame.cpp \
+    helperClasses/jsonPacker/json_packer.cpp \
     main.cpp \
     mainwindow.cpp \
     server.cpp
@@ -25,6 +26,7 @@ HEADERS += \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h \
     components/frames/cardFrame/changeIPLineEditFrame/change_IP_line_edit_frame.h \
+    helperClasses/jsonPacker/json_packer.h \
     mainwindow.h \
     server.h
 
