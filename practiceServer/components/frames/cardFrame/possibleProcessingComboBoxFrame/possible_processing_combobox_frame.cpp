@@ -28,13 +28,19 @@ void PossibleProcessingComboBoxFrame::createInterface()
     frameLayout->addWidget(possibleProcessingComboBox);
 }
 
-QVariant PossibleProcessingComboBoxFrame::getValue()
+QMap<QString, QVariant> PossibleProcessingComboBoxFrame::getValue()
 {
-    QMap<QString, QVariant> comboBoxData;
+    QMap<QString, QVariant> comboBoxData;   //  переменная для данных выпадающего списка
     for(int i = 0; i < possibleProcessingComboBox->count(); i++){
         comboBoxData[possibleProcessingComboBox->itemText(i)] = possibleProcessingComboBox->itemData(i);
     }
-    return QVariant(comboBoxData);
+
+    QMap<QString, QVariant> valueMap;   //  переменная для возврата
+    //  сообщение в консоль
+    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлены новые обработки! <br/><font color = red>!!!<\\font>";
+
+    valueMap.insert(consoleMessage, comboBoxData);
+    return valueMap;
 }
 
 void PossibleProcessingComboBoxFrame::setValue(QVariant value)

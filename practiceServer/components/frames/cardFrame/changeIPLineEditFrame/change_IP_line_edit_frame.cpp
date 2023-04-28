@@ -1,9 +1,11 @@
 #include "change_IP_line_edit_frame.h"
 
 #include <QHBoxLayout>
+#include <QMap>
 
 ChangeIPLineEditFrame::ChangeIPLineEditFrame(MainWindow *parentUi)
 {
+    //  конструктор карточки
     this->setObjectName("Change IP lineEdit Frame");
     changeIPLineEdit = new QLineEdit;
     dataLabel = new QLabel;
@@ -16,21 +18,25 @@ ChangeIPLineEditFrame::ChangeIPLineEditFrame(MainWindow *parentUi)
 
 void ChangeIPLineEditFrame::createInterface()
 {
-    QHBoxLayout *frameLayout = new QHBoxLayout();
+    //  создание интерфейса
+    QHBoxLayout *frameLayout = new QHBoxLayout();   //  слой выравнивания
     this->setLayout(frameLayout);
 
     frameLayout->addWidget(dataLabel);
     frameLayout->addWidget(changeIPLineEdit);
 }
 
-QVariant ChangeIPLineEditFrame::getValue()
+QMap<QString, QVariant> ChangeIPLineEditFrame::getValue()
 {
-    return changeIPLineEdit->text();
+    QMap<QString, QVariant> valueMap;   //  переменная для возврата
+    //  сообщение в консоль
+    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлен новый IP: "+changeIPLineEdit->text()+"<br/><font color = red>!!!<\\font>";
+
+    valueMap.insert(consoleMessage, changeIPLineEdit->text());
+    return valueMap;
 }
 
 void ChangeIPLineEditFrame::setValue(QVariant value)
 {
-    //  TODO:   сделать вызов сигнала для IP
-
     changeIPLineEdit->setText(value.toString());
 }

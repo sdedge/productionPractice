@@ -25,11 +25,16 @@ void SelectWorkspaceFrame::createInterface(){
     frameLayout->addWidget(dataLabel);
 }
 
-QVariant SelectWorkspaceFrame::getValue(){
-    return dataLabel->text();
+QMap<QString, QVariant> SelectWorkspaceFrame::getValue(){
+    QMap<QString, QVariant> valueMap;   //  переменная для возврата
+    //  сообщение в консоль
+    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dataLabel->text()+"<br/><font color = red>!!!<\\font>";
+
+    valueMap.insert(consoleMessage, dataLabel->text());
+    return valueMap;
 }
 
 void SelectWorkspaceFrame::setValue(QVariant value){
     dataLabel->setText(value.toString());
-    emit parentUi->signalNewSaveDir(value.toString());
+    emit parentUi->signalNewWorkspaceFolder(value.toString());
 }
