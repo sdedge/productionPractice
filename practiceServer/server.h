@@ -37,14 +37,6 @@ private:
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
     QMap<QString,QString> possibleTreatments;   //  определяем возможные обработки с приставкой и её человеческим описанием
 
-    void SendPossibleTreatments(QTcpSocket* socket);  //  функция передачи возможных обработок
-
-    void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
-    void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
-
-    void SendFileToClient(QString filePath);    //  функция отправки файл (начало)
-    void SendPartOfFile();      //  функция отправки части файла (продолжение)
-
     qint64 nextBlockSize;   //  блок нового сообщения
 
     QFile *file;    //  определяем файл
@@ -61,6 +53,14 @@ private:
     QString JSONSettingFilePath = "";
 
     QFileSystemWatcher *fileSystemWatcher;
+
+    void SendPossibleTreatments(QTcpSocket* socket);  //  функция передачи возможных обработок
+
+    void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
+    void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
+
+    void SendFileToClient(QString filePath);    //  функция отправки файл (начало)
+    void SendPartOfFile();      //  функция отправки части файла (продолжение)
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
