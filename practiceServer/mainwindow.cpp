@@ -232,29 +232,23 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 
 void MainWindow::on_saveSettingsPushButton_clicked()
 {
-    for(auto item : ui->settingsFrame->children()){ //  проходимся по сгенерированному списку настроек
+    //  проходимся по сгенерированному списку настроек
+    for(auto item : ui->settingsFrame->children()){
+
+        //  если встречаем слой выравнивания, то пропускаем
+        //  поскольку в списке настроек первым элементом всегда будет слой выравнивания
         if(QString(item->metaObject()->className()).contains("Layout")){
             continue;
         }
 
-        item = dynamic_cast<I_CardFrame*>(item);
+        //  получаем json вариант данных с элемента, приведённого от QObject* к I_CardFrame*
+        m_currentJsonValue = m_jsonPacker.getJsonVersionValue(dynamic_cast<I_CardFrame*>(item));
 
-        if(QString(item->metaObject()->className()).contains("ComboBox")){
-            //  картеж из текста : данные
-            m_currentJsonValue = dynamic_cast<I_CardFrame*>(item)->getValue().toJsonObject();
+        //  выводим в консоль сообщение, получая первый ключ
+        ui->infoAboutServerTextEdit->append(dynamic_cast<I_CardFrame*>(item)->getValue().firstKey());
 
-            m_currentJsonObject.insert(item->metaObject()->className(), m_currentJsonValue);
-            continue;
-        }
-
-        if(QString(item->metaObject()->className()).contains("SpinBox")){
-            m_currentJsonValue = dynamic_cast<I_CardFrame*>(item)->getValue().toInt();
-
-            m_currentJsonObject.insert(item->metaObject()->className(), m_currentJsonValue);
-            continue;
-        }
-
-        m_currentJsonObject[item->metaObject()->className()] = dynamic_cast<I_CardFrame*>(item)->getValue().toString();
+        //  дополняем в m_currentJsonObject ключ(название класса) : значение(json вариант)
+        m_currentJsonObject[item->metaObject()->className()] = m_currentJsonValue;
     }
 
     //  TODO:   решить проблему с Linux

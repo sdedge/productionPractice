@@ -27,6 +27,7 @@
 ///
 ///  ========================   свои классы
 #include "components/frames/cardFrame/I_cardframe.h"
+#include "helperClasses/jsonPacker/json_packer.h"
 
 #include "server.h"
 
@@ -53,6 +54,8 @@ private:
     I_CardFrame *m_possibleProcessingFrame;
     I_CardFrame *m_changeIPLineEditFrame;
     I_CardFrame *m_maxConnectionSpinBoxFrame;
+
+    JsonPacker m_jsonPacker;
 
     QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
 
