@@ -219,12 +219,15 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 
             dynamic_cast<I_CardFrame*>(settingsTabChild)->setValue(valueObject);
 
-            ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+valueObject.toString()+"<br/><font color = red>!!!<\\font>");
+            //  получаем строку для консоли и добавляем её в infoAboutServerTextEdit
+            ui->infoAboutServerTextEdit->append(dynamic_cast<I_CardFrame*>(settingsTabChild)->getValue().firstKey());
 
             break;
         }
 
     }
+
+    ui->infoAboutServerTextEdit->append("<hr/>Настройки загружены");
 
     qDebug() << "======";
     qDebug() << "Настройки установлены";

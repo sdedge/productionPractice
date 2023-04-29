@@ -36,5 +36,5 @@ QMap<QString, QVariant> SelectWorkspaceFrame::getValue(){
 
 void SelectWorkspaceFrame::setValue(QVariant value){
     dataLabel->setText(value.toString());
-    emit parentUi->signalNewWorkspaceFolder(value.toString());
+    emit parentUi->signalNewWorkspaceFolder(value.toString());  //  вызываем сигнал для установки значения на стороне сервера
 }
