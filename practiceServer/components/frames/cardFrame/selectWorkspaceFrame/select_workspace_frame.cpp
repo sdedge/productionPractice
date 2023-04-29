@@ -28,7 +28,7 @@ void SelectWorkspaceFrame::createInterface(){
 QMap<QString, QVariant> SelectWorkspaceFrame::getValue(){
     QMap<QString, QVariant> valueMap;   //  переменная для возврата
     //  сообщение в консоль
-    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+dataLabel->text()+"<br/><font color = red>!!!<\\font>";
+    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая рабочая папка: "+dataLabel->text()+"<br/><font color = red>!!!<\\font>";
 
     valueMap.insert(consoleMessage, dataLabel->text());
     return valueMap;
