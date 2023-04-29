@@ -18,10 +18,10 @@ QString WorkspaceManager::createWorkspaceFolders()
 
 QString WorkspaceManager::saveSettings(QJsonObject m_currentJsonObject)
 {
-    //  TODO:   решить проблему с Linux
     QString saveFileName = "serverSettings.json";
-    QFileInfo fileInfo(rootFolder+"/Settings/"+saveFileName);   // С помощью QFileInfo
-    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
+    QFileInfo fileInfo(rootFolder+"/Settings/"+saveFileName);
+    // установим текущую рабочую директорию, где будет файл, без QFileInfo может не заработать
+    QDir::setCurrent(fileInfo.path());
     // Создаём объект файла и открываем его на запись
     QFile jsonFile(saveFileName);
     if (!jsonFile.open(QIODevice::WriteOnly))
@@ -31,7 +31,7 @@ QString WorkspaceManager::saveSettings(QJsonObject m_currentJsonObject)
 
     // Записываем текущий объект Json в файл
     jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
-    jsonFile.close();   // Закрываем файл
+    jsonFile.close();
 
     return QString("<hr/>Файл настроек сохранён");
 }
