@@ -163,13 +163,18 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
 {
     QString folderPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
     if(!folderPath.isEmpty()){
-        //  указываем в статусе сервера, что была изменена директория. HTML тут работает, пользуемся
-        ui->infoAboutServerTextEdit->append("<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлена новая директория сохранения: "+folderPath+"<br/><font color = red>!!!<\\font>");
+        //  для наглядности работы сохраняем путь в информационный QLabel
+        //  при вызове setValue данный виджет сам вызовет сигнал для установки директории
+        m_selectWorkspaceFrame->setValue(folderPath);
+        ui->infoAboutServerTextEdit->append(m_selectWorkspaceFrame->getValue().firstKey());
 
-        m_selectWorkspaceFrame->findChild<QLabel*>("Data Label")->setText(folderPath); //  для наглядности выводим путь в dataLabel
+        qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:        on_chooseWorkspaceDirPushButton_clicked || " << folderPath;
 
-        emit signalNewWorkspaceFolder(folderPath);
-        qDebug() << "MainWindow::on_chooseSaveDirPushButton_clicked:        on_chooseSaveDirPushButton_clicked || " << folderPath;
+        //  теперь можно сохранить настройки
+        ui->saveSettingsPushButton->setEnabled(true);
+
+        workspaceManager = new WorkspaceManager(folderPath);
+        ui->infoAboutServerTextEdit->append(workspaceManager->createWorkspaceFolders());
     }
 }
 
@@ -254,22 +259,7 @@ void MainWindow::on_saveSettingsPushButton_clicked()
         m_currentJsonObject[item->metaObject()->className()] = m_currentJsonValue;
     }
 
-    //  TODO:   решить проблему с Linux
-    QString saveFileName = QFileDialog::getSaveFileName(this,
-                                                            tr("Save Json File"),
-                                                            QString(),
-                                                            tr("JSON (*.json)"));
-    QFileInfo fileInfo(saveFileName);   // С помощью QFileInfo
-    QDir::setCurrent(fileInfo.path());  // установим текущую рабочую директорию, где будет файл, иначе может не заработать
-    // Создаём объект файла и открываем его на запись
-    QFile jsonFile(saveFileName);
-    if (!jsonFile.open(QIODevice::WriteOnly))
-    {
-        return;
-    }
-
-    // Записываем текущий объект Json в файл
-    jsonFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
-    jsonFile.close();   // Закрываем файл
+    //  добавляем в консоль отчет по сохранению настроек
+    ui->infoAboutServerTextEdit->append(workspaceManager->saveSettings(m_currentJsonObject));
 }
 

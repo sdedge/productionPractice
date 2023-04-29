@@ -28,6 +28,7 @@
 ///  ========================   свои классы
 #include "components/frames/cardFrame/I_cardframe.h"
 #include "helperClasses/jsonPacker/json_packer.h"
+#include "helperClasses/managers/workspaceManager/workspace_manager.h"
 
 #include "server.h"
 
@@ -49,6 +50,7 @@ public:
 private:
     Ui::MainWindow *ui;
     Server* server;     //  создаем экземпляр сервера
+    WorkspaceManager *workspaceManager; //  данная сущность отвечает за работу с рабочей директорией
 
     I_CardFrame *m_selectWorkspaceFrame;
     I_CardFrame *m_possibleProcessingFrame;
