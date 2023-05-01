@@ -28,10 +28,23 @@ Server::Server(bool &server_started){
     possibleTreatments[""] = "Отсутствие обработки";
     possibleTreatments["DOUBLE_INFO"] = "Дублирование информации";  //  содержимое файла дублируется в конец
     possibleTreatments["TRIPLE_INFO"] = "Утроение информации";  //  то же самое, но утраивается
+}
+
+void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока неработающий обработчик новой директории
+{
+    this->workspaceFolder = newFolderPath;  //  установили новую директорию
+
+    entryFolder = workspaceFolder+"/Data/Entry";    //  папка для файлов извне
+    storageFolder = workspaceFolder+"/Data/Storage";    //  папка для хранения конечных файлов
+    expectationFolder = workspaceFolder+"/Data/Expectation";    //  папка для файлов в состоянии ожидания
 
     fileSystemWatcher = new QFileSystemWatcher;
-    fileSystemWatcher->addPath(folderForRawInformation);    //  устанавливаем папку для слежки
-    connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotFolderForRawInformationChanged(QString)));
+    fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
+
+    qDebug() << "Server::slotNewWorkspaceFolder:        " << fileSystemWatcher->addPath(entryFolder);
+    connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
+
+    qDebug() << "Server::slotNewWorkspaceFolder:        " << this->entryFolder;
 }
 
 void Server::SendPossibleTreatments(QTcpSocket* socketForSend)
@@ -46,25 +59,21 @@ void Server::SendPossibleTreatments(QTcpSocket* socketForSend)
     socketForSend->write(Data);    //  отправляем по сокету данные
 }
 
-void Server::slotFolderForRawInformationChanged(const QString &folderName)
+void Server::slotEntryFolderChanged(const QString &folderName)
 {
-    QDir workWithDirectory;     //  создаем рабочую директорию
-    workWithDirectory.cd(folderName); //  переходим в нужный каталог
+    qDebug() << "Server::slotEntryFolderChanged:        ";
+    processingManager = new ProcessingManager();
+    QFileInfoList list = processingManager->entryFiles(folderName);     //  получаем список файлов директории
 
-    QStringList filters;    //  создаем список для фильтра
-    filters << "DOUBLE_INFO*.txt";  //  заполняем
-
-    workWithDirectory.setNameFilters(filters);  //  устанавливаем фильтр
-    workWithDirectory.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);     //  устанавливаем фильтр выводимых файлов/папок
-    workWithDirectory.setSorting(QDir::Size | QDir::Reversed);  //  устанавливаем сортировку "от меньшего к большему"
-    QFileInfoList list = workWithDirectory.entryInfoList();     //  получаем список файлов директории
-    for (int i = 0; i < list.size(); ++i) {
+    for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
-        qDebug() << "Server::slotFolderForRawInformationChanged:        " << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //  выводим в формате "размер имя"
-        SendFileToClient(fileInfo.filePath());  //  отправляем файл клиенту
+        qDebug() << "Server::slotEntryFolderChanged:        " << qPrintable(QString("%1 %2 %3").arg(fileInfo.size(), 10).arg(fileInfo.fileName(), 5).arg(fileInfo.lastModified().toString()));   //  выводим в формате "размер имя"
+//        SendFileToClient(fileInfo.filePath());  //  отправляем файл клиенту
     }
-    qDebug() << "Server::slotFolderForRawInformationChanged:        " << folderName;
-    qDebug() << "Server::slotFolderForRawInformationChanged:        " << "================";     // переводим строку
+    qDebug() << "Server::slotEntryFolderChanged:        " << folderName;
+    qDebug() << "Server::slotEntryFolderChanged:        " << "================";     // переводим строку
+
+    processingManager = nullptr;    //  освобождаем память
 }
 
 void Server::slotSocketDisplayed(QTcpSocket* displayedSocket)
@@ -87,6 +96,7 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
 void Server::slotSetJSONSettingFilePath(QString JSONSettingsFilePath)   //  принимаем путь
 {
     this->JSONSettingFilePath = JSONSettingsFilePath;   //   и устанавливаем его
+
     qDebug() << "Server::slotSetJSONSettingFilePath:        " << this->JSONSettingFilePath;
 }
 
@@ -160,7 +170,10 @@ void Server::slotReadyRead(){
 
                     file = new QFile;     //  определяем файл
                     file->setFileName(fileName);    //  устанавливаем имя файла
-                    QDir::setCurrent(newDirPath);  //  устанавливаем путь сохранения на рабочем столе
+
+                    //  этой функции entryFolder определяется в Server::slotNewWorkspaceFolder
+                    //  поскольку этот слот всегда происходит раньше вызова Server::slotReadyRead
+                    QDir::setCurrent(entryFolder);  //  устанавливаем путь сохранения
                     Server::signalStatusServer("Файл "+fileName+" создан на сервере");  //  уведомляем
 
                     SendToOneClient(socket, mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
@@ -272,12 +285,6 @@ void Server::slotDisconnect()
     Server::signalStatusServer("<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
     Server::signalDeleteSocketFromListWidget(mapSockets);
     disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
-}
-
-void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока неработающий обработчик новой директории
-{
-    this->workspaceFolder = newFolderPath;  //  установили новую директорию
-    qDebug() << "Server::slotNewWorkspaceFolder:        " << this->workspaceFolder;
 }
 
 void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправка клиенту сообщений
