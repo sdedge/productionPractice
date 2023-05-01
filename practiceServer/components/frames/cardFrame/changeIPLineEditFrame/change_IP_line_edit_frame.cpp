@@ -8,6 +8,9 @@ ChangeIPLineEditFrame::ChangeIPLineEditFrame(MainWindow *parentUi)
     //  конструктор карточки
     this->setObjectName("Change IP lineEdit Frame");
     changeIPLineEdit = new QLineEdit;
+    changeIPLineEdit->setPlaceholderText("000.000.000.000");
+    changeIPLineEdit->setMaximumWidth(95);
+
     dataLabel = new QLabel;
 
     this->parentUi = parentUi;

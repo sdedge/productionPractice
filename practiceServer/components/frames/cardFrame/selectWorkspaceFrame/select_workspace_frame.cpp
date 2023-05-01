@@ -1,20 +1,20 @@
 #include "select_workspace_frame.h"
 
-#include <QHBoxLayout>
-#include <QFileDialog>
-
 SelectWorkspaceFrame::SelectWorkspaceFrame(MainWindow *parentUi)
 {
     this->setObjectName("Choose workspace directory Frame");
+
     chooseWorkspaceDirPushButton = new QPushButton("Выбрать рабочую папку");
+    connect(chooseWorkspaceDirPushButton, &QPushButton::clicked, parentUi, &MainWindow::on_chooseWorkspaceDirPushButton_clicked);
+
+    //  кнопка автоматически растягивается в зависимости от длины текста
+    chooseWorkspaceDirPushButton->adjustSize();
 
     dataLabel = new QLabel();
     dataLabel->setText("Нет рабочей папки!");
     dataLabel->setObjectName("Data Label");
 
     this->parentUi = parentUi;
-
-    connect(chooseWorkspaceDirPushButton, &QPushButton::clicked, parentUi, &MainWindow::on_chooseWorkspaceDirPushButton_clicked);
 }
 
 void SelectWorkspaceFrame::createInterface(){

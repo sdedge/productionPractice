@@ -1,8 +1,15 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include <QFrame>
-#include <QObject>
+///     Класс I_CardFrame является интерфейсом для карточек настроек
+///     Каждая карточка является графическим элементом
+///     Методы:
+///     createInterface() - создание графического представления
+///     getValue() - возвращает QMap из одного элемента {строка для сервера}:{данные}
+///     setValue() - установка необходимых сообщений в графической части
+
+#include <QFrame>   //  класс, от которого наследуемся
+#include <QObject>  //  для создания объекта
 
 class I_CardFrame : public QFrame
 {

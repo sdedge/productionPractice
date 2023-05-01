@@ -1,12 +1,12 @@
 #include "max_connection_spinbox_frame.h"
 
-#include <QHBoxLayout>
-
 MaxConnectionSpinBoxFrame::MaxConnectionSpinBoxFrame(MainWindow *parentUi)
 {
     this->setObjectName("Max Connection Frame");
 
     maxConnectionSpinBox = new QSpinBox();
+    maxConnectionSpinBox->setMaximumWidth(40);
+
     dataLabel = new QLabel();
 
     this->parentUi = parentUi;
