@@ -164,11 +164,11 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
     QString folderPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
     if(!folderPath.isEmpty()){
         //  для наглядности работы сохраняем путь в информационный QLabel
-        //  при вызове setValue данный виджет сам вызовет сигнал для установки директории
+        //  при вызове setValue данный виджет сам вызовет сигнал для установки директории на сервере
         m_selectWorkspaceFrame->setValue(folderPath);
         ui->infoAboutServerTextEdit->append(m_selectWorkspaceFrame->getValue().firstKey());
 
-        qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:        on_chooseWorkspaceDirPushButton_clicked || " << folderPath;
+        qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:   " << folderPath;
 
         //  теперь можно сохранить настройки
         ui->saveSettingsPushButton->setEnabled(true);
