@@ -9,9 +9,9 @@
 ///     createWorkspaceFolders() - создаёт структуру папки и возвращает отчёт в консоль
 ///     saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
 
-#include <QDir> //  для работы с директориями
+#include <QDir>             //  для работы с директориями
 #include <QJsonDocument>    //  для создания json документов
-#include <QJsonObject>  //  для использования переменных типа QJsonObject
+#include <QJsonObject>      //  для использования переменных типа QJsonObject
 
 class WorkspaceManager
 {
