@@ -1,7 +1,5 @@
 #include "possible_processing_combobox_frame.h"
 
-#include <QHBoxLayout>
-
 PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame(MainWindow *parentUi)
 {
     this->setObjectName("Possible processing Frame");
@@ -14,9 +12,19 @@ PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame(MainWindow *par
 
     dataLabel = new QLabel();
 
+    updateProcessingPushButton = new QPushButton("Редактировать");
+    connect(updateProcessingPushButton, &QPushButton::clicked, this, &PossibleProcessingComboBoxFrame::on_updateProcessingPushButton_clicked);
+
     this->parentUi = parentUi;
 
     dataLabel->setText("Возможные обработки:");
+}
+
+void PossibleProcessingComboBoxFrame::on_updateProcessingPushButton_clicked()
+{
+    updateProcessingDialog = new UpdateProcessingDialog(parentUi);
+    updateProcessingDialog->createInterface();
+    updateProcessingDialog->show();
 }
 
 void PossibleProcessingComboBoxFrame::createInterface()
@@ -26,6 +34,7 @@ void PossibleProcessingComboBoxFrame::createInterface()
 
     frameLayout->addWidget(dataLabel);
     frameLayout->addWidget(possibleProcessingComboBox);
+    frameLayout->addWidget(updateProcessingPushButton);
 }
 
 QMap<QString, QVariant> PossibleProcessingComboBoxFrame::getValue()
@@ -52,4 +61,3 @@ void PossibleProcessingComboBoxFrame::setValue(QVariant value)
         possibleProcessingComboBox->addItem(valueMap.key(), valueMap.value());
     }
 }
-
