@@ -10,6 +10,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    components/dialogs/I_dialogwindow.cpp \
+    components/dialogs/updateProcessingDialog/update_processing_dialog.cpp \
     components/frames/cardFrame/I_cardframe.cpp \
     components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.cpp \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.cpp \
@@ -23,6 +25,8 @@ SOURCES += \
     server.cpp
 
 HEADERS += \
+    components/dialogs/I_dialogwindow.h \
+    components/dialogs/updateProcessingDialog/update_processing_dialog.h \
     components/frames/cardFrame/I_cardframe.h \
     components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h \
