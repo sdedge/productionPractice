@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-///  ========================    классы для работы сервера
+///  ========================   классы для работы сервера
 #include <QTcpServer>
 #include <QTcpSocket>
 ///  ========================
@@ -20,6 +20,9 @@
 #include <QMap>                 //  определение глоссария для приходящих данных сокета
 #include <QRandomGenerator>     //  генератор случайных чисел
 ///  ========================
+///
+///  ========================   свои классы
+#include "helperClasses/managers/processingManager/processing_manager.h"    //  класс для распределения файлов на обработчиков
 
 
 
@@ -47,12 +50,15 @@ private:
     QString someone;    //  имя отправителя
 
     QString workspaceFolder = "";   //  путь до рабочей директории
-    QString newDirPath = ""; //  путь новой директории, по умолчанию рабочий стол
-    QString folderForRawInformation = "";  //  путь к папке с приходящей обработанной информацией от клиентов
+    QString entryFolder = ""; //  путь до папки для файлов извне
+    QString storageFolder = "";  //  путь до папки с приходящей обработанной информацией от клиентов
+    QString expectationFolder = "";
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
     QString JSONSettingFilePath = "";
 
     QFileSystemWatcher *fileSystemWatcher;
+
+    ProcessingManager *processingManager;
 
     void SendPossibleTreatments(QTcpSocket* socket);  //  функция передачи возможных обработок
 
@@ -67,7 +73,7 @@ public slots:
     void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
     void slotDisconnect();  //  обработчик отключившихся клиентов
     void slotNewWorkspaceFolder(QString newFolderPath);  //  обработчик новой директории
-    void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
+    void slotEntryFolderChanged(const QString & fileName);  //  обработчик изменений в директории
     void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
     void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
     void slotSetJSONSettingFilePath(QString JSONSettingsFilePath);   //  обработчик установки пути к JSON файлу настроек
