@@ -41,7 +41,6 @@ void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока нера
     fileSystemWatcher = new QFileSystemWatcher;
     fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
 
-    qDebug() << "Server::slotNewWorkspaceFolder:        " << fileSystemWatcher->addPath(entryFolder);
     connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
 
     qDebug() << "Server::slotNewWorkspaceFolder:        " << this->entryFolder;
