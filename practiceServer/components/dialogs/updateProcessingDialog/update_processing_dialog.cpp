@@ -12,10 +12,10 @@ UpdateProcessingDialog::UpdateProcessingDialog(MainWindow *parentUi)
     connect(openJsonFilePushButton, &QPushButton::clicked, this, &UpdateProcessingDialog::on_openJsonFilePushButton_clicked);
 
     closeDialogPushButton = new QPushButton("Закрыть");
-    connect(openJsonFilePushButton, &QPushButton::clicked, this, &UpdateProcessingDialog::on_closeDialogPushButton_clicked);
+    connect(closeDialogPushButton, &QPushButton::clicked, this, &UpdateProcessingDialog::on_closeDialogPushButton_clicked);
 
     applyDataPushButton = new QPushButton("Подтвердить");
-    connect(openJsonFilePushButton, &QPushButton::clicked, this, &UpdateProcessingDialog::on_applyDataPushButton_clicked);
+    connect(applyDataPushButton, &QPushButton::clicked, this, &UpdateProcessingDialog::on_applyDataPushButton_clicked);
 }
 
 void UpdateProcessingDialog::createInterface()
