@@ -13,6 +13,18 @@ QString WorkspaceManager::createWorkspaceFolders()
     QDir().mkdir(rootFolder+"/Data/Expectation");
     QDir().mkdir(rootFolder+"/Data/Storage");
 
+    QFile possibleProcessingFile(rootFolder+"/Settings/possibleProcessing.json");
+
+    if (!possibleProcessingFile.open(QIODevice::WriteOnly)) {
+        return QString("<hr/>Рабочая папка организована, но проблемы с файлом обработок");
+    }
+
+    QJsonObject m_currentJsonObject;
+
+    possibleProcessingFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
+
+    possibleProcessingFile.close();
+
     return QString("<hr/>Рабочая папка организована!");
 }
 
