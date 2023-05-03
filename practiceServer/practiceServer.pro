@@ -20,6 +20,7 @@ SOURCES += \
     helperClasses/jsonPacker/json_packer.cpp \
     helperClasses/jsonParser/json_parser.cpp \
     helperClasses/managers/processingManager/processing_manager.cpp \
+    helperClasses/managers/workspaceManager/settingsManager/settings_manager.cpp \
     helperClasses/managers/workspaceManager/workspace_manager.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -36,6 +37,7 @@ HEADERS += \
     helperClasses/jsonPacker/json_packer.h \
     helperClasses/jsonParser/json_parser.h \
     helperClasses/managers/processingManager/processing_manager.h \
+    helperClasses/managers/workspaceManager/settingsManager/settings_manager.h \
     helperClasses/managers/workspaceManager/workspace_manager.h \
     mainwindow.h \
     server.h
