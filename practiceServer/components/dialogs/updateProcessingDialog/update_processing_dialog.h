@@ -46,6 +46,7 @@ public:
     UpdateProcessingDialog(MainWindow *parentUi);
 
     void createInterface() override;
+    QVariant getValue() override;
 
 private:
     MainWindow *parentUi;
