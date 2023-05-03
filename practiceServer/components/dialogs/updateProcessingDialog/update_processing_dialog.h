@@ -9,17 +9,18 @@
 ///     closeDialogPushButton - кнопка для закрытия диалогового окна
 ///     applyDataPushButton - кнопка для подтверждения новых данных
 ///     m_currentJsonObject - json объект для работы с файлом
+///     m_jsonParser - сущность, определяющая ликвидность принимаемой json структуры
 ///     Методы:
 ///     createInterface() - создание графического представления
-///     getValue() - возвращает QVariant данные
 ///     Приватные слоты:
-///     on_openJsonFilePushButton_clicked() - возвращает путь до файла с json данными
+///     on_openJsonFilePushButton_clicked() - устанавливает путь до файла с json данными
 ///     on_closeDialogPushButton_clicked() - закрывает текущее окно
 ///     on_applyDataPushButton_clicked() - возвращает сообщение о записи данных в ранее открытый файл
 
 ///  ========================    заголовочные файлы проекта
 #include "components/dialogs/I_dialogwindow.h"  //  реализуемый интерфейс
 #include "mainwindow.h"         //  родительский ui
+#include "helperClasses/jsonParser/json_parser.h"   //  парсер для json данных
 ///  ========================
 ///
 ///  ========================    классы для работы с виджетами
@@ -29,15 +30,15 @@
 #include <QVBoxLayout>          //  вертикальное выравнивание
 ///  ========================
 ///
-///  ========================    класс для работы с файлами
-#include <QFileDialog>
-#include <QFile>
-#include <QDir>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonValue>
-#include <QJsonParseError>
+///  ========================    классы для работы с файлами
+#include <QFileDialog>          //  обращение к файлам через системное окно
+#include <QFile>                //  работа с файлами
+#include <QDir>                 //  работа с директориями
+///  ========================
+///
+///  ========================    классы для работы с json
+#include <QJsonObject>          //  работа с json объектами
+#include <QJsonDocument>        //  работа с json документами
 
 class UpdateProcessingDialog : public I_DialogWindow
 {
@@ -45,7 +46,6 @@ public:
     UpdateProcessingDialog(MainWindow *parentUi);
 
     void createInterface() override;
-    QVariant getValue() override;
 
 private:
     MainWindow *parentUi;
@@ -55,12 +55,15 @@ private:
     QPushButton *closeDialogPushButton;
     QPushButton *applyDataPushButton;
 
+    QString jsonFilePath;
+
     QJsonObject m_currentJsonObject;
+    JsonParser m_jsonParser;
 
 private slots:
-    QString on_openJsonFilePushButton_clicked();
+    void on_openJsonFilePushButton_clicked();
     void on_closeDialogPushButton_clicked();
-    QString on_applyDataPushButton_clicked();
+    void on_applyDataPushButton_clicked();
 };
 
 #endif // UPDATEPROCESSINGDIALOG_H
