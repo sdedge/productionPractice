@@ -18,6 +18,8 @@ SettingsManager::SettingsManager(QString rootFolder)
     //  создание пустой json структуры внутри файла
     possibleProcessingFile.open(QIODevice::WriteOnly);
     QJsonObject m_currentJsonObject;
+    //  m_currentJsonObject - это просто { }
+    m_currentJsonObject.insert("Data", m_currentJsonObject);
     possibleProcessingFile.write(QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented));
     possibleProcessingFile.close();
 }
