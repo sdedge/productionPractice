@@ -12,7 +12,7 @@ bool JsonParser::isJson(QByteArray &jsonData)
     QJsonDocument document = QJsonDocument::fromJson(jsonData, &parserError);
 
     //  если парсер нашёл любую ошибку
-    if(parserError.error != QJsonParseError::NoError){
+    if(parserError.error != 0){
         return false;
     }
 

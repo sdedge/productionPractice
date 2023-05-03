@@ -5,13 +5,12 @@
 ///     Методы:
 ///     isJson() - возвращает булевое значение, парся данные в формате QByteArray
 
-///  ========================    классы для работы с директориями
+///  ========================    классы для работы с данными
 #include <QJsonParseError>
 #include <QJsonDocument>
 
 class JsonParser : public QJsonParseError
 {
-    Q_OBJECT
 public:
     JsonParser();
 
