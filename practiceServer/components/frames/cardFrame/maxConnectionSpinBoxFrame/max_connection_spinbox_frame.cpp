@@ -27,7 +27,7 @@ QMap<QString, QVariant> MaxConnectionSpinBoxFrame::getValue()
 {
     QMap<QString, QVariant> valueMap;   //  переменная для возврата
     //  сообщение в консоль
-    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлен новый IP: "+QString::number(maxConnectionSpinBox->value())+"<br/><font color = red>!!!<\\font>";
+    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлено новое кол-во пользователей: "+QString::number(maxConnectionSpinBox->value())+"<br/><font color = red>!!!<\\font>";
 
     valueMap.insert(consoleMessage, maxConnectionSpinBox->value());
     return valueMap;
