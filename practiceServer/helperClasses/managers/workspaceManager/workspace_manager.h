@@ -9,6 +9,10 @@
 ///     createWorkspaceFolders() - создаёт структуру папки и возвращает отчёт в консоль
 ///     saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
 
+///  ========================    классы проекта
+#include "helperClasses/managers/workspaceManager/settingsManager/settings_manager.h"   //  менеджер для папки /Settings
+///  ========================
+///
 ///  ========================    классы для работы с директориями
 #include <QDir>             //  для работы с директориями
 #include <QFile>            //  для работы с файлами
@@ -28,6 +32,13 @@ public:
 
 private:
     QString rootFolder;
+    QString settingsFolder;
+    QString dataFolder;
+    QString entryFolder;
+    QString expectationFolder;
+    QString storageFolder;
+
+    SettingsManager *m_settingsManager;
 };
 
 #endif // WORKSPACEMANAGER_H
