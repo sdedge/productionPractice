@@ -5,7 +5,7 @@ UpdateProcessingDialog::UpdateProcessingDialog(MainWindow *parentUi)
     this->setObjectName("Update processing Dialog");
     this->parentUi = parentUi;
 
-    dataLabel = new QLabel();
+    dataLabel = new QLabel("Отредактируйте данные:");
     jsonDataTextEdit = new QTextEdit();
 
     openJsonFilePushButton = new QPushButton("Открыть");
@@ -30,12 +30,7 @@ void UpdateProcessingDialog::createInterface()
     frameLayout->addWidget(applyDataPushButton);
 }
 
-QVariant UpdateProcessingDialog::getValue()
-{
-    return 0;
-}
-
-QString UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
+void UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
 {
     QString openFileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open Json File"),
@@ -46,8 +41,9 @@ QString UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
 
     QFile jsonFile(openFileName);
     if(!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)){
-        return QString("Невозможно открыть файл");
+        dataLabel->setText("Невозможно открыть файл!");
         qDebug() << "Невозможно открыть файл";
+        return;
     }
     QByteArray saveData = jsonFile.readAll();
 
@@ -63,7 +59,7 @@ QString UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
 
     qDebug() << openFileName;
     qDebug() << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
-    return openFileName;
+    jsonFilePath = openFileName;
 }
 
 void UpdateProcessingDialog::on_closeDialogPushButton_clicked()
@@ -71,7 +67,26 @@ void UpdateProcessingDialog::on_closeDialogPushButton_clicked()
     this->close();
 }
 
-QString UpdateProcessingDialog::on_applyDataPushButton_clicked()
+void UpdateProcessingDialog::on_applyDataPushButton_clicked()
 {
-    return QString("");
+    QByteArray jsonData  = jsonDataTextEdit->toPlainText().toUtf8();
+
+    if(!m_jsonParser.isJson(jsonData)){
+        dataLabel->setText("Документ содержит ошибку");
+        return;
+    }
+
+    QFile possibleProcessingFile(jsonFilePath);
+
+    if (!possibleProcessingFile.open(QIODevice::WriteOnly)) {
+        dataLabel->setText("Невозможно открыть файл для сохранения");
+    }
+
+    QTextStream writeStream(&possibleProcessingFile);
+
+    writeStream << jsonDataTextEdit->toPlainText();
+
+    possibleProcessingFile.close();
+
+    dataLabel->setText("Запись сохранена!");
 }
