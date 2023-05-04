@@ -30,6 +30,11 @@ void UpdateProcessingDialog::createInterface()
     frameLayout->addWidget(applyDataPushButton);
 }
 
+QVariant UpdateProcessingDialog::getValue()
+{
+    return 0;
+}
+
 void UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
 {
     QString openFileName = QFileDialog::getOpenFileName(this,
