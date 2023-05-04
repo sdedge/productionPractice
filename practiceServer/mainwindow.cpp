@@ -45,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
+    workspaceManager = new WorkspaceManager();
+    connect(workspaceManager, &WorkspaceManager::updateUiComboBoxSignal, this, &MainWindow::on_workspaceFileChangedSlot);
+
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
     m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame(this);
     m_changeIPLineEditFrame = new ChangeIPLineEditFrame(this);
@@ -173,7 +176,7 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
         //  теперь можно сохранить настройки
         ui->saveSettingsPushButton->setEnabled(true);
 
-        workspaceManager = new WorkspaceManager(folderPath);
+        workspaceManager->setRootFolder(folderPath);
         ui->infoAboutServerTextEdit->append(workspaceManager->createWorkspaceFolders());
     }
 }
@@ -261,5 +264,10 @@ void MainWindow::on_saveSettingsPushButton_clicked()
 
     //  добавляем в консоль отчет по сохранению настроек
     ui->infoAboutServerTextEdit->append(workspaceManager->saveSettings(m_currentJsonObject));
+}
+
+void MainWindow::on_workspaceFileChangedSlot(const QString &fileName)
+{
+    qDebug() << "MainWindow::on_workspaceFileChangedSlot    " << fileName;
 }
 
