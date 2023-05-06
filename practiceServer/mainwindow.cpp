@@ -46,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
     workspaceManager = new WorkspaceManager();
-    connect(workspaceManager, &WorkspaceManager::updateUiComboBoxSignal, this, &MainWindow::on_workspaceFileChangedSlot);
+    connect(workspaceManager, &WorkspaceManager::updateUiComboBoxSignal, this, &MainWindow::updateUiComboBoxSlot);
+    connect(workspaceManager, &WorkspaceManager::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
     m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame(this);
@@ -177,7 +178,23 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
         ui->saveSettingsPushButton->setEnabled(true);
 
         workspaceManager->setRootFolder(folderPath);
-        ui->infoAboutServerTextEdit->append(workspaceManager->createWorkspaceFolders());
+        if(workspaceManager->createWorkspaceFolders()){
+            ui->infoAboutServerTextEdit->append("<hr/>Рабочая папка организована!");
+            for(auto item : ui->settingsFrame->children()){
+
+                //  если встречаем слой выравнивания, то пропускаем
+                //  поскольку в списке настроек первым элементом всегда будет слой выравнивания
+                if(QString(item->metaObject()->className()).contains("Layout") ||
+                        item->objectName().contains("Choose workspace directory Frame")){
+                    continue;
+                }
+
+                //  включаем интерфейс
+                dynamic_cast<I_CardFrame*>(item)->enableInteface();
+            }
+        } else {
+            ui->infoAboutServerTextEdit->append("<hr/>Рабочая папка не организована!");
+        }
     }
 }
 
@@ -266,8 +283,37 @@ void MainWindow::on_saveSettingsPushButton_clicked()
     ui->infoAboutServerTextEdit->append(workspaceManager->saveSettings(m_currentJsonObject));
 }
 
-void MainWindow::on_workspaceFileChangedSlot(const QString &fileName)
+void MainWindow::updateUiComboBoxSlot(const QString &fileName)
 {
-    qDebug() << "MainWindow::on_workspaceFileChangedSlot    " << fileName;
+    qDebug() << "MainWindow::updateUiComboBoxSlot !!!   " << fileName;
+
+    QFile fileJSONSetting;
+    fileJSONSetting.setFileName(fileName);
+    fileJSONSetting.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString val = fileJSONSetting.readAll();
+    fileJSONSetting.close();
+
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
+    qDebug() << "MainWindow::updateUiComboBoxSlot:     Error: " << error.errorString() << error.offset << error.error;
+
+    QJsonObject documentObject = document.object();
+    QString keyObject = ""; //  ключ всегда строка
+    QVariant valueObject;  //  а вот значение может быть разным
+
+    for (int i = 0; i < documentObject.size(); i++) { //  проходимся по всему файлу
+
+        keyObject = documentObject.keys().at(i);  //  берем i-тый ключ-название_виджета
+
+        //  получаем значение по ключу
+        valueObject = documentObject.value(keyObject);
+
+        ui->settingsFrame->findChild<PossibleProcessingComboBoxFrame*>("Possible processing Frame")->setValue(valueObject);
+    }
+
+    ui->infoAboutServerTextEdit->append("<hr/>Список обновлен");
+
+    qDebug() << "MainWindow::updateUiComboBoxSlot:  ======";
+    qDebug() << "MainWindow::updateUiComboBoxSlot:  Настройки установлены";
 }
 
