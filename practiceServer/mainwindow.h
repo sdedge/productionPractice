@@ -92,7 +92,7 @@ private slots:
 
     void on_saveSettingsPushButton_clicked();
 
-    void on_workspaceFileChangedSlot(const QString &fileName);
+    void updateUiComboBoxSlot(const QString &fileName);
 
 signals:
     void signalNewWorkspaceFolder(QString); //  сигнал для установки новой рабочей папки
