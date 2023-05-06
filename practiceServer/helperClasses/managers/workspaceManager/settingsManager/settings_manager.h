@@ -7,8 +7,13 @@
 ///     rootFolder - абсолютный путь папки настроек
 ///     serverSettingsFileName - абсолютный путь файла настроек
 ///     possibleProcessingFileName - абсолютный путь файла обработок
+///     settingsfilesWatcher - наблюдатель за файлами
 ///     Методы:
 ///     saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
+///     Сигналы:
+///     processingFileChangedSignal - передает путь до измененного файла обработок
+///     Слоты:
+///     processingFileChanged - обрабатывает слот наблюдателя за possibleProcessing.json
 
 ///  ========================    классы для работы с json
 #include <QJsonObject>          //  работа с json объектами
@@ -19,6 +24,7 @@
 #include <QFileInfo>            //  информация о файле
 #include <QDir>                 //  работа с директориями
 #include <QFile>                //  работа с файлами
+#include <QFileSystemWatcher>   //  наблюдатель за файлами
 ///  ========================
 ///
 ///  ========================    классы для работы
@@ -36,6 +42,14 @@ private:
     QString rootFolder;
     QString serverSettingsFileName;
     QString possibleProcessingFileName;
+
+    QFileSystemWatcher *settingsfilesWatcher;
+
+signals:
+    void processingFileChangedSignal(const QString &fileName);
+
+private slots:
+    void processingFileChanged(const QString &fileName);
 };
 
 #endif // SETTINGSMANAGER_H
