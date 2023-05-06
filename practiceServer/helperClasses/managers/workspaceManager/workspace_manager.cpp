@@ -5,15 +5,14 @@ WorkspaceManager::WorkspaceManager()
 
 }
 
-QString WorkspaceManager::createWorkspaceFolders()
+bool WorkspaceManager::createWorkspaceFolders()
 {
-    QDir().mkdir(settingsFolder);
-    QDir().mkdir(dataFolder);
-    QDir().mkdir(entryFolder);
-    QDir().mkdir(expectationFolder);
-    QDir().mkdir(storageFolder);
-
-    return QString("<hr/>Рабочая папка организована!");
+    //  возвращаем значение, создались ли все папки
+    return  QDir().mkdir(settingsFolder) &&
+            QDir().mkdir(dataFolder) &&
+            QDir().mkdir(entryFolder) &&
+            QDir().mkdir(expectationFolder) &&
+            QDir().mkdir(storageFolder);
 }
 
 QString WorkspaceManager::saveSettings(QJsonObject m_currentJsonObject)
@@ -27,20 +26,37 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
 
     this->settingsFolder = incomingRootFolder+"/Settings";
     this->dataFolder = incomingRootFolder+"/Data";
-    this->entryFolder = incomingRootFolder+"/Data/Entry";
-    this->expectationFolder = incomingRootFolder+"/Data/Expectation";
-    this->storageFolder = incomingRootFolder+"/Data/Storage";
+    this->entryFolder = dataFolder+"/Entry";
+    this->expectationFolder = dataFolder+"/Expectation";
+    this->storageFolder = dataFolder+"/Storage";
+
+    QStringList folders = {settingsFolder, dataFolder, entryFolder, expectationFolder, storageFolder};
 
     this->workspaceWatcher = new QFileSystemWatcher();
 
-    workspaceWatcher->addPath(settingsFolder);
-    qDebug() << settingsFolder << workspaceWatcher->directories();
-    connect(workspaceWatcher, &QFileSystemWatcher::directoryChanged, this, &WorkspaceManager::workspaceFileChanged);
+    QStringList watchingFolders = workspaceWatcher->addPaths(folders);
+    QString status;
+
+    if(watchingFolders == folders){
+        status = "Все папки отслеживаются";
+    } else {
+        status = "Не все папки отслеживаются";
+    }
+    emit signalStatusServer(status);
+
+    connect(workspaceWatcher, &QFileSystemWatcher::directoryChanged, this, &WorkspaceManager::workspaceDirectoryChanged);
 
     m_settingsManager = new SettingsManager(settingsFolder);
+
+    connect(m_settingsManager, &SettingsManager::processingFileChangedSignal, this, &WorkspaceManager::workspaceFileChanged);
 }
 
 void WorkspaceManager::workspaceFileChanged(const QString &fileName)
 {
-    WorkspaceManager::updateUiComboBoxSignal(fileName);
+    emit updateUiComboBoxSignal(fileName);
+}
+
+void WorkspaceManager::workspaceDirectoryChanged(const QString &fodlerName)
+{
+    return;
 }
