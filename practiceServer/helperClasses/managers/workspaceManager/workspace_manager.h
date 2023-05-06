@@ -46,12 +46,13 @@ class WorkspaceManager : public QObject
 public:
     WorkspaceManager();
 
-    QString createWorkspaceFolders();
+    bool createWorkspaceFolders();
     QString saveSettings(QJsonObject m_currentJsonObject);
     void setRootFolder(QString incomingRootFolder);
 
 signals:
     void updateUiComboBoxSignal(const QString &fileName);
+    void signalStatusServer(QString status);
 
 private:
     QString rootFolder;
@@ -67,6 +68,7 @@ private:
 
 private slots:
     void workspaceFileChanged(const QString &fileName);
+    void workspaceDirectoryChanged(const QString &fileName);
 };
 
 #endif // WORKSPACEMANAGER_H
