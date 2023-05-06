@@ -11,6 +11,7 @@
 ///     createInterface() - создание графического представления
 ///     getValue() - возвращает QMap из одного элемента {строка для сервера}:{данные}
 ///     setValue() - установка необходимых сообщений в графической части
+///     enableInteface() - включить интефейс
 
 ///  ========================    заголовочные файлы проекта
 #include "../I_cardframe.h"     //  реализуемый интерфейс
@@ -31,6 +32,7 @@ public:
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
+    void enableInteface() override;
 
 private:
     QString consoleMessage;

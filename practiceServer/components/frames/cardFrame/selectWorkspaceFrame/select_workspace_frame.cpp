@@ -38,3 +38,8 @@ void SelectWorkspaceFrame::setValue(QVariant value){
     dataLabel->setText(value.toString());
     emit parentUi->signalNewWorkspaceFolder(value.toString());  //  вызываем сигнал для установки значения на стороне сервера
 }
+
+void SelectWorkspaceFrame::enableInteface()
+{
+    return;
+}

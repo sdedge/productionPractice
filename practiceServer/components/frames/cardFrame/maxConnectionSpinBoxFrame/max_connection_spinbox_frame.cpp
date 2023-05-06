@@ -6,6 +6,7 @@ MaxConnectionSpinBoxFrame::MaxConnectionSpinBoxFrame(MainWindow *parentUi)
 
     maxConnectionSpinBox = new QSpinBox();
     maxConnectionSpinBox->setMaximumWidth(40);
+    maxConnectionSpinBox->setEnabled(false);
 
     dataLabel = new QLabel();
 
@@ -21,6 +22,10 @@ void MaxConnectionSpinBoxFrame::createInterface()
 
     frameLayout->addWidget(dataLabel);
     frameLayout->addWidget(maxConnectionSpinBox);
+}
+
+void MaxConnectionSpinBoxFrame::enableInteface(){
+    maxConnectionSpinBox->setEnabled(true);
 }
 
 QMap<QString, QVariant> MaxConnectionSpinBoxFrame::getValue()

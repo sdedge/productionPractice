@@ -5,15 +5,13 @@ PossibleProcessingComboBoxFrame::PossibleProcessingComboBoxFrame(MainWindow *par
     this->setObjectName("Possible processing Frame");
 
     possibleProcessingComboBox = new QComboBox();
-
-    //  TODO:   сделать подгрузку из JSON
-    possibleProcessingComboBox->addItem("Дублирование информации", "double");
-    possibleProcessingComboBox->addItem("Утроение информации", "triple");
+    possibleProcessingComboBox->setEnabled(false);
 
     dataLabel = new QLabel();
 
     updateProcessingPushButton = new QPushButton("Редактировать");
     connect(updateProcessingPushButton, &QPushButton::clicked, this, &PossibleProcessingComboBoxFrame::on_updateProcessingPushButton_clicked);
+    updateProcessingPushButton->setEnabled(false);
 
     this->parentUi = parentUi;
 
@@ -35,6 +33,11 @@ void PossibleProcessingComboBoxFrame::createInterface()
     frameLayout->addWidget(dataLabel);
     frameLayout->addWidget(possibleProcessingComboBox);
     frameLayout->addWidget(updateProcessingPushButton);
+}
+
+void PossibleProcessingComboBoxFrame::enableInteface(){
+    updateProcessingPushButton->setEnabled(true);
+    possibleProcessingComboBox->setEnabled(true);
 }
 
 QMap<QString, QVariant> PossibleProcessingComboBoxFrame::getValue()

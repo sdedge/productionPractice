@@ -7,6 +7,7 @@
 ///     createInterface() - создание графического представления
 ///     getValue() - возвращает QMap из одного элемента {строка для сервера}:{данные}
 ///     setValue() - установка необходимых сообщений в графической части
+///     enableInteface() - включить интефейс
 
 #include <QFrame>   //  класс, от которого наследуемся
 #include <QObject>  //  для создания объекта
@@ -20,6 +21,7 @@ public:
     virtual void createInterface() = 0;
     virtual QMap<QString, QVariant> getValue() = 0;
     virtual void setValue(QVariant value) = 0;
+    virtual void enableInteface() = 0;
 };
 
 #endif // CARDFRAME_H

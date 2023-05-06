@@ -13,6 +13,7 @@
 ///     createInterface() - создание графического представления
 ///     getValue() - возвращает QMap из одного элемента {строка для сервера}:{данные}
 ///     setValue() - установка необходимых сообщений в графической части
+///     enableInteface() - включить интефейс
 ///     Приватные слоты:
 ///     on_updateProcessingPushButton_clicked() - открытие диалогового окна для редактирования списка обработок
 
@@ -38,6 +39,7 @@ public:
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
+    void enableInteface() override;
 
 private:
     QString consoleMessage;

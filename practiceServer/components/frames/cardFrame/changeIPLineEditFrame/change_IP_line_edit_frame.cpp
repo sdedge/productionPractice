@@ -10,6 +10,7 @@ ChangeIPLineEditFrame::ChangeIPLineEditFrame(MainWindow *parentUi)
     changeIPLineEdit = new QLineEdit;
     changeIPLineEdit->setPlaceholderText("000.000.000.000");
     changeIPLineEdit->setMaximumWidth(95);
+    changeIPLineEdit->setEnabled(false);
 
     dataLabel = new QLabel;
 
@@ -27,6 +28,10 @@ void ChangeIPLineEditFrame::createInterface()
 
     frameLayout->addWidget(dataLabel);
     frameLayout->addWidget(changeIPLineEdit);
+}
+
+void ChangeIPLineEditFrame::enableInteface(){
+    changeIPLineEdit->setEnabled(true);
 }
 
 QMap<QString, QVariant> ChangeIPLineEditFrame::getValue()
