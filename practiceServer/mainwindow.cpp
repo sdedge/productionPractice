@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
     connect(this, &MainWindow::signalSetJSONSettingFilePath, server, &Server::slotSetJSONSettingFilePath);  //  связка для установки пути к JSON файлу настроек
-    //    connect(server, &Server::signalAddTreatmentToPossibleTreatmentsComboBox, this, &MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox);  //  связка для добавления нового вида обработки в PossibleTreatmentsComboBox
+    connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
@@ -289,7 +289,11 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
 
     QFile fileJSONSetting;
     fileJSONSetting.setFileName(fileName);
-    fileJSONSetting.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    if(!fileJSONSetting.open(QIODevice::ReadOnly | QIODevice::Text)){
+        ui->infoAboutServerTextEdit->append("<font color = red><\\font>Не удалось открыть файл списка обработок!<font color = black><\\font>");
+        return;
+    }
     QString val = fileJSONSetting.readAll();
     fileJSONSetting.close();
 
@@ -312,6 +316,8 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
     }
 
     ui->infoAboutServerTextEdit->append("<hr/>Список обновлен");
+
+    emit signalUpdatePossibleProcessing(valueObject);
 
     qDebug() << "MainWindow::updateUiComboBoxSlot:  ======";
     qDebug() << "MainWindow::updateUiComboBoxSlot:  Настройки установлены";

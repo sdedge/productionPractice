@@ -101,6 +101,7 @@ signals:
     void signalDisconnectSocket(int socketDiscriptor);  //  сигнал для принудительного удаления сокета
     void signalSetJSONSettingFilePath(QString); //  сигнал для установки пути к JSON файлу настроек
     void signalSaveSettings();
+    void signalUpdatePossibleProcessing(QVariant newPossibleProcessingData);
 };
 
 #endif // MAINWINDOW_H
