@@ -54,7 +54,7 @@ private:
 
     I_CardFrame *m_selectWorkspaceFrame;
     I_CardFrame *m_possibleProcessingFrame;
-    I_CardFrame *m_changeIPLineEditFrame;
+    I_CardFrame *m_changePortLineEditFrame;
     I_CardFrame *m_maxConnectionSpinBoxFrame;
 
     JsonPacker m_jsonPacker;

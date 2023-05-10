@@ -6,7 +6,7 @@
 
 #include "components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h"
 #include "components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h"
-#include "components/frames/cardFrame/changeIPLineEditFrame/change_IP_line_edit_frame.h"
+#include "components/frames/cardFrame/changePortLineEditFrame/change_port_line_edit_frame.h"
 #include "components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -51,17 +51,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
     m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame(this);
-    m_changeIPLineEditFrame = new ChangeIPLineEditFrame(this);
+    m_changePortLineEditFrame = new ChangePortLineEditFrame(this);
     m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame(this);
 
     m_selectWorkspaceFrame->createInterface();
     m_possibleProcessingFrame->createInterface();
-    m_changeIPLineEditFrame->createInterface();
+    m_changePortLineEditFrame->createInterface();
     m_maxConnectionSpinBoxFrame->createInterface();
 
     settingsContainer->addWidget(m_selectWorkspaceFrame);
     settingsContainer->addWidget(m_possibleProcessingFrame);
-    settingsContainer->addWidget(m_changeIPLineEditFrame);
+    settingsContainer->addWidget(m_changePortLineEditFrame);
     settingsContainer->addWidget(m_maxConnectionSpinBoxFrame);
 
     ui->settingsFrame->setLayout(settingsContainer);

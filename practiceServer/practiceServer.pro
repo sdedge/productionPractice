@@ -16,10 +16,15 @@ SOURCES += \
     components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.cpp \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.cpp \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.cpp \
-    components/frames/cardFrame/changeIPLineEditFrame/change_IP_line_edit_frame.cpp \
+    components/frames/cardFrame/changePortLineEditFrame/change_port_line_edit_frame.cpp \
     helperClasses/jsonPacker/json_packer.cpp \
     helperClasses/jsonParser/json_parser.cpp \
     helperClasses/managers/processingManager/processing_manager.cpp \
+    helperClasses/managers/readyReadManager/ready_read_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsMessageManager/clients_message_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsProcessingManager/clients_processing_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/fileManager/file_manager.cpp \
     helperClasses/managers/workspaceManager/settingsManager/settings_manager.cpp \
     helperClasses/managers/workspaceManager/workspace_manager.cpp \
     main.cpp \
@@ -33,10 +38,15 @@ HEADERS += \
     components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h \
-    components/frames/cardFrame/changeIPLineEditFrame/change_IP_line_edit_frame.h \
+    components/frames/cardFrame/changePortLineEditFrame/change_port_line_edit_frame.h \
     helperClasses/jsonPacker/json_packer.h \
     helperClasses/jsonParser/json_parser.h \
     helperClasses/managers/processingManager/processing_manager.h \
+    helperClasses/managers/readyReadManager/ready_read_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsMessageManager/clients_message_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsProcessingManager/clients_processing_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/fileManager/file_manager.h \
     helperClasses/managers/workspaceManager/settingsManager/settings_manager.h \
     helperClasses/managers/workspaceManager/workspace_manager.h \
     mainwindow.h \
