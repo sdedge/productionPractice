@@ -22,11 +22,11 @@
 #include <QLineEdit>            //  поле ввода текста
 #include <QLabel>               //  метка для подсказки
 
-class ChangeIPLineEditFrame : public I_CardFrame
+class ChangePortLineEditFrame : public I_CardFrame
 {
     Q_OBJECT
 public:
-    ChangeIPLineEditFrame(MainWindow *parentUi);
+    ChangePortLineEditFrame(MainWindow *parentUi);
 
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
@@ -35,7 +35,7 @@ public:
 
 private:
     QString consoleMessage;
-    QLineEdit *changeIPLineEdit;
+    QLineEdit *changePortLineEdit;
     QLabel *dataLabel;
     MainWindow *parentUi; 
 };
