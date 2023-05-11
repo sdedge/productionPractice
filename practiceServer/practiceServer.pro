@@ -25,6 +25,7 @@ SOURCES += \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsMessageManager/clients_message_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsProcessingManager/clients_processing_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/fileManager/file_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
     helperClasses/managers/workspaceManager/settingsManager/settings_manager.cpp \
     helperClasses/managers/workspaceManager/workspace_manager.cpp \
     main.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsMessageManager/clients_message_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsProcessingManager/clients_processing_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/fileManager/file_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
     helperClasses/managers/workspaceManager/settingsManager/settings_manager.h \
     helperClasses/managers/workspaceManager/workspace_manager.h \
     mainwindow.h \
