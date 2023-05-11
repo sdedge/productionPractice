@@ -21,24 +21,24 @@
 #include <QRandomGenerator>     //  генератор случайных чисел
 ///  ========================
 ///
-///  ========================   свои классы
+///  ========================   классы проекта
 #include "helperClasses/managers/processingManager/processing_manager.h"    //  класс для распределения файлов на обработчиков
-
-
+#include "helperClasses/managers/readyReadManager/ready_read_manager.h"     //  класс для работы слота ReadyRead
+#include "helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h"    //  класс для работы с обработчиками сообщений
 
 class Server : public QTcpServer{   //  создание класса сервера, унаследованного от QTcpServer'a
     Q_OBJECT
 public:
     Server(bool &server_started);
     QTcpSocket *socket;
-    int generatedServerPort = QRandomGenerator::global()->bounded(1, 65535);    //  автоматически генерируем порт
+    int generatedServerPort = QRandomGenerator::global()->bounded(1024, 65535);    //  автоматически генерируем порт
 
 private:
     QMap<QTcpSocket*, QString> mapSockets;  //  структура из сокета-ключа и возможной обработки-значения
     QByteArray Data;    //  то, что будет путешествовать между клиентом и сервером
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
-    QMap<QString,QString> possibleTreatments;   //  определяем возможные обработки с приставкой и её человеческим описанием
+    QMap<QString, QVariant> possibleProcessing;   //  определяем возможные обработки с приставкой и её человеческим описанием
 
     qint64 nextBlockSize;   //  блок нового сообщения
 
@@ -59,8 +59,9 @@ private:
     QFileSystemWatcher *fileSystemWatcher;
 
     ProcessingManager *processingManager;
+    ReadyReadManager *readyReadManager;
 
-    void SendPossibleTreatments(QTcpSocket* socket);  //  функция передачи возможных обработок
+    void SendPossibleProcessing(QTcpSocket* socket, QMap<QString, QVariant> possibleProcessingData);  //  функция передачи возможных обработок
 
     void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
     void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
@@ -77,12 +78,12 @@ public slots:
     void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
     void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
     void slotSetJSONSettingFilePath(QString JSONSettingsFilePath);   //  обработчик установки пути к JSON файлу настроек
+    void slotUpdatePossibleProcessing(QVariant newPossibleProcessingData);
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
     void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
     void signalDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);  //  слот для удаления сокета из clientsListWidget при его отключении
-    void signalAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd); 
 //    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };
 
