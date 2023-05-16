@@ -68,7 +68,7 @@ private:
 
 private slots:
     void workspaceFileChanged(const QString &fileName);
-    void workspaceDirectoryChanged(const QString &fileName);
+    void workspaceDirectoryChanged(const QString &fodlerName);
 };
 
 #endif // WORKSPACEMANAGER_H
