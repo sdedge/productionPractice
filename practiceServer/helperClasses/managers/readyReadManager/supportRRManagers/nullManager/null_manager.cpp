@@ -5,7 +5,17 @@ NullManager::NullManager()
 
 }
 
-void NullManager::processData(QDataStream &in)
+void NullManager::readDataFromStream(QDataStream &inStream)
+{
+
+}
+
+void NullManager::writeDataToStream(QDataStream &outStream)
+{
+
+}
+
+void NullManager::processData(QDataStream &inStream, QTcpSocket *socket)
 {
     return;
 }

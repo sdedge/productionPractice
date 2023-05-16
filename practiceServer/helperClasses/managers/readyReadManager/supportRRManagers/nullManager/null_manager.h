@@ -5,6 +5,8 @@
 ///     обозначает отсутствие обработчика сообщений (заглушку)
 ///     Переменные:
 ///     Методы:
+///     readDataFromStream() - чтение данных с потока
+///     writeDataFromStream() - запись данных в поток
 ///     processData() - обрабатывает приходящие данные
 ///     typeOfMessage() - возвращает строку тип менеджера
 
@@ -16,7 +18,9 @@ class NullManager : public I_MessageManager
     Q_OBJECT
 public:
     NullManager();
-    void processData(QDataStream &in) override;
+    void readDataFromStream(QDataStream &inStream) override;
+    void writeDataToStream(QDataStream &outStream) override;
+    void processData(QDataStream &inStream, QTcpSocket *socket) override;
     QString typeOfMessage() override;
 };
 
