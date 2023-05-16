@@ -5,6 +5,8 @@
 ///     обрабатывает всё необходимое, что связанное с обработками
 ///     Переменные:
 ///     Методы:
+///     readDataFromStream() - чтение данных с потока
+///     writeDataFromStream() - запись данных в поток
 ///     processData() - обрабатывает приходящие данные
 ///     typeOfMessage() - возвращает строку тип менеджера
 
@@ -16,8 +18,13 @@ class ClientsProcessingManager : public I_MessageManager
     Q_OBJECT
 public:
     ClientsProcessingManager();
-    void processData(QDataStream &in) override;
+    void readDataFromStream(QDataStream &inStream) override;
+    void writeDataToStream(QDataStream &outStream) override;
+    void processData(QDataStream &inStream, QTcpSocket *socket) override;
     QString typeOfMessage() override;
+signals:
+    void signalStatusRRManager(QString status);
+    void signalSendToAllClientsRRManager(QString typeOfMsg, QString str);
 };
 
 #endif // CLIENTSPROCESSINGMANAGER_H

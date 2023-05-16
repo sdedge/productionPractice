@@ -5,7 +5,17 @@ ClientsProcessingManager::ClientsProcessingManager()
 
 }
 
-void ClientsProcessingManager::processData(QDataStream &in)
+void ClientsProcessingManager::readDataFromStream(QDataStream &inStream)
+{
+
+}
+
+void ClientsProcessingManager::writeDataToStream(QDataStream &outStream)
+{
+
+}
+
+void ClientsProcessingManager::processData(QDataStream &inStream, QTcpSocket *socket)
 {
 
 }
