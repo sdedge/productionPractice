@@ -22,9 +22,10 @@ SOURCES += \
     helperClasses/managers/processingManager/processing_manager.cpp \
     helperClasses/managers/readyReadManager/ready_read_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsRequestPartProcessingFile/clients_request_part_processing_file.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsMessageManager/clients_message_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsProcessingManager/clients_processing_manager.cpp \
-    helperClasses/managers/readyReadManager/supportRRManagers/fileManager/file_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsFileManager/clients_file_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
     helperClasses/managers/workspaceManager/settingsManager/settings_manager.cpp \
     helperClasses/managers/workspaceManager/workspace_manager.cpp \
@@ -45,9 +46,10 @@ HEADERS += \
     helperClasses/managers/processingManager/processing_manager.h \
     helperClasses/managers/readyReadManager/ready_read_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsRequestPartProcessingFile/clients_request_part_processing_file.h \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsMessageManager/clients_message_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsProcessingManager/clients_processing_manager.h \
-    helperClasses/managers/readyReadManager/supportRRManagers/fileManager/file_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientsFileManager/clients_file_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
     helperClasses/managers/workspaceManager/settingsManager/settings_manager.h \
     helperClasses/managers/workspaceManager/workspace_manager.h \
