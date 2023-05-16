@@ -26,6 +26,9 @@ Server::Server(bool &server_started){
     mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
 
     readyReadManager = new ReadyReadManager();
+    connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerServer, this, &Server::slotStatusServer);
+    connect(readyReadManager, &ReadyReadManager::signalSendToAllClientsServer, this, &Server::slotSendToAllClients);
+    connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Server::slotSendToOneClient);
 }
 
 void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока неработающий обработчик новой директории
@@ -33,6 +36,8 @@ void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока нера
     this->workspaceFolder = newFolderPath;  //  установили новую директорию
 
     entryFolder = workspaceFolder+"/Data/Entry";    //  папка для файлов извне
+    readyReadManager->setEntryFolder(entryFolder);
+
     storageFolder = workspaceFolder+"/Data/Storage";    //  папка для хранения конечных файлов
     expectationFolder = workspaceFolder+"/Data/Expectation";    //  папка для файлов в состоянии ожидания
 
@@ -121,16 +126,16 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     mapSockets[socket] = "";    //  клиент пока не показал, что он умеет делать
     Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
     Server::signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
-    SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor)+delimiter);
+    SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor));
     qDebug() << "Server::incomingConnection:        new client on " << socketDescriptor;
     qDebug() << "Server::incomingConnection:        push quantity of clients: "+QString::number(mapSockets.size());
 }
 
 void Server::slotReadyRead(){
     socket = (QTcpSocket*)sender(); //  записываем именно тот сокет, с которого пришел запрос
-    QDataStream *in = new QDataStream(); //  создание объекта "in", помогающий работать с данными в сокете
-    in->setVersion(QDataStream::Qt_6_2); //  установка версии, чтобы не было ошибок
-    if(in->status() != QDataStream::Ok){ //  если у нас нет ошибок в состоянии работы in
+    QDataStream in(socket); //  создание объекта "in", помогающий работать с данными в сокете
+    in.setVersion(QDataStream::Qt_6_2); //  установка версии, чтобы не было ошибок
+    if(in.status() != QDataStream::Ok){ //  если у нас нет ошибок в состоянии работы in
         emit signalStatusServer("Ошибка чтения потока данных!");    //  при ошибке чтения сообщения
         return;
     }
@@ -143,7 +148,7 @@ void Server::slotReadyRead(){
                 qDebug() << "Server::slotReadyRead:     Data < 8, break";
                 break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
             }
-            *in >> nextBlockSize;    //  считываем размер блока в правильном исходе
+            in >> nextBlockSize;    //  считываем размер блока в правильном исходе
             qDebug() << "Server::slotReadyRead:     nextBlockSize: " << nextBlockSize;
             qDebug() << "Server::slotReadyRead:     размер данных:  " << nextBlockSize - 26;
         }
@@ -154,18 +159,19 @@ void Server::slotReadyRead(){
         //  надо же, мы до сих пор в цикле, все хорошо
 
         QString typeOfMess;
-        *in >> typeOfMess;   //  считываем тип сообщения
+        in >> typeOfMess;   //  считываем тип сообщения
 
         qDebug() << "Server::slotReadyRead:     остаток после чтения с in: " << socket->bytesAvailable();
-        qDebug() << "Тип сообщения:     " << typeOfMess;
+        qDebug() << "Server::slotReadyRead:     Тип сообщения:     " << typeOfMess;
         I_MessageManager *messageManager = readyReadManager->identifyMessage(typeOfMess);
 
         if(messageManager->typeOfMessage() == "No type"){
             emit signalStatusServer("Была произведена попытка отправки сообщения неизвестного типа!");
+            nextBlockSize = 0;
             return;
         }
 
-        messageManager->processData(*in);
+        messageManager->processData(in, socket);
 
 //        if(typeOfMess == "Message"){     //  если тип данных "Message"
 //            QString str;    //  создаем переменную строки
@@ -320,7 +326,7 @@ void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправ�
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << typeOfMsg << str;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
+    out << quint64(0) << typeOfMsg << str+delimiter;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
 
@@ -409,5 +415,20 @@ void Server::SendPartOfFile()
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
     socket->write(Data);
     qDebug() << "Server::SendPartOfFile:        Data size = " << Data.size();
+}
+
+void Server::slotStatusServer(QString status)
+{
+    emit signalStatusServer(status);
+}
+
+void Server::slotSendToAllClients(QString typeOfMsg, QString str)
+{
+    SendToAllClients(typeOfMsg, str);
+}
+
+void Server::slotSendToOneClient(QTcpSocket *sendSocket, QString typeOfMsg, QString str)
+{
+    SendToOneClient(sendSocket, typeOfMsg, str);
 }
 
