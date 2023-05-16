@@ -69,6 +69,11 @@ private:
     void SendFileToClient(QString filePath);    //  функция отправки файл (начало)
     void SendPartOfFile();      //  функция отправки части файла (продолжение)
 
+private slots:
+    void slotStatusServer(QString status);
+    void slotSendToAllClients(QString typeOfMsg, QString str);
+    void slotSendToOneClient(QTcpSocket* sendSocket, QString typeOfMsg, QString str);
+
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
@@ -84,7 +89,7 @@ signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
     void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
     void signalDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);  //  слот для удаления сокета из clientsListWidget при его отключении
-//    void signalChatServer(QString);     //  слот для обработки чата сервераы
+    //    void signalChatServer(QString);     //  слот для обработки чата сервераы
 };
 
 #endif // SERVER_H
