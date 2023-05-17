@@ -40,9 +40,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
-//    ui->possibleTreatmetsComboBox->addItem("Дублирование информации");
-//    ui->possibleTreatmetsComboBox->addItem("Утроение информации");
-
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
     workspaceManager = new WorkspaceManager();
