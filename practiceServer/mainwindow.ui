@@ -58,6 +58,22 @@
        <attribute name="title">
         <string>File manager</string>
        </attribute>
+       <widget class="QFrame" name="frame">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>60</y>
+          <width>811</width>
+          <height>371</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="consoleTab">
        <attribute name="title">
