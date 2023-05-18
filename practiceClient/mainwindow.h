@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QObject>
 #include <QTcpSocket>   //  класс сервера
 
 /// =========================   Для работы с файлами
@@ -19,7 +20,12 @@
 /// =========================   Разные дополнения
 #include <QTime>    //  для отображения времени отправки
 #include <QMap>     //  определение глоссария для приходящих данных сокета
+#include <QVBoxLayout>
 /// =========================
+///
+/// =========================   Классы проекта
+#include "client.h"             //  класс клиента
+#include "components/frames/cardFrame/I_cardframe.h"    //  интерфейс виджета-карточки
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,21 +39,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void on_connectToServerPushButton_clicked();    //  нажатие на кнопку "Connect to server"
+    void setEnableInteface();
 
-    void on_sendMsgPushButton_clicked();   //  нажатие на кнопку "Send"
-
-    void on_lineEdit_returnPressed();   //  событие нажатия клавиши Enter
-
-    void on_openFilePushButton_clicked();   //  нажатие на кнопку "Or open file"
-
-    void on_sendFilePushButton_clicked();   //  нажатие на кнопку "Send file"
-
-    void on_chooseTreatmentPushButton_clicked();    //  нажатие на кнопку выбора типа обработки
+signals:
+    void signalSendTextToServer(QString message, QString senderName);
 
 private:
     Ui::MainWindow *ui;
+    Client *client;
     QTcpSocket *socket; //  сокет соединения
     QByteArray Data;    //  передаваемые файлы
 
@@ -70,14 +69,28 @@ private:
     void SendPartOfFile();  //  метод отправки части файла
     void SendToServer(QString typeOfMsg, QString str);  //  отправка служебных сообщений серверу
 
-    void BlockingInterface();   //  функция блокировки интерфейса, пока снова не подключимся к хосту
+    void setEnabledInterface(bool flag);   //  функция блокировки интерфейса, пока снова не подключимся к хосту
 
     qint64 nextBlockSize;  //  переменная для хранения размера блока текста
 
     QFileSystemWatcher *fileSystemWatcher;
 
-public slots:
-    void slotReadyRead();   //  слот готовности к чтению сообщений
-    void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
+    QVBoxLayout *mainContainer = new QVBoxLayout();
+    QVBoxLayout *settingsContainer = new QVBoxLayout();
+    I_CardFrame *connectFrame;
+    I_CardFrame *possibleProcessingFrame;
+    I_CardFrame *chatFrame;
+    I_CardFrame *fileFrame;
+    I_CardFrame *selectWorkspaceFrame;
+    I_CardFrame *selectProcessorFrame;
+
+private slots:
+    void slotStatusClient(QString status);
+    void slotMessageTextBrowser(QString message);
+    void slotSetCBDataForm(QMap<QString,QVariant> possibleProcessingData);
+
+//public slots:
+//    void slotReadyRead();   //  слот готовности к чтению сообщений
+//    void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
 };
 #endif // MAINWINDOW_H
