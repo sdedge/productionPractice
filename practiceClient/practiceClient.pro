@@ -9,10 +9,36 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    client.cpp \
+    components/frames/cardFrame/I_cardframe.cpp \
+    components/frames/cardFrame/mainTabFrames/chatFrame/chat_frame.cpp \
+    components/frames/cardFrame/mainTabFrames/connectFrame/connect_frame.cpp \
+    components/frames/cardFrame/mainTabFrames/fileFrame/file_frame.cpp \
+    components/frames/cardFrame/mainTabFrames/possibleProcessingFrame/possible_processing_frame.cpp \
+    components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.cpp \
+    components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.cpp \
+    helperClasses/managers/readyReadManager/ready_read_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    client.h \
+    components/frames/cardFrame/I_cardframe.h \
+    components/frames/cardFrame/mainTabFrames/chatFrame/chat_frame.h \
+    components/frames/cardFrame/mainTabFrames/connectFrame/connect_frame.h \
+    components/frames/cardFrame/mainTabFrames/fileFrame/file_frame.h \
+    components/frames/cardFrame/mainTabFrames/possibleProcessingFrame/possible_processing_frame.h \
+    components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.h \
+    components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.h \
+    helperClasses/managers/readyReadManager/ready_read_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.h \
     mainwindow.h
 
 FORMS += \
