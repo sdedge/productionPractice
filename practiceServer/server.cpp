@@ -22,7 +22,7 @@ Server::Server(bool &server_started){
     mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
     mapRequest["103"] = "Request part of processing file";  //  запрос на еще одну часть обрабатываемого файла
     mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
-    mapRequest["004"] = "Possible treatments ComboBox data";    //  отправка данных по доступным обработкам
+    mapRequest["004"] = "Possible processing ComboBox data";    //  отправка данных по доступным обработкам
     mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
 
     readyReadManager = new ReadyReadManager();
@@ -93,13 +93,6 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
             break;
         }
     }
-}
-
-void Server::slotSetJSONSettingFilePath(QString JSONSettingsFilePath)   //  принимаем путь
-{
-    this->JSONSettingFilePath = JSONSettingsFilePath;   //   и устанавливаем его
-
-    qDebug() << "Server::slotSetJSONSettingFilePath:        " << this->JSONSettingFilePath;
 }
 
 void Server::slotUpdatePossibleProcessing(QVariant newPossibleProcessingData)
@@ -315,8 +308,8 @@ void Server::slotDisconnect()
     QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
     mapSockets.remove(disconnectedSocket);
     qDebug() << "Server::slotDisconnect:        pop quantity of clients: "+QString::number(mapSockets.size());
-    SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
-    Server::signalStatusServer("<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected \n"+delimiter);
+    SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected <hr/>");
+    Server::signalStatusServer("<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected <hr/>");
     Server::signalDeleteSocketFromListWidget(mapSockets);
     disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
 }
@@ -424,6 +417,7 @@ void Server::slotStatusServer(QString status)
 
 void Server::slotSendToAllClients(QString typeOfMsg, QString str)
 {
+    qDebug() << "Server::slotSendToAllClients:      typeOfMsg: " << typeOfMsg << "  str: "<< str;
     SendToAllClients(typeOfMsg, str);
 }
 
