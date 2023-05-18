@@ -1,36 +1,39 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-
 ///  ========================    классы для работы сервера
-#include <QTcpServer>
-#include <QTcpSocket>
+#include <QTcpServer>           //  Работа с сервером
+#include <QTcpSocket>           //  работа с сокетами
 ///  ========================
 ///
 ///  ========================   классы для работы с файлаи
-#include <QFileDialog>
-#include <QFile>
-#include <QDir>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonValue>
-#include <QJsonParseError>
+#include <QFileDialog>          //  вызов диалогового окна для файлов
+#include <QFile>                //  работа с файлами
+#include <QDir>                 //  работа с директориями
+///  ========================
+///
+///  ========================   классы для работы с json
+#include <QJsonObject>          //  работа с json объектами
+#include <QJsonArray>           //  работа с json массивами
+#include <QJsonDocument>        //  работа с json документами
+#include <QJsonValue>           //  работа с json значениями
+#include <QJsonParseError>      //  парсинг json Ошибок
 ///  ========================
 ///
 ///  ========================   классы для работы с элементами формы
-#include <QListWidgetItem>
-#include <QAbstractScrollArea>
-#include <QMessageBox>
+#include <QMainWindow>          //  работа главного окна
+#include <QListWidgetItem>      //  список виджетов
+#include <QAbstractScrollArea>  //  работа со скролящимися областями
+#include <QMessageBox>          //  работа со всплывающими окнами
+#include <QFileSystemModel>     //  модель файловой системы
+#include <QTreeView>            //  отображение в виде дерева
 ///  ========================
 ///
 ///  ========================   свои классы
-#include "components/frames/cardFrame/I_cardframe.h"
-#include "helperClasses/jsonPacker/json_packer.h"
-#include "helperClasses/managers/workspaceManager/workspace_manager.h"
-
-#include "server.h"
+#include "components/frames/cardFrame/I_cardframe.h"    //  интерфейс работы с карточками настройки
+#include "helperClasses/jsonPacker/json_packer.h"       //  упаковщик карточки в json вариант
+#include "helperClasses/managers/workspaceManager/workspace_manager.h"  //  менеджер рабочего пространства
+#include "server.h" //  работа с сервером
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -99,7 +102,6 @@ signals:
 //    void signalNewSaveDir(QString);   //  сигнал для обработки директории сохранения
     void signalSocketDisplayed(QTcpSocket* displayedSocket);   //  сигнал для обработки уже отобразившихся сокетов
     void signalDisconnectSocket(int socketDiscriptor);  //  сигнал для принудительного удаления сокета
-    void signalSetJSONSettingFilePath(QString); //  сигнал для установки пути к JSON файлу настроек
     void signalSaveSettings();
     void signalUpdatePossibleProcessing(QVariant newPossibleProcessingData);
 };

@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::signalNewWorkspaceFolder, server, &Server::slotNewWorkspaceFolder);  //  связка для отображения новой директории
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
-    connect(this, &MainWindow::signalSetJSONSettingFilePath, server, &Server::slotSetJSONSettingFilePath);  //  связка для установки пути к JSON файлу настроек
     connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
