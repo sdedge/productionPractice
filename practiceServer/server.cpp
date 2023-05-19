@@ -105,8 +105,12 @@ void Server::slotUpdatePossibleProcessing(QVariant newPossibleProcessingData)
         i.next();
         this->possibleProcessing.insert(i.key(), i.value());
     }
-//    SendPossibleProcessing(displayedSocket, possibleProcessing);
-    emit signalStatusServer("Список обработок ПОКА НЕ отправлен всем клиентам!");
+
+    for(auto it = mapSockets.begin(); it != mapSockets.end(); it++){
+        SendPossibleProcessing(it.key(), possibleProcessing);
+    }
+
+    emit signalStatusServer("Список обработок отправлен всем клиентам!");
     qDebug() << "Server::slotUpdatePossibleProcessing:      " << this->possibleProcessing;
 }
 
