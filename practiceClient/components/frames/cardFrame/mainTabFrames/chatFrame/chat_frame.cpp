@@ -18,6 +18,8 @@ ChatFrame::ChatFrame(MainWindow *ui)
     messageLineEdit->setObjectName("messageLineEdit");
     messageLineEdit->setPlaceholderText("Введите сообщение: ");
     messageLineEdit->setEnabled(false);
+    //  поскольку нужен один и тот же функционал, разные сигналы подключаются к одному слоту
+    connect(messageLineEdit, &QLineEdit::returnPressed, this, &ChatFrame::slotSendMessagePushButton);
 
     sendMessagePushButton = new QPushButton("Отправить сообщение");
     sendMessagePushButton->setObjectName("sendMessagePushButton");
@@ -61,6 +63,8 @@ void ChatFrame::switchEnabledInteface()
 
 void ChatFrame::slotSendMessagePushButton()
 {
-    emit parentUi->signalSendTextToServer("MESS:"+messageLineEdit->text(), callMeLineEdit->text());
+    QString text = "MESS:"+messageLineEdit->text();
+    QString senderName = callMeLineEdit->text();
+    emit parentUi->signalSendTextToServer(text, senderName);
     messageLineEdit->clear();
 }
