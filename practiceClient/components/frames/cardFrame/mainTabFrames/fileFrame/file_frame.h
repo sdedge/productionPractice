@@ -8,6 +8,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFileSystemModel>
+#include <QCompleter>
 
 class FileFrame : public I_CardFrame
 {
@@ -26,6 +28,12 @@ private:
     QPushButton *openFilePushButton;
     QPushButton *sendFilePushButton;
     MainWindow *parentUi;
+    QCompleter *completer;
+    QFileSystemModel *fileSystemModel;
+
+private slots:
+    void sendFilePushButtonClicked();
+    void openFilePushButtonClicked();
 };
 
 #endif // FILEFRAME_H
