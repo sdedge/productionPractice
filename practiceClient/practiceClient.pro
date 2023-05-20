@@ -19,6 +19,8 @@ SOURCES += \
     components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.cpp \
     helperClasses/managers/readyReadManager/ready_read_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.cpp \
@@ -36,6 +38,8 @@ HEADERS += \
     components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.h \
     helperClasses/managers/readyReadManager/ready_read_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.h \
