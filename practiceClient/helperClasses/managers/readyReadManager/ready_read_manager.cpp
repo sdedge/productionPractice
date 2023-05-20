@@ -8,14 +8,20 @@ ReadyReadManager::ReadyReadManager()
     possibleProcessingManager = new PossibleProcessingManager();
     connect(possibleProcessingManager, &PossibleProcessingManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
     connect(possibleProcessingManager, &PossibleProcessingManager::signalSetCBDataRRManager, this, &ReadyReadManager::slotSetCBDataRRManager);
-//    clientsFileManager = new ClientsFileManager();
-//    connect(clientsFileManager, &ClientsFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
-//    connect(clientsFileManager, &ClientsFileManager::signalSendToOneRRManager, this, &ReadyReadManager::slotSendToOneRRManager);
+
+    clientFileRequestPartManager = new ClientFileRequestPartManager();
+    connect(clientFileRequestPartManager, &ClientFileRequestPartManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(clientFileRequestPartManager, &ClientFileRequestPartManager::signalSendBufferRRManager, this, &ReadyReadManager::slotSendBufferRRManager);
+
+    fileDownloadedManager = new FileDownloadedManager();
+    connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(fileDownloadedManager, &FileDownloadedManager::signalClearFileData, clientFileRequestPartManager, &ClientFileRequestPartManager::slotClearFileData);
 
     nullManager = new NullManager();
     messageManagers[serverMessageManager->typeOfMessage()] = serverMessageManager;
     messageManagers[possibleProcessingManager->typeOfMessage()] = possibleProcessingManager;
-//    messageManagers[clientsFileManager->typeOfMessage()] = clientsFileManager;
+    messageManagers[clientFileRequestPartManager->typeOfMessage()] = clientFileRequestPartManager;
+    messageManagers[fileDownloadedManager->typeOfMessage()] = fileDownloadedManager;
 }
 
 I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
@@ -33,7 +39,13 @@ I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
 
 void ReadyReadManager::setEntryFolder(QString &entryFolder)
 {
-//    clientsFileManager->setEntryFolderName(entryFolder);
+    //    clientsFileManager->setEntryFolderName(entryFolder);
+}
+
+void ReadyReadManager::setFileClientFileRequest(QString &filePath)
+{
+    qDebug() << "ReadyReadManager::setFileClientFileRequest:    " << filePath;
+    clientFileRequestPartManager->setFilePath(filePath);
 }
 
 void ReadyReadManager::slotMessageRRManager(QString message)
@@ -64,4 +76,10 @@ void ReadyReadManager::slotSendToOneRRManager(QTcpSocket *socket, QString typeOf
 {
     qDebug() << "ReadyReadManager::slotSendToOneRRManager:     " << typeOfMsg << " | " << str;
     emit signalSendToAllClientsServer(typeOfMsg, str);
+}
+
+void ReadyReadManager::slotSendBufferRRManager(QByteArray &buffer)
+{
+    qDebug() << "ReadyReadManager::slotSendBufferRRManager:     buffer.size(): " << buffer.size();
+    emit signalSendBufferToServer(buffer);
 }
