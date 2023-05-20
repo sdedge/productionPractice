@@ -53,12 +53,13 @@ void ClientsFileManager::processData(QDataStream &inStream, QTcpSocket *socket)
             file->write(bytes, blockData);    //  записываем в файл
         } else {
             emit signalStatusRRManager("Не удается открыть файл "+fileName);
+            return;
         }
 
         if(file->size() < fileSize){    //  если размер до сих пор не полон
             emit signalStatusRRManager("Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-            emit signalSendToOneRRManager(socket, "Request part of file","<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем первую часть файла
+            emit signalSendToOneRRManager(socket, "Request part of file", "<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем первую часть файла
         } else {
             //  оформляем чат на стороне Сервера
             emit signalStatusRRManager("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
