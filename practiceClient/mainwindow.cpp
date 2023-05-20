@@ -33,18 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
-//    completer = new QCompleter(this);   //  создаем completer
-
-//    fModel = new QFileSystemModel();    //  создаем модель системы
-//    fModel->setRootPath(QDir::currentPath() + "\\");    //  устанавливаем разделитель
-
-//    completer->setModel(fModel);    //  completer'у устанавливаем модель
-
-//    completer->setCompletionMode(QCompleter::CompletionMode(0));    //  подсказки во всплывающем окне (2 - как выделенный текст, идущий далее)
-//    completer->setModelSorting(QCompleter::ModelSorting(2));    //  НЕ чувствительно к регистру (0 -  не сортировать, 1 - чувствительно к регистру)
-
-///    ui->filePathLineEdit->setCompleter(completer);  //  устанавливам completer
-
 //    fileSystemWatcher = new QFileSystemWatcher;
 //    fileSystemWatcher->addPath(rawInformationDirectory);    //  устанавливаем папку для слежки
 //    connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotFolderForRawInformationChanged(QString)));
@@ -104,16 +92,18 @@ void MainWindow::setEnableInteface()
     }
 
     connect(this, &MainWindow::signalSendTextToServer, client, &Client::slotSendTextToServer);
+    connect(this, &MainWindow::signalSendFileToServer, client, &Client::slotSendFileToServer);
     connect(client, &Client::signalStatusClient, this, &MainWindow::slotStatusClient);
     connect(client, &Client::signalMessageTextBrowser, this, &MainWindow::slotMessageTextBrowser);
     connect(client, &Client::signalSetCBDataForm, this, &MainWindow::slotSetCBDataForm);
+    connect(client, &Client::signalSetFilePathLabel, this, &MainWindow::slotSetFilePathLabel);
 
     chatFrame->setValue("You are online!"+delimiter);
 }
 
 void MainWindow::slotStatusClient(QString status)
 {
-    ui->consoleTextBrowser->append(status+"</hr>");
+    ui->consoleTextBrowser->append(QTime::currentTime().toString()+" | "+status+"</hr>");
 }
 
 void MainWindow::slotMessageTextBrowser(QString message)
@@ -126,22 +116,10 @@ void MainWindow::slotSetCBDataForm(QMap<QString, QVariant> possibleProcessingDat
     possibleProcessingFrame->setValue(possibleProcessingData);
 }
 
-//void MainWindow::SendTextToServer(QString str)
-//{
-//    Data.clear();   //  чистим массив байт
-//    QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
-//    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
-////    if(!ui->callMeLineEdit->text().isEmpty()){
-//        out <<  quint64(0) << QString("Message") << str << ui->callMeLineEdit->text();   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
-////    } else {
-////        out << quint64(0) << mapRequest["001"] << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка
-////    }
-//    out.device()->seek(0);  //  передвигаемся в начало
-//    out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-//    socket->write(Data);    //  записываем данные в сокет
-
-//    ui->lineEdit->clear();  //  чистим lineEdit после отправки сообщения
-//}
+void MainWindow::slotSetFilePathLabel(QString text)
+{
+    fileFrame->setValue(text);
+}
 
 //void MainWindow::SendPartOfFile()
 //{
@@ -183,55 +161,6 @@ void MainWindow::slotSetCBDataForm(QMap<QString, QVariant> possibleProcessingDat
 //    out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
 //    socket->write(Data);    //  отправляем данные на сервер
 //}
-
-//void MainWindow::setEnabledInterface(bool flag)
-//{
-//    ui->filePathLabel->clear();
-//    ui->filePathLineEdit->setEnabled(false); //  то включаем интерфейс
-//    ui->lineEdit->setEnabled(false);
-//    ui->openFilePushButton->setEnabled(false);
-//    ui->sendFilePushButton->setEnabled(false);
-//    ui->sendMsgPushButton->setEnabled(false);
-//    ui->textBrowser->setEnabled(false);
-//    ui->callMeLineEdit->setEnabled(false);
-//    ui->chooseTreatmentComboBox->setEnabled(false);
-//    ui->chooseTreatmentPushButton->setEnabled(false);
-
-//    ui->connectToServerPushButton->setEnabled(true);   //  и гасим кнопку подключения
-//}
-
-//void MainWindow::SendFileToServer(QString filePath) //  метод отправки файла серверу (его начало)
-//{
-//    Data.clear();   //  чистим массив байт от мусора
-//    file = new QFile(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
-//    fileSize = file->size();     //  определяем размер файла
-//    QFileInfo fileInfo(file->fileName());    //  без этой строки название файла будет хранить полный путь до него
-//    fileName = fileInfo.fileName();     //  записываем название файла
-//    ui->filePathLabel->setText("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
-
-//    if(fileSize < blockData){   //  если размер файла меньше выделенного блока
-//        blockData = fileSize;
-//    } else {    //  если мы еще раз отправляем какой-нибудь файл
-//        blockData = 1000000;  //  возвращаем дефолтное значение
-//    }
-//    bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
-
-//    if(file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
-//        socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
-
-//        QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-//        out.setVersion(QDataStream::Qt_6_2);
-//        out << quint64(0) << QString("File") << fileName << fileSize;   //  отправляем название файла и его размер
-//        out.device()->seek(0);
-//        //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-//        out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-//        qDebug() << "sending data size: " << Data.size() - sizeof(quint64);
-//        socket->write(Data);
-//    } else {
-//        ui->filePathLabel->setText("File not open :(");
-//    }
-//}
-
 
 //void MainWindow::slotReadyRead()
 //{
@@ -430,36 +359,6 @@ void MainWindow::slotSetCBDataForm(QMap<QString, QVariant> possibleProcessingDat
 //        ui->filePathLabel->setText("Your msg is empty!");   //  уведомляем о пустом сообщении
 //    }
 //}
-
-
-//void MainWindow::on_lineEdit_returnPressed()    //  сообщение также отправится, если нажать клавишу Enter
-//{
-//    if(!ui->lineEdit->text().isEmpty()){    //  проверка на то, НЕ пустое ли сообщение
-//        ui->filePathLabel->clear();     //  чистим от предыдущего уведомления
-//        SendTextToServer("MESS:"+ui->lineEdit->text()); //  отправляем сообщение со служебным префиксом
-//    } else {
-//        ui->filePathLabel->setText("Your msg is empty!");   //  уведомляем о пустом сообщении
-//    }
-//}
-
-
-//void MainWindow::on_openFilePushButton_clicked()    //  по нажатию на "Or open file"
-//{
-//    QString filePath;
-//    filePath = QFileDialog::getOpenFileName(this, "Выбор файла", "C:\\");   //  открываем диалоговое окно с заголовком "Выбор файла" и по умолчанию ставим путь C:/
-//    ui->filePathLineEdit->setText(filePath);   //  устанавливаем путь в LineEdit для наглядности
-//}
-
-
-//void MainWindow::on_sendFilePushButton_clicked()    //  по нажатию на кнопку "Send file"
-//{
-//    QString filePath;   //  определяем наш путь к файлу
-//    filePath = ui->filePathLineEdit->text();    //  сохраняем в переменную путь к файлу
-//    ui->filePathLineEdit->clear();  //  очищаем поле ввода пути файла после выбора нажатии отправки
-
-//    SendFileToServer(filePath); //  отправляем серверу файл
-//}
-
 
 //void MainWindow::on_chooseTreatmentPushButton_clicked() //  по нажатию на кнопку "Choose treatment"
 //{

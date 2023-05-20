@@ -42,7 +42,8 @@ public:
     void setEnableInteface();
 
 signals:
-    void signalSendTextToServer(QString message, QString senderName);
+    void signalSendTextToServer(QString &message, QString &senderName);
+    void signalSendFileToServer(QString &filePath);
 
 private:
     Ui::MainWindow *ui;
@@ -52,9 +53,6 @@ private:
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
     QMap<QString,QString> possibleTreatments;   //  определяем возможные обработки с приставкой и её человеческим описанием
-
-    QCompleter *completer;  //  автодополнение вводимого пути файла
-    QFileSystemModel *fModel;   //  файловая модель
 
     int fileSize;   //  размер файла
     QString fileName;   //  его название
@@ -88,6 +86,7 @@ private slots:
     void slotStatusClient(QString status);
     void slotMessageTextBrowser(QString message);
     void slotSetCBDataForm(QMap<QString,QVariant> possibleProcessingData);
+    void slotSetFilePathLabel(QString text);
 
 //public slots:
 //    void slotReadyRead();   //  слот готовности к чтению сообщений
