@@ -48,5 +48,5 @@ void ReadyReadManager::slotSendToAllClientsRRManager(QString typeOfMsg, QString 
 void ReadyReadManager::slotSendToOneRRManager(QTcpSocket *socket, QString typeOfMsg, QString str)
 {
     qDebug() << "ReadyReadManager::slotSendToOneRRManager:     " << typeOfMsg << " | " << str;
-    emit signalSendToAllClientsServer(typeOfMsg, str);
+    emit signalSendToOneRRManager(socket, typeOfMsg, str);
 }
