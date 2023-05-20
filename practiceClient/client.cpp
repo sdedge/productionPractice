@@ -10,11 +10,12 @@ Client::Client(){
     connect(readyReadManager, &ReadyReadManager::signalMessageRRManagerClient, this, &Client::slotMessageServer);
     connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerClient, this, &Client::slotStatusClient);
     connect(readyReadManager, &ReadyReadManager::signalSetCBData, this, &Client::slotSetCBData);
+    connect(readyReadManager, &ReadyReadManager::signalSendBufferToServer, this, &Client::slotSendBufferToServer);
 //    connect(readyReadManager, &ReadyReadManager::signalSendToAllClientsServer, this, &Client::slotSendToAllClients);
 //    connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Client::slotSendToOneClie
 }
 
-void Client::slotSendTextToServer(QString message, QString senderName)
+void Client::slotSendTextToServer(QString &message, QString &senderName)
 {
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
@@ -23,6 +24,36 @@ void Client::slotSendTextToServer(QString message, QString senderName)
     out.device()->seek(0);  //  передвигаемся в начало
     out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     this->write(Data);    //  записываем данные в сокет
+}
+
+void Client::slotSendFileToServer(QString &filePath)
+{
+    Data.clear();   //  чистим массив байт от мусора
+    file = new QFile(filePath);   //  определяем файл, чтобы поработать с его свойствами и данными
+    fileSize = file->size();     //  определяем размер файла
+    QFileInfo fileInfo(file->fileName());    //  без этой строки название файла будет хранить полный путь до него
+    fileName = fileInfo.fileName();     //  записываем название файла
+
+    emit signalSetFilePathLabel("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
+
+    if(!file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
+        emit signalSetFilePathLabel("Файл не открывается для передачи");
+        return;
+    }
+    file->close();  //  Открытие-закрытие было сделано для проверки, можем ли мы вообще отправить файл
+
+    this->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint64(0) << QString("File") << fileName << fileSize;   //  отправляем название файла и его размер
+    out.device()->seek(0);
+    //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
+    qDebug() << "Client::slotSendFileToServer:      sending data size: " << Data.size() - sizeof(quint64);
+    this->write(Data);
+
+    readyReadManager->setFileClientFileRequest(filePath);
 }
 
 void Client::slotReadyRead()
@@ -61,13 +92,6 @@ void Client::slotReadyRead()
             }
 
             messageManager->processData(in);
-
-    //            if(typeOfMessage == "Message"){ //  сервер прислал сообщение
-    //                QString str;    //  определяем переменную, в которую сохраним данные
-    //                in >> str;  //  выводим в переменную сообщение
-    //                qDebug() << str;
-    //                ui->textBrowser->append(QTime::currentTime().toString()+" | "+str);   //  выводим полученное сообщение на экран
-    //            }
 
     //            if(typeOfMessage == "File"){    //  отправляется файл
 
@@ -190,15 +214,10 @@ void Client::slotReadyRead()
     //                socket->disconnectFromHost();
     //            }
 
-    //            nextBlockSize = 0;  //  обнуляем для новых сообщений
-    //            if(socket->bytesAvailable() == 0){
-    //                break;  //  выходим, делать больше нечего
-    //            }
-    //        }   //  конец whil'a
-    //    } else {    //  если произошли проблемы с подключением
-    //        ui->textBrowser->append("Error connection");    //  уведомление клиента
-            //    }
-//        }
+                nextBlockSize = 0;  //  обнуляем для новых сообщений
+                if(this->bytesAvailable() == 0){
+                    break;  //  выходим, делать больше нечего
+                }
         }
     }
 }
@@ -216,6 +235,20 @@ void Client::slotStatusClient(QString status)
 void Client::slotSetCBData(QMap<QString, QVariant> &possibleProcessingData)
 {
     emit signalSetCBDataForm(possibleProcessingData);
+}
+
+void Client::slotSendBufferToServer(QByteArray &data)
+{
+    this->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+    Data.clear();   //  чистим массив байт
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
+    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
+    out << quint64(0) << QString("File") << data;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
+    out.device()->seek(0);  //  передвигаемся в начало
+    qDebug() << "Client::slotSendBufferToServer:    sending blockSize = " << quint64(Data.size() - sizeof(quint64));
+    out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    this->write(Data);    //  записываем данные в сокет
+    qDebug() << "Client::slotSendBufferToServer:    Data size = " << Data.size();
 }
 
 
