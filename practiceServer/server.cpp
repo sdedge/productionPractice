@@ -54,7 +54,7 @@ void Server::SendPossibleProcessing(QTcpSocket* socketForSend, QMap<QString,QVar
     Data.clear();   //  может быть мусор
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
-    out.setVersion(QDataStream::Qt_6_2);
+    out.setVersion(QDataStream::Qt_5_14);
     out << quint64(0) << mapRequest["004"] << possibleProcessingData;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
@@ -131,7 +131,7 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
 void Server::slotReadyRead(){
     socket = (QTcpSocket*)sender(); //  записываем именно тот сокет, с которого пришел запрос
     QDataStream in(socket); //  создание объекта "in", помогающий работать с данными в сокете
-    in.setVersion(QDataStream::Qt_6_2); //  установка версии, чтобы не было ошибок
+    in.setVersion(QDataStream::Qt_5_14); //  установка версии, чтобы не было ошибок
     if(in.status() != QDataStream::Ok){ //  если у нас нет ошибок в состоянии работы in
         emit signalStatusServer("Ошибка чтения потока данных!");    //  при ошибке чтения сообщения
         return;
@@ -322,7 +322,7 @@ void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправ�
     Data.clear();   //  может быть мусор
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
-    out.setVersion(QDataStream::Qt_6_2);
+    out.setVersion(QDataStream::Qt_5_14);
     out << quint64(0) << typeOfMsg << str+delimiter;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
@@ -338,7 +338,7 @@ void Server::SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str)
     Data.clear();   //  может быть мусор
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
-    out.setVersion(QDataStream::Qt_6_2);
+    out.setVersion(QDataStream::Qt_5_14);
     out << quint64(0) << typeOfMsg << str;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
@@ -371,7 +371,7 @@ void Server::SendFileToClient(QString filePath)
                 socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
 
                 QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-                out.setVersion(QDataStream::Qt_6_2);
+                out.setVersion(QDataStream::Qt_5_14);
                 out << quint64(0) << mapRequest["002"] << fileName << fileSize;   //  отправляем название файла и его размер
                 out.device()->seek(0);
                 //  избавляемся от зарезервированных двух байт в начале каждого сообщения
@@ -404,7 +404,7 @@ void Server::SendPartOfFile()
     qDebug() << "Server::SendPartOfFile:        block size" << blockData << "buffer size" << buffer.size();
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-    out.setVersion(QDataStream::Qt_6_2);
+    out.setVersion(QDataStream::Qt_5_14);
     out << quint64(0) << mapRequest["103"] << buffer;   //  отправляем байты
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения

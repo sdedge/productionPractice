@@ -1,5 +1,7 @@
 #include "select_processor_frame.h"
 
+#include <QVariant>
+
 SelectProcessorFrame::SelectProcessorFrame()
 {
     dataLabel = new QLabel("Не выбран обработчик");

@@ -1,5 +1,7 @@
 #include "possible_processing_manager.h"
 
+#include <QDataStream>
+
 PossibleProcessingManager::PossibleProcessingManager()
 {
 

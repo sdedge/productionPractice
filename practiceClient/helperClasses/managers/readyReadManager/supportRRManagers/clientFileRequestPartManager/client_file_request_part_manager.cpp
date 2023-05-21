@@ -33,10 +33,18 @@ void ClientFileRequestPartManager::processData(QDataStream &inStream)
     qDebug() << "ClientFileRequestPartManager::processData:     read: " << file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
     qDebug() << "ClientFileRequestPartManager::processData:     blockData: " << blockData;   //  нужно, чтобы видеть текущий размер блоков
 
-    buffer = buffer.fromRawData(bytes, blockData);
+    //buffer = QByteArray::fromRawData(bytes, blockData);
+    buffer.clear();
+    buffer.append(bytes, blockData);
+
     qDebug() << "ClientFileRequestPartManager::processData:     block size" << blockData << "buffer size" << buffer.size();
 
-    delete[] bytes;
+    if(bytes != nullptr)
+    {
+        delete[] bytes;
+        bytes = nullptr;
+    }
+
 
     emit signalSendBufferRRManager(buffer);
 }
@@ -66,5 +74,12 @@ void ClientFileRequestPartManager::slotClearFileData()
     fileName.clear();   //  очищаем его название
     fileSize = 0;   //  очищаем его размер
     blockData = 1000000;  //  устанавливаем прежний размер байтов
-    delete[] bytes; //  удаляем байты из кучи
+
+
+    qDebug() << (bytes == nullptr) << "my debug";
+    if(bytes != nullptr)
+    {
+        delete[] bytes;
+        bytes = nullptr;
+    } //  удаляем байты из кучи
 }

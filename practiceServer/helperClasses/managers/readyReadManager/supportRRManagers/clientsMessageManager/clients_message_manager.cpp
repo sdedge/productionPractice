@@ -1,5 +1,7 @@
 #include "clients_message_manager.h"
 
+#include <QHostAddress>
+
 ClientsMessageManager::ClientsMessageManager()
 {
 

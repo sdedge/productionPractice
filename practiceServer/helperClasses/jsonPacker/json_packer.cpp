@@ -1,5 +1,7 @@
 #include "json_packer.h"
 
+#include <QVariant>
+
 JsonPacker::JsonPacker()
 {
 

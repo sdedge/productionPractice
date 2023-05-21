@@ -1,5 +1,7 @@
 #include "client.h"
 
+#include <QDataStream>
+
 Client::Client(){
     connect(this, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
     connect(this, &QTcpSocket::disconnected, this, &QTcpSocket::deleteLater);   //  при отключении сокет сам удалится
@@ -19,7 +21,7 @@ void Client::slotSendTextToServer(QString &message, QString &senderName)
 {
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
-    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
+    out.setVersion(QDataStream::Qt_5_14);    //  устанавливаем последнюю версию
     out <<  quint64(0) << QString("Message") << message << senderName;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
     out.device()->seek(0);  //  передвигаемся в начало
     out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
@@ -45,7 +47,7 @@ void Client::slotSendFileToServer(QString &filePath)
     this->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-    out.setVersion(QDataStream::Qt_6_2);
+    out.setVersion(QDataStream::Qt_5_14);
     out << quint64(0) << QString("File") << fileName << fileSize;   //  отправляем название файла и его размер
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения
@@ -59,7 +61,7 @@ void Client::slotSendFileToServer(QString &filePath)
 void Client::slotReadyRead()
 {
     QDataStream in(this); //  создание объекта "in", помогающий работать с данными в сокете
-    in.setVersion(QDataStream::Qt_6_2);
+    in.setVersion(QDataStream::Qt_5_14);
     if(in.status()==QDataStream::Ok){
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
@@ -242,7 +244,7 @@ void Client::slotSendBufferToServer(QByteArray &data)
     this->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
     Data.clear();   //  чистим массив байт
     QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
-    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
+    out.setVersion(QDataStream::Qt_5_14);    //  устанавливаем последнюю версию
     out << quint64(0) << QString("File") << data;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
     out.device()->seek(0);  //  передвигаемся в начало
     qDebug() << "Client::slotSendBufferToServer:    sending blockSize = " << quint64(Data.size() - sizeof(quint64));

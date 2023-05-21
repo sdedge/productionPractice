@@ -1,5 +1,7 @@
 #include "select_workspace_frame.h"
 
+#include <QVariant>
+
 SelectWorkspaceFrame::SelectWorkspaceFrame()
 {
     dataLabel = new QLabel("Не выбрана рабочая папка");

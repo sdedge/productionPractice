@@ -1,5 +1,7 @@
 #include "processing_manager.h"
 
+#include <QDebug>
+
 ProcessingManager::ProcessingManager()
 {
 

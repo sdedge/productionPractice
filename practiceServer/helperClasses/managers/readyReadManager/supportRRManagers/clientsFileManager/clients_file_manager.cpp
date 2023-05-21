@@ -1,5 +1,8 @@
 #include "clients_file_manager.h"
 
+#include <QDataStream>
+#include <QHostAddress>
+
 ClientsFileManager::ClientsFileManager()
 {
 
